@@ -1,16 +1,25 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User } from '@/lib/types';
+import { User, UserType, SubscriptionTier, SubscriptionDetails } from '@/lib/types';
 import { toast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
+  register: (
+    name: string, 
+    email: string, 
+    password: string, 
+    userType: UserType,
+    subscriptionTier: SubscriptionTier,
+    organizationName?: string,
+    organizationSize?: number
+  ) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
   updateUser: (userData: Partial<User>) => void;
+  updateSubscription: (subscriptionData: Partial<SubscriptionDetails>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -58,7 +67,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         maxFailedAttempts: 5
       },
       lastLogin: null,
-      status: 'active'
+      status: 'active',
+      subscription: {
+        type: 'individual',
+        tier: 'basic',
+        startDate: Date.now(),
+        endDate: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days from now
+        autoRenew: true,
+        status: 'active'
+      }
     }
   ];
 
@@ -110,7 +127,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+  const register = async (
+    name: string, 
+    email: string, 
+    password: string, 
+    userType: UserType = 'individual',
+    subscriptionTier: SubscriptionTier = 'free',
+    organizationName?: string,
+    organizationSize?: number
+  ): Promise<boolean> => {
     setLoading(true);
     
     try {
@@ -129,6 +154,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return false;
       }
       
+      // Create subscription details
+      const subscription: SubscriptionDetails = {
+        type: userType,
+        tier: subscriptionTier,
+        startDate: Date.now(),
+        endDate: subscriptionTier === 'free' ? null : Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days for paid plans
+        autoRenew: subscriptionTier !== 'free',
+        status: 'active'
+      };
+      
       // Create new user
       const newUser: User = {
         id: `user-${Date.now()}`,
@@ -144,7 +179,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           maxFailedAttempts: 5
         },
         lastLogin: Date.now(),
-        status: 'active'
+        status: 'active',
+        subscription,
+        organizationName: userType !== 'individual' ? organizationName : undefined,
+        organizationSize: userType === 'company' ? organizationSize : undefined
       };
       
       // Save to local storage
@@ -189,8 +227,31 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setUser(updatedUser);
   };
 
+  const updateSubscription = (subscriptionData: Partial<SubscriptionDetails>) => {
+    if (!user || !user.subscription) return;
+    
+    const updatedSubscription = { ...user.subscription, ...subscriptionData };
+    const updatedUser = { ...user, subscription: updatedSubscription };
+    
+    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+    
+    toast({
+      title: "Subscription Updated",
+      description: "Your subscription details have been updated",
+    });
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading, updateUser }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      login, 
+      register, 
+      logout, 
+      loading, 
+      updateUser,
+      updateSubscription
+    }}>
       {children}
     </AuthContext.Provider>
   );

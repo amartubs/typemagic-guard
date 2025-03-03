@@ -51,6 +51,22 @@ export interface SecuritySettings {
   maxFailedAttempts: number;
 }
 
+// Subscription types
+export type UserType = 'individual' | 'company' | 'charity';
+
+export type SubscriptionTier = 'free' | 'basic' | 'professional' | 'enterprise';
+
+export interface SubscriptionDetails {
+  type: UserType;
+  tier: SubscriptionTier;
+  startDate: number;
+  endDate: number | null; // null means unlimited
+  autoRenew: boolean;
+  status: 'active' | 'cancelled' | 'expired' | 'trial';
+  paymentMethod?: string;
+  lastPayment?: number;
+}
+
 // Application user
 export interface User {
   id: string;
@@ -61,6 +77,9 @@ export interface User {
   securitySettings: SecuritySettings;
   lastLogin: number | null;
   status: 'active' | 'locked' | 'pending';
+  subscription?: SubscriptionDetails;
+  organizationName?: string; // For companies and charities
+  organizationSize?: number; // For companies (number of employees)
 }
 
 // Visualization data
@@ -69,4 +88,26 @@ export interface VisualizationData {
   keyPressHeatmap: Record<string, number>; // Key usage frequency
   rhythmPatterns: number[][]; // Inter-key timing patterns
   confidenceHistory: {timestamp: number, score: number}[];
+}
+
+// Subscription plans
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  description: string;
+  tier: SubscriptionTier;
+  userTypes: UserType[];
+  price: {
+    individual: number;
+    company: number;
+    charity: number;
+  };
+  features: string[];
+  limits: {
+    users: number;
+    biometricProfiles: number;
+    advancedAnalytics: boolean;
+    customSecuritySettings: boolean;
+    prioritySupport: boolean;
+  };
 }
