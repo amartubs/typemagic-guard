@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import KeystrokeCapture from '@/components/ui-custom/KeystrokeCapture';
-import { Shield, User as UserIcon, Bell, Fingerprint, ArrowLeft, Save, RefreshCw, AlertTriangle, Info } from 'lucide-react';
+import { Shield, User as UserIcon, Bell, Fingerprint, ArrowLeft, Save, RefreshCw, AlertTriangle, Info, HelpCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -182,6 +182,32 @@ const ProfilePage: React.FC = () => {
         return "Financial applications, admin dashboards";
       case 'very-high':
         return "Financial transfers, critical infrastructure";
+    }
+  };
+
+  const getConfidenceScoreGuidance = (score: number) => {
+    if (score < 30) {
+      return "Very low confidence. Your profile needs significant training.";
+    } else if (score < 60) {
+      return "Low confidence. Keep adding more samples to improve accuracy.";
+    } else if (score < 80) {
+      return "Moderate confidence. Your profile is developing well.";
+    } else {
+      return "High confidence. Your profile is well-established.";
+    }
+  };
+
+  const getImprovementTips = (sampleCount: number) => {
+    if (sampleCount === 0) {
+      return "Start by adding your first biometric sample.";
+    } else if (sampleCount < 3) {
+      return "Add at least 3 samples for basic functionality.";
+    } else if (sampleCount < 5) {
+      return "Add 2-3 more samples to improve accuracy.";
+    } else if (sampleCount < 10) {
+      return "Your profile is good. Adding more samples will fine-tune recognition.";
+    } else {
+      return "Excellent! Consider updating samples periodically for best results.";
     }
   };
 
@@ -436,6 +462,38 @@ const ProfilePage: React.FC = () => {
                         ? new Date(user.biometricProfile.lastUpdated).toLocaleString() 
                         : 'Never'}
                     </span>
+                  </div>
+                </div>
+                
+                <div className="bg-muted/40 p-4 rounded-md border space-y-3">
+                  <div className="flex items-start gap-2">
+                    <HelpCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-medium text-sm">Biometric Profile Guidance</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {getConfidenceScoreGuidance(user.biometricProfile?.confidenceScore || 0)}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium">Improvement Tips:</p>
+                    <p className="text-sm text-muted-foreground">
+                      {getImprovementTips(user.biometricProfile?.keystrokePatterns?.length || 0)}
+                    </p>
+                  </div>
+                  
+                  <div className="pt-2 border-t text-sm text-muted-foreground">
+                    <p className="mb-1">
+                      <span className="font-medium">How to improve your score:</span>
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1">
+                      <li>Collect at least 5 typing samples for good accuracy</li>
+                      <li>Type naturally at your normal pace when training</li>
+                      <li>Train in different sessions over multiple days</li>
+                      <li>Consider updating your samples every few months</li>
+                      <li>Use similar devices for training and authentication</li>
+                    </ul>
                   </div>
                 </div>
                 
