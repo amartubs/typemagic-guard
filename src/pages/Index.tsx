@@ -9,32 +9,38 @@ const features = [
   {
     icon: <Key className="h-6 w-6 text-primary" />,
     title: 'Keystroke Biometrics',
-    description: 'Analyzes your unique typing patterns to verify your identity'
+    description: 'Analyzes your unique typing patterns to verify your identity',
+    link: '/demo'
   },
   {
     icon: <UserCheck className="h-6 w-6 text-primary" />,
     title: 'Continuous Authentication',
-    description: 'Constantly monitors typing behavior to ensure ongoing security'
+    description: 'Constantly monitors typing behavior to ensure ongoing security',
+    link: '/profile'
   },
   {
     icon: <Lock className="h-6 w-6 text-primary" />,
     title: 'Multi-layered Security',
-    description: 'Combines passwords with behavioral biometrics for enhanced protection'
+    description: 'Combines passwords with behavioral biometrics for enhanced protection',
+    link: '/login'
   },
   {
     icon: <BarChart4 className="h-6 w-6 text-primary" />,
     title: 'Analytics & Reporting',
-    description: 'Detailed insights into security patterns and potential threats'
+    description: 'Detailed insights into security patterns and potential threats',
+    link: '/dashboard'
   },
   {
     icon: <FileCode className="h-6 w-6 text-primary" />,
     title: 'Easy Integration',
-    description: 'Seamlessly integrate with existing authentication systems'
+    description: 'Seamlessly integrate with existing authentication systems',
+    link: '/demo'
   },
   {
     icon: <Shield className="h-6 w-6 text-primary" />,
     title: 'Fraud Prevention',
-    description: 'Stops unauthorized access even with stolen credentials'
+    description: 'Stops unauthorized access even with stolen credentials',
+    link: '/dashboard'
   }
 ];
 
@@ -90,17 +96,24 @@ export default function Index() {
             <h2 className="text-3xl font-bold text-center mb-12">Key Features</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {features.map((feature, index) => (
-                <Card key={index} className="border border-muted transition-all hover:border-primary/50 hover:shadow-md">
-                  <CardHeader>
-                    <div className="mb-2">{feature.icon}</div>
-                    <CardTitle>{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-foreground/80">
-                      {feature.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
+                <Link key={index} to={feature.link} className="block">
+                  <Card className="border border-muted transition-all hover:border-primary/50 hover:shadow-md h-full hover:bg-accent/10">
+                    <CardHeader>
+                      <div className="mb-2">{feature.icon}</div>
+                      <CardTitle>{feature.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription className="text-foreground/80">
+                        {feature.description}
+                      </CardDescription>
+                    </CardContent>
+                    <CardFooter>
+                      <span className="text-sm text-primary flex items-center">
+                        Learn more <ChevronRight className="ml-1 h-4 w-4" />
+                      </span>
+                    </CardFooter>
+                  </Card>
+                </Link>
               ))}
             </div>
           </div>
