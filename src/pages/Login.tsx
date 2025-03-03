@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, KeyTiming, KeystrokePattern, AuthenticationResult } from '@/lib/types';
-import { KeystrokeCapture, BiometricAnalyzer, createBiometricProfile } from '@/lib/biometricAuth';
+import { KeystrokeCapture as KeystrokeCaptureService, BiometricAnalyzer, createBiometricProfile } from '@/lib/biometricAuth';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -90,7 +90,7 @@ const LoginPage: React.FC = () => {
     setLoading(true);
     
     // Create a pattern from captured keystrokes
-    const keystrokeService = new KeystrokeCapture('login');
+    const keystrokeService = new KeystrokeCaptureService('login');
     const pattern: KeystrokePattern = {
       userId: currentUser.id,
       patternId: `${currentUser.id}-${Date.now()}`,
