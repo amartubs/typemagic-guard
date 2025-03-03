@@ -84,6 +84,11 @@ const ProfilePage: React.FC = () => {
     };
 
     const existingPatterns = user.biometricProfile?.keystrokePatterns || [];
+    
+    // Explicitly specify the status as one of the allowed values
+    const biometricStatus: 'learning' | 'active' | 'locked' = 
+      existingPatterns.length > 2 ? 'active' : 'learning';
+    
     const updatedUser = {
       ...user,
       biometricProfile: {
@@ -91,7 +96,7 @@ const ProfilePage: React.FC = () => {
         keystrokePatterns: [...existingPatterns, newPattern],
         confidenceScore: Math.min(100, (existingPatterns.length + 1) * 10),
         lastUpdated: Date.now(),
-        status: existingPatterns.length > 2 ? 'active' : 'learning'
+        status: biometricStatus
       }
     };
 
