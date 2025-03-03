@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User } from '@/lib/types';
@@ -10,11 +9,13 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import KeystrokeCapture from '@/components/ui-custom/KeystrokeCapture';
-import { Shield, User as UserIcon, Bell, Fingerprint, ArrowLeft, Save, RefreshCw } from 'lucide-react';
+import { Shield, User as UserIcon, Bell, Fingerprint, ArrowLeft, Save, RefreshCw, AlertTriangle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
+  const { user: authUser, updateUser } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -22,26 +23,25 @@ const ProfilePage: React.FC = () => {
   const [enforceTwoFactor, setEnforceTwoFactor] = useState(false);
   const [minConfidenceThreshold, setMinConfidenceThreshold] = useState(60);
   const [isTrainingMode, setIsTrainingMode] = useState(false);
+  const [twoFactorDialogOpen, setTwoFactorDialogOpen] = useState(false);
 
   useEffect(() => {
-    // Load user from localStorage
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      setName(parsedUser.name);
-      setEmail(parsedUser.email);
-      setSecurityLevel(parsedUser.securitySettings.securityLevel);
-      setEnforceTwoFactor(parsedUser.securitySettings.enforceTwoFactor);
-      setMinConfidenceThreshold(parsedUser.securitySettings.minConfidenceThreshold);
+    if (authUser) {
+      setUser(authUser);
+      setName(authUser.name);
+      setEmail(authUser.email);
+      setSecurityLevel(authUser.securitySettings.securityLevel);
+      setEnforceTwoFactor(authUser.securitySettings.enforceTwoFactor);
+      setMinConfidenceThreshold(authUser.securitySettings.minConfidenceThreshold);
     } else {
-      // Redirect to login if no user is stored
       navigate('/login');
     }
-  }, [navigate]);
+  }, [authUser, navigate]);
 
   const handleSaveProfile = () => {
     if (!user) return;
+
+    const twoFactorChanged = enforceTwoFactor !== user.securitySettings.enforceTwoFactor;
 
     const updatedUser = {
       ...user,
@@ -55,13 +55,39 @@ const ProfilePage: React.FC = () => {
       }
     };
 
-    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    updateUser(updatedUser);
     setUser(updatedUser);
     
-    toast({
-      title: "Profile Updated",
-      description: "Your profile changes have been saved successfully.",
-    });
+    if (twoFactorChanged) {
+      if (enforceTwoFactor) {
+        toast({
+          title: "Two-Factor Authentication Enabled",
+          description: "Your account is now more secure with two-factor authentication.",
+        });
+      } else {
+        toast({
+          title: "Two-Factor Authentication Disabled",
+          description: "Two-factor authentication has been turned off for your account.",
+        });
+      }
+    } else {
+      toast({
+        title: "Profile Updated",
+        description: "Your profile changes have been saved successfully.",
+      });
+    }
+  };
+
+  const handleToggleTwoFactor = (checked: boolean) => {
+    setEnforceTwoFactor(checked);
+    
+    if (checked) {
+      toast({
+        title: "Two-Factor Authentication",
+        description: "When enabled, you'll need to verify your identity with a code sent to your email during login.",
+        duration: 5000,
+      });
+    }
   };
 
   const handleBiometricTraining = () => {
@@ -85,7 +111,6 @@ const ProfilePage: React.FC = () => {
 
     const existingPatterns = user.biometricProfile?.keystrokePatterns || [];
     
-    // Explicitly specify the status as one of the allowed values
     const biometricStatus: 'learning' | 'active' | 'locked' = 
       existingPatterns.length > 2 ? 'active' : 'learning';
     
@@ -236,15 +261,28 @@ const ProfilePage: React.FC = () => {
                   <div className="space-y-0.5">
                     <Label htmlFor="two-factor">Require Two-Factor Authentication</Label>
                     <p className="text-sm text-muted-foreground">
-                      Add an extra layer of security to your account
+                      Add an extra layer of security to your account with email verification
                     </p>
                   </div>
                   <Switch
                     id="two-factor"
                     checked={enforceTwoFactor}
-                    onCheckedChange={setEnforceTwoFactor}
+                    onCheckedChange={handleToggleTwoFactor}
                   />
                 </div>
+                
+                {enforceTwoFactor && (
+                  <div className="p-4 border border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/50 rounded-md flex gap-3">
+                    <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-amber-800 dark:text-amber-300">
+                      <p className="font-semibold">Two-Factor Authentication Info</p>
+                      <p className="mt-1">
+                        When enabled, you'll need to enter a verification code sent to your email 
+                        when logging in. For demo purposes, the code will be shown directly in the app.
+                      </p>
+                    </div>
+                  </div>
+                )}
                 
                 <div className="space-y-2">
                   <Label htmlFor="confidence-threshold">

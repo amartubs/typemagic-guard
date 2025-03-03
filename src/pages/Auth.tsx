@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { KeyTiming, SubscriptionPlan, UserType } from '@/lib/types';
@@ -12,13 +11,24 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import KeystrokeCapture from '@/components/ui-custom/KeystrokeCapture';
 import SubscriptionPlans from '@/components/subscription/SubscriptionPlans';
 import { useAuth } from '@/contexts/AuthContext';
-import { Lock, User as UserIcon, Shield, AlertCircle, Mail, Building, Users, Heart } from 'lucide-react';
+import { 
+  Lock, 
+  User as UserIcon, 
+  Shield, 
+  AlertCircle, 
+  Mail, 
+  Building, 
+  Users, 
+  Heart,
+  KeyRound,
+  RefreshCw
+} from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const AuthPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, register, user } = useAuth();
+  const { login, register, user, twoFactorRequired, verifyTwoFactorCode, sendTwoFactorCode } = useAuth();
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const [registrationStep, setRegistrationStep] = useState<'userInfo' | 'userType' | 'subscription' | 'payment'>('userInfo');
   
@@ -26,6 +36,10 @@ const AuthPage = () => {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
+  
+  // Two-factor authentication state
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [verifyingCode, setVerifyingCode] = useState(false);
   
   // Register form state
   const [registerName, setRegisterName] = useState('');
@@ -45,12 +59,19 @@ const AuthPage = () => {
 
   // Redirect if user is already logged in
   useEffect(() => {
-    if (user) {
+    if (user && !twoFactorRequired) {
       // Get the intended destination or default to dashboard
       const from = location.state?.from?.pathname || '/dashboard';
       navigate(from);
     }
-  }, [user, navigate, location]);
+  }, [user, navigate, location, twoFactorRequired]);
+
+  // Save the email temporarily for 2FA flow
+  useEffect(() => {
+    if (twoFactorRequired && loginEmail) {
+      localStorage.setItem('pendingTwoFactorEmail', loginEmail);
+    }
+  }, [twoFactorRequired, loginEmail]);
 
   const handleKeystrokeCapture = (timings: KeyTiming[]) => {
     setKeystrokeTimings(timings);
@@ -73,6 +94,27 @@ const AuthPage = () => {
     } finally {
       setLoginLoading(false);
     }
+  };
+
+  const handleTwoFactorSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setVerifyingCode(true);
+    
+    try {
+      const success = await verifyTwoFactorCode(twoFactorCode);
+      
+      if (success) {
+        // Navigate to the intended destination or dashboard
+        const from = location.state?.from?.pathname || '/dashboard';
+        navigate(from);
+      }
+    } finally {
+      setVerifyingCode(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    await sendTwoFactorCode();
   };
 
   const handleRegisterSubmit = async (e: React.FormEvent) => {
@@ -262,6 +304,66 @@ const AuthPage = () => {
               </Button>
             </div>
           </div>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show the 2FA verification screen if two-factor authentication is required
+  if (twoFactorRequired) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
+        <Card className="w-full max-w-md p-6 shadow-lg">
+          <div className="mb-6 text-center">
+            <div className="flex justify-center mb-4">
+              <Shield className="h-12 w-12 text-primary" />
+            </div>
+            <h1 className="text-2xl font-bold">Two-Factor Verification</h1>
+            <p className="text-muted-foreground mt-2">
+              Enter the verification code sent to your email
+            </p>
+          </div>
+
+          <form onSubmit={handleTwoFactorSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="verification-code">Verification Code</Label>
+              <div className="relative">
+                <KeyRound className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                <Input
+                  id="verification-code"
+                  placeholder="Enter 6-digit code"
+                  value={twoFactorCode}
+                  onChange={(e) => setTwoFactorCode(e.target.value)}
+                  className="pl-10"
+                  required
+                />
+              </div>
+            </div>
+
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={verifyingCode}
+            >
+              {verifyingCode ? 'Verifying...' : 'Verify Code'}
+            </Button>
+            
+            <Button 
+              type="button"
+              variant="outline"
+              className="w-full flex items-center justify-center gap-2"
+              onClick={handleResendCode}
+            >
+              <RefreshCw className="h-4 w-4" />
+              Resend Code
+            </Button>
+            
+            <div className="text-center text-xs text-muted-foreground mt-4">
+              <p>
+                For demo purposes, the verification code is shown in a toast notification.
+              </p>
+            </div>
+          </form>
         </Card>
       </div>
     );

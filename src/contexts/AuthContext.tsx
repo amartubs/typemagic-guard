@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, UserType, SubscriptionTier, SubscriptionDetails } from '@/lib/types';
@@ -20,6 +19,10 @@ interface AuthContextType {
   loading: boolean;
   updateUser: (userData: Partial<User>) => void;
   updateSubscription: (subscriptionData: Partial<SubscriptionDetails>) => void;
+  verifyTwoFactorCode: (code: string) => Promise<boolean>;
+  sendTwoFactorCode: () => Promise<boolean>;
+  twoFactorRequired: boolean;
+  setTwoFactorRequired: (required: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,9 +30,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [twoFactorRequired, setTwoFactorRequired] = useState(false);
+  const [tempTwoFactorCode, setTempTwoFactorCode] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Load user from localStorage on mount
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
@@ -44,7 +48,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setLoading(false);
   }, []);
 
-  // Mock user database
   const mockUsers: User[] = [
     {
       id: 'user-1',
@@ -83,20 +86,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setLoading(true);
     
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Find user by email
       const foundUser = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
       
       if (foundUser && password === 'demo') {
-        // Update last login
+        if (foundUser.securitySettings.enforceTwoFactor) {
+          setTwoFactorRequired(true);
+          const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
+          setTempTwoFactorCode(randomCode);
+          toast({
+            title: "Two-Factor Authentication Required",
+            description: `A verification code has been sent to your email. For demo purposes, the code is: ${randomCode}`,
+          });
+          return false;
+        }
+        
         const updatedUser = {
           ...foundUser,
           lastLogin: Date.now()
         };
         
-        // Save to local storage
         localStorage.setItem('currentUser', JSON.stringify(updatedUser));
         setUser(updatedUser);
         
@@ -127,6 +137,76 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const sendTwoFactorCode = async (): Promise<boolean> => {
+    try {
+      if (!tempTwoFactorCode) {
+        const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
+        setTempTwoFactorCode(randomCode);
+      }
+      
+      toast({
+        title: "Verification Code Resent",
+        description: `For demo purposes, the code is: ${tempTwoFactorCode}`,
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Error sending 2FA code:', error);
+      toast({
+        title: "Failed to Send Code",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  const verifyTwoFactorCode = async (code: string): Promise<boolean> => {
+    try {
+      if (code === tempTwoFactorCode) {
+        const storedEmail = localStorage.getItem('pendingTwoFactorEmail');
+        const foundUser = mockUsers.find(u => u.email.toLowerCase() === storedEmail?.toLowerCase());
+        
+        if (foundUser) {
+          const updatedUser = {
+            ...foundUser,
+            lastLogin: Date.now()
+          };
+          
+          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+          setUser(updatedUser);
+          
+          setTwoFactorRequired(false);
+          setTempTwoFactorCode(null);
+          localStorage.removeItem('pendingTwoFactorEmail');
+          
+          toast({
+            title: "Verification Successful",
+            description: `Welcome back, ${updatedUser.name}!`,
+          });
+          
+          return true;
+        }
+      } else {
+        toast({
+          title: "Verification Failed",
+          description: "Invalid verification code",
+          variant: "destructive",
+        });
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('2FA verification error:', error);
+      toast({
+        title: "Verification Failed",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
   const register = async (
     name: string, 
     email: string, 
@@ -139,10 +219,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setLoading(true);
     
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Check if user already exists
       const userExists = mockUsers.some(u => u.email.toLowerCase() === email.toLowerCase());
       
       if (userExists) {
@@ -154,7 +232,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return false;
       }
       
-      // Create subscription details
       const subscription: SubscriptionDetails = {
         type: userType,
         tier: subscriptionTier,
@@ -164,7 +241,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         status: 'active'
       };
       
-      // Create new user
       const newUser: User = {
         id: `user-${Date.now()}`,
         email,
@@ -185,7 +261,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         organizationSize: userType === 'company' ? organizationSize : undefined
       };
       
-      // Save to local storage
       localStorage.setItem('currentUser', JSON.stringify(newUser));
       setUser(newUser);
       
@@ -250,7 +325,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       logout, 
       loading, 
       updateUser,
-      updateSubscription
+      updateSubscription,
+      verifyTwoFactorCode,
+      sendTwoFactorCode,
+      twoFactorRequired,
+      setTwoFactorRequired
     }}>
       {children}
     </AuthContext.Provider>
