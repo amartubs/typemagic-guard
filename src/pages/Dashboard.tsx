@@ -1,19 +1,37 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User } from '@/lib/types';
+import { User, VisualizationData } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Shield, UserCheck, Clock, LogOut } from 'lucide-react';
+import { Shield, UserCheck, Clock, LogOut, Settings, ChevronRight } from 'lucide-react';
+import KeystrokeAnalytics from '@/components/dashboard/KeystrokeAnalytics';
+import { BiometricAnalyzer } from '@/lib/biometricAuth';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
+  const [analyticsData, setAnalyticsData] = useState<VisualizationData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Load user from localStorage
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      
+      // Generate visualization data if user has a biometric profile
+      if (parsedUser.biometricProfile) {
+        // Simulate a loading delay for better UX
+        setTimeout(() => {
+          const data = BiometricAnalyzer.getVisualizationData(parsedUser.biometricProfile);
+          setAnalyticsData(data);
+          setIsLoading(false);
+        }, 1000);
+      } else {
+        setIsLoading(false);
+      }
     } else {
       // Redirect to login if no user is stored
       navigate('/login');
@@ -41,17 +59,75 @@ const Dashboard: React.FC = () => {
             <Shield className="h-6 w-6 text-primary" />
             <span className="font-bold text-lg">Biometric Auth</span>
           </div>
-          <Button variant="ghost" onClick={handleLogout} className="gap-2">
-            <LogOut size={16} />
-            Sign Out
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/profile')} 
+              className="gap-2"
+            >
+              <Settings size={16} />
+              <span className="hidden sm:inline">Settings</span>
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={handleLogout} 
+              className="gap-2"
+            >
+              <LogOut size={16} />
+              <span className="hidden sm:inline">Sign Out</span>
+            </Button>
+          </div>
         </div>
       </header>
 
       <main className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold mb-8">Welcome, {user.name}</h1>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold">Welcome, {user.name}</h1>
+          
+          <div className="mt-4 sm:mt-0 flex items-center">
+            <span className="text-sm text-muted-foreground mr-3">Security Level:</span>
+            <Badge variant={
+              user.securitySettings.securityLevel === 'high' || user.securitySettings.securityLevel === 'very-high' 
+                ? 'success' 
+                : user.securitySettings.securityLevel === 'medium' 
+                  ? 'warning' 
+                  : 'danger'
+            }>
+              {user.securitySettings.securityLevel.toUpperCase()}
+            </Badge>
+          </div>
+        </div>
         
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {/* Analytics Dashboard */}
+        <section>
+          <h2 className="text-xl font-semibold mb-4">Biometric Analytics</h2>
+          
+          {user.biometricProfile ? (
+            <KeystrokeAnalytics 
+              visualizationData={analyticsData} 
+              isLoading={isLoading} 
+            />
+          ) : (
+            <Card className="mb-6">
+              <CardContent className="pt-6">
+                <div className="text-center py-8">
+                  <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium mb-2">No Biometric Data Available</h3>
+                  <p className="text-muted-foreground mb-4">
+                    You haven't trained your biometric profile yet. Complete your profile to see analytics.
+                  </p>
+                  <Button onClick={() => navigate('/profile')}>
+                    Set Up Biometric Profile
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </section>
+
+        <div className="grid gap-6 md:grid-cols-3">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -134,24 +210,59 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="mt-12">
-          <h2 className="text-xl font-semibold mb-4">What's Next?</h2>
+          <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
           <div className="grid gap-4 md:grid-cols-2">
-            <Button variant="outline" className="h-auto p-4 justify-start" onClick={() => navigate('/profile')}>
-              <div className="flex flex-col items-start text-left">
-                <span className="font-medium">Update Your Profile</span>
-                <span className="text-sm text-muted-foreground">Manage your account settings and security preferences</span>
-              </div>
-            </Button>
-            <Button variant="outline" className="h-auto p-4 justify-start" onClick={() => navigate('/demo')}>
-              <div className="flex flex-col items-start text-left">
-                <span className="font-medium">Explore Demo</span>
-                <span className="text-sm text-muted-foreground">See how biometric authentication works with interactive demos</span>
-              </div>
-            </Button>
+            <Card className="overflow-hidden transition-all hover:border-primary/50">
+              <Button 
+                variant="ghost" 
+                className="h-auto p-0 justify-start w-full"
+                onClick={() => navigate('/profile')}
+              >
+                <div className="flex items-center justify-between w-full p-6">
+                  <div className="flex flex-col items-start text-left">
+                    <span className="font-medium">Update Your Profile</span>
+                    <span className="text-sm text-muted-foreground">Manage your account settings and security preferences</span>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                </div>
+              </Button>
+            </Card>
+            
+            <Card className="overflow-hidden transition-all hover:border-primary/50">
+              <Button 
+                variant="ghost" 
+                className="h-auto p-0 justify-start w-full"
+                onClick={() => navigate('/demo')}
+              >
+                <div className="flex items-center justify-between w-full p-6">
+                  <div className="flex flex-col items-start text-left">
+                    <span className="font-medium">Explore Demo</span>
+                    <span className="text-sm text-muted-foreground">See how biometric authentication works with interactive demos</span>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                </div>
+              </Button>
+            </Card>
           </div>
         </div>
       </main>
     </div>
+  );
+};
+
+// Create a Badge component for security level
+const Badge = ({ children, variant = 'default' }: { children: React.ReactNode; variant?: 'default' | 'success' | 'warning' | 'danger' }) => {
+  const variantClasses = {
+    default: 'bg-primary/10 text-primary',
+    success: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+    warning: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+    danger: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+  };
+
+  return (
+    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${variantClasses[variant]}`}>
+      {children}
+    </span>
   );
 };
 
