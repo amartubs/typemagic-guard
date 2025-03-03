@@ -9,9 +9,10 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import KeystrokeCapture from '@/components/ui-custom/KeystrokeCapture';
-import { Shield, User as UserIcon, Bell, Fingerprint, ArrowLeft, Save, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Shield, User as UserIcon, Bell, Fingerprint, ArrowLeft, Save, RefreshCw, AlertTriangle, Info } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ const ProfilePage: React.FC = () => {
   const [minConfidenceThreshold, setMinConfidenceThreshold] = useState(60);
   const [isTrainingMode, setIsTrainingMode] = useState(false);
   const [twoFactorDialogOpen, setTwoFactorDialogOpen] = useState(false);
+  const [thresholdCategory, setThresholdCategory] = useState<'low' | 'medium' | 'high' | 'very-high'>('medium');
 
   useEffect(() => {
     if (authUser) {
@@ -33,10 +35,32 @@ const ProfilePage: React.FC = () => {
       setSecurityLevel(authUser.securitySettings.securityLevel);
       setEnforceTwoFactor(authUser.securitySettings.enforceTwoFactor);
       setMinConfidenceThreshold(authUser.securitySettings.minConfidenceThreshold);
+      
+      if (authUser.securitySettings.minConfidenceThreshold < 60) {
+        setThresholdCategory('low');
+      } else if (authUser.securitySettings.minConfidenceThreshold < 75) {
+        setThresholdCategory('medium');
+      } else if (authUser.securitySettings.minConfidenceThreshold < 85) {
+        setThresholdCategory('high');
+      } else {
+        setThresholdCategory('very-high');
+      }
     } else {
       navigate('/login');
     }
   }, [authUser, navigate]);
+
+  useEffect(() => {
+    if (minConfidenceThreshold < 60) {
+      setThresholdCategory('low');
+    } else if (minConfidenceThreshold < 75) {
+      setThresholdCategory('medium');
+    } else if (minConfidenceThreshold < 85) {
+      setThresholdCategory('high');
+    } else {
+      setThresholdCategory('very-high');
+    }
+  }, [minConfidenceThreshold]);
 
   const handleSaveProfile = () => {
     if (!user) return;
@@ -133,6 +157,32 @@ const ProfilePage: React.FC = () => {
       title: "Biometric Sample Collected",
       description: `You now have ${updatedUser.biometricProfile.keystrokePatterns.length} patterns recorded.`,
     });
+  };
+
+  const getThresholdDescription = (category: 'low' | 'medium' | 'high' | 'very-high') => {
+    switch (category) {
+      case 'low':
+        return "Lower security but better usability. Good for non-sensitive applications.";
+      case 'medium':
+        return "Balanced approach suitable for most users and general applications.";
+      case 'high':
+        return "Higher security for sensitive information, may occasionally reject legitimate users.";
+      case 'very-high':
+        return "Maximum security for critical systems, may require more frequent verification.";
+    }
+  };
+
+  const getThresholdRecommendation = (category: 'low' | 'medium' | 'high' | 'very-high') => {
+    switch (category) {
+      case 'low':
+        return "Personal blogs, content viewing platforms";
+      case 'medium':
+        return "Social media, general business applications";
+      case 'high':
+        return "Financial applications, admin dashboards";
+      case 'very-high':
+        return "Financial transfers, critical infrastructure";
+    }
   };
 
   if (!user) {
@@ -284,10 +334,14 @@ const ProfilePage: React.FC = () => {
                   </div>
                 )}
                 
-                <div className="space-y-2">
-                  <Label htmlFor="confidence-threshold">
-                    Minimum Confidence Threshold: {minConfidenceThreshold}%
-                  </Label>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="confidence-threshold">
+                      Confidence Threshold: {minConfidenceThreshold}%
+                    </Label>
+                    <Badge variant="outline" className="ml-2">{thresholdCategory.toUpperCase()}</Badge>
+                  </div>
+                  
                   <Input 
                     id="confidence-threshold" 
                     type="range" 
@@ -297,9 +351,47 @@ const ProfilePage: React.FC = () => {
                     onChange={(e) => setMinConfidenceThreshold(parseInt(e.target.value))}
                     className="w-full"
                   />
-                  <p className="text-sm text-muted-foreground">
-                    Sets how closely your typing must match your profile to be accepted
-                  </p>
+                  
+                  <div className="bg-muted/40 p-4 rounded-md border">
+                    <div className="flex items-start gap-2 mb-2">
+                      <Info className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-medium text-sm">Threshold Guidance: {thresholdCategory.charAt(0).toUpperCase() + thresholdCategory.slice(1)} Security</h4>
+                        <p className="text-sm text-muted-foreground">{getThresholdDescription(thresholdCategory)}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 space-y-2">
+                      <p className="text-sm font-medium">Recommended for:</p>
+                      <p className="text-sm text-muted-foreground">{getThresholdRecommendation(thresholdCategory)}</p>
+                    </div>
+                    
+                    <RadioGroup className="grid grid-cols-1 mt-3 gap-1" defaultValue={thresholdCategory}>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="low" id="low-security" onClick={() => setMinConfidenceThreshold(50)} />
+                        <Label htmlFor="low-security" className="cursor-pointer">Low (40-60%): Prioritizes convenience</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="medium" id="medium-security" onClick={() => setMinConfidenceThreshold(65)} />
+                        <Label htmlFor="medium-security" className="cursor-pointer">Medium (60-75%): Balanced approach</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="high" id="high-security" onClick={() => setMinConfidenceThreshold(80)} />
+                        <Label htmlFor="high-security" className="cursor-pointer">High (75-85%): Enhanced security</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="very-high" id="very-high-security" onClick={() => setMinConfidenceThreshold(90)} />
+                        <Label htmlFor="very-high-security" className="cursor-pointer">Very High (85-95%): Maximum security</Label>
+                      </div>
+                    </RadioGroup>
+                    
+                    <div className="mt-3 pt-3 border-t text-sm text-muted-foreground">
+                      <p>
+                        <span className="font-medium">Tips:</span> Start with Medium and collect at least 3-5 typing samples.
+                        Lower the threshold if you experience frequent false rejections.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
               <CardFooter>
