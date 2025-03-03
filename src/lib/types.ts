@@ -1,4 +1,3 @@
-
 // Keystroke data
 export interface KeyTiming {
   key: string;
@@ -56,6 +55,8 @@ export type UserType = 'individual' | 'company' | 'charity';
 
 export type SubscriptionTier = 'free' | 'basic' | 'professional' | 'enterprise';
 
+export type SocialProvider = 'google' | 'github' | 'microsoft' | 'apple' | null;
+
 export interface SubscriptionDetails {
   type: UserType;
   tier: SubscriptionTier;
@@ -80,6 +81,7 @@ export interface User {
   subscription?: SubscriptionDetails;
   organizationName?: string; // For companies and charities
   organizationSize?: number; // For companies (number of employees)
+  socialProvider?: SocialProvider; // For users who sign in with social providers
 }
 
 // Visualization data

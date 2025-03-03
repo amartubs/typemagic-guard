@@ -10,7 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import KeystrokeCapture from '@/components/ui-custom/KeystrokeCapture';
 import SubscriptionPlans from '@/components/subscription/SubscriptionPlans';
-import { useAuth } from '@/contexts/AuthContext';
+import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
+import { useAuth, SocialProvider } from '@/contexts/AuthContext';
 import { 
   Lock, 
   User as UserIcon, 
@@ -21,16 +22,28 @@ import {
   Users, 
   Heart,
   KeyRound,
-  RefreshCw
+  RefreshCw,
+  ArrowLeft
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const AuthPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, register, user, twoFactorRequired, verifyTwoFactorCode, sendTwoFactorCode } = useAuth();
+  const { 
+    login, 
+    register, 
+    user, 
+    twoFactorRequired, 
+    verifyTwoFactorCode, 
+    sendTwoFactorCode,
+    signInWithProvider,
+    loading: authLoading
+  } = useAuth();
+  
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const [registrationStep, setRegistrationStep] = useState<'userInfo' | 'userType' | 'subscription' | 'payment'>('userInfo');
+  const [showEmailLogin, setShowEmailLogin] = useState(false);
   
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
@@ -93,6 +106,18 @@ const AuthPage = () => {
       }
     } finally {
       setLoginLoading(false);
+    }
+  };
+
+  const handleSocialLogin = async (provider: SocialProvider) => {
+    const success = await signInWithProvider(provider);
+    
+    if (success && enableBiometrics) {
+      setBiometricStep(true);
+    } else if (success) {
+      // Navigate to the intended destination or dashboard
+      const from = location.state?.from?.pathname || '/dashboard';
+      navigate(from);
     }
   };
 
@@ -382,7 +407,10 @@ const AuthPage = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="login" value={activeTab} onValueChange={(value) => setActiveTab(value as 'login' | 'register')}>
+        <Tabs defaultValue="login" value={activeTab} onValueChange={(value) => {
+          setActiveTab(value as 'login' | 'register');
+          setShowEmailLogin(false);
+        }}>
           <div className="px-6">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">Login</TabsTrigger>
@@ -392,62 +420,98 @@ const AuthPage = () => {
 
           <TabsContent value="login" className="m-0">
             <CardContent className="p-6">
-              <form onSubmit={handleLoginSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      placeholder="demo@example.com"
-                      type="email"
-                      value={loginEmail}
-                      onChange={(e) => setLoginEmail(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                    <Input
-                      id="password"
-                      placeholder="••••••••"
-                      type="password"
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="biometrics"
-                    className="rounded border-gray-300 text-primary focus:ring-primary"
-                    checked={enableBiometrics}
-                    onChange={(e) => setEnableBiometrics(e.target.checked)}
+              {!showEmailLogin ? (
+                <div className="space-y-4">
+                  <SocialLoginButtons 
+                    onProviderClick={handleSocialLogin} 
+                    isLoading={authLoading} 
                   />
-                  <Label htmlFor="biometrics" className="text-sm cursor-pointer">
-                    Enable keystroke biometric verification
-                  </Label>
+                  
+                  <div className="flex items-center space-x-2 mt-4">
+                    <input
+                      type="checkbox"
+                      id="biometrics"
+                      className="rounded border-gray-300 text-primary focus:ring-primary"
+                      checked={enableBiometrics}
+                      onChange={(e) => setEnableBiometrics(e.target.checked)}
+                    />
+                    <Label htmlFor="biometrics" className="text-sm cursor-pointer">
+                      Enable keystroke biometric verification
+                    </Label>
+                  </div>
+                  
+                  <div className="text-center text-xs text-muted-foreground mt-2">
+                    <p>For demo purposes, any provider will create a mock user account</p>
+                  </div>
                 </div>
-
-                <Button type="submit" className="w-full" disabled={loginLoading}>
-                  {loginLoading ? 'Authenticating...' : 'Sign In'}
-                </Button>
+              ) : (
+                <form onSubmit={handleLoginSubmit} className="space-y-4">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="flex items-center gap-2 -mt-2 -ml-2 mb-2"
+                    onClick={() => setShowEmailLogin(false)}
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to login options
+                  </Button>
                 
-                <div className="text-center text-xs text-muted-foreground mt-4">
-                  <p>
-                    For demo: use email "demo@example.com" and password "demo"
-                  </p>
-                </div>
-              </form>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        placeholder="demo@example.com"
+                        type="email"
+                        value={loginEmail}
+                        onChange={(e) => setLoginEmail(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                      <Input
+                        id="password"
+                        placeholder="••••••••"
+                        type="password"
+                        value={loginPassword}
+                        onChange={(e) => setLoginPassword(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="biometrics"
+                      className="rounded border-gray-300 text-primary focus:ring-primary"
+                      checked={enableBiometrics}
+                      onChange={(e) => setEnableBiometrics(e.target.checked)}
+                    />
+                    <Label htmlFor="biometrics" className="text-sm cursor-pointer">
+                      Enable keystroke biometric verification
+                    </Label>
+                  </div>
+
+                  <Button type="submit" className="w-full" disabled={loginLoading}>
+                    {loginLoading ? 'Authenticating...' : 'Sign In'}
+                  </Button>
+                  
+                  <div className="text-center text-xs text-muted-foreground mt-4">
+                    <p>
+                      For demo: use email "demo@example.com" and password "demo"
+                    </p>
+                  </div>
+                </form>
+              )}
             </CardContent>
           </TabsContent>
 

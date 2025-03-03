@@ -23,7 +23,11 @@ interface AuthContextType {
   sendTwoFactorCode: () => Promise<boolean>;
   twoFactorRequired: boolean;
   setTwoFactorRequired: (required: boolean) => void;
+  signInWithGoogle: () => Promise<boolean>;
+  signInWithProvider: (provider: SocialProvider) => Promise<boolean>;
 }
+
+export type SocialProvider = 'google' | 'github' | 'microsoft' | 'apple';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -317,6 +321,128 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
   };
 
+  const signInWithGoogle = async (): Promise<boolean> => {
+    setLoading(true);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      const googleUser: User = {
+        id: `google-user-${Date.now()}`,
+        email: 'google-user@example.com',
+        name: 'Google User',
+        role: 'user',
+        biometricProfile: {
+          userId: `google-user-${Date.now()}`,
+          keystrokePatterns: [],
+          confidenceScore: 0,
+          lastUpdated: Date.now(),
+          status: 'learning'
+        },
+        securitySettings: {
+          minConfidenceThreshold: 65,
+          learningPeriod: 5,
+          anomalyDetectionSensitivity: 70,
+          securityLevel: 'medium',
+          enforceTwoFactor: false,
+          maxFailedAttempts: 5
+        },
+        lastLogin: Date.now(),
+        status: 'active',
+        subscription: {
+          type: 'individual',
+          tier: 'basic',
+          startDate: Date.now(),
+          endDate: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days from now
+          autoRenew: true,
+          status: 'active'
+        },
+        socialProvider: 'google'
+      };
+      
+      localStorage.setItem('currentUser', JSON.stringify(googleUser));
+      setUser(googleUser);
+      
+      toast({
+        title: "Google Authentication Successful",
+        description: "You've been signed in with Google",
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Google authentication error:', error);
+      toast({
+        title: "Authentication Failed",
+        description: "Failed to authenticate with Google",
+        variant: "destructive",
+      });
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signInWithProvider = async (provider: SocialProvider): Promise<boolean> => {
+    setLoading(true);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      const socialUser: User = {
+        id: `${provider}-user-${Date.now()}`,
+        email: `${provider}-user@example.com`,
+        name: `${provider} User`,
+        role: 'user',
+        biometricProfile: {
+          userId: `${provider}-user-${Date.now()}`,
+          keystrokePatterns: [],
+          confidenceScore: 0,
+          lastUpdated: Date.now(),
+          status: 'learning'
+        },
+        securitySettings: {
+          minConfidenceThreshold: 65,
+          learningPeriod: 5,
+          anomalyDetectionSensitivity: 70,
+          securityLevel: 'medium',
+          enforceTwoFactor: false,
+          maxFailedAttempts: 5
+        },
+        lastLogin: Date.now(),
+        status: 'active',
+        subscription: {
+          type: 'individual',
+          tier: 'basic',
+          startDate: Date.now(),
+          endDate: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days from now
+          autoRenew: true,
+          status: 'active'
+        },
+        socialProvider: provider
+      };
+      
+      localStorage.setItem('currentUser', JSON.stringify(socialUser));
+      setUser(socialUser);
+      
+      toast({
+        title: `${provider.charAt(0).toUpperCase() + provider.slice(1)} Authentication Successful`,
+        description: `You've been signed in with ${provider.charAt(0).toUpperCase() + provider.slice(1)}`,
+      });
+      
+      return true;
+    } catch (error) {
+      console.error(`${provider} authentication error:`, error);
+      toast({
+        title: "Authentication Failed",
+        description: `Failed to authenticate with ${provider}`,
+        variant: "destructive",
+      });
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -329,7 +455,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       verifyTwoFactorCode,
       sendTwoFactorCode,
       twoFactorRequired,
-      setTwoFactorRequired
+      setTwoFactorRequired,
+      signInWithGoogle,
+      signInWithProvider
     }}>
       {children}
     </AuthContext.Provider>
