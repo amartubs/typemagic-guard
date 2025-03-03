@@ -13,6 +13,7 @@ import KeystrokeCapture from '@/components/ui-custom/KeystrokeCapture';
 import SubscriptionPlans from '@/components/subscription/SubscriptionPlans';
 import { useAuth } from '@/contexts/AuthContext';
 import { Lock, User as UserIcon, Shield, AlertCircle, Mail, Building, Users, Heart } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -79,7 +80,11 @@ const AuthPage = () => {
     
     // Validate passwords match
     if (registerPassword !== registerConfirmPassword) {
-      alert('Passwords do not match');
+      toast({
+        title: "Passwords do not match",
+        description: "Please make sure your passwords match.",
+        variant: "destructive"
+      });
       return;
     }
     
@@ -87,7 +92,11 @@ const AuthPage = () => {
     
     try {
       if (!selectedPlan) {
-        alert('Please select a subscription plan');
+        toast({
+          title: "No Plan Selected",
+          description: "Please select a subscription plan",
+          variant: "destructive"
+        });
         return;
       }
       
@@ -103,11 +112,20 @@ const AuthPage = () => {
       
       if (success) {
         // Navigate to dashboard after successful registration
+        toast({
+          title: "Registration Successful",
+          description: "Welcome to TypeMagic Guard!"
+        });
         navigate('/dashboard');
       }
     } finally {
       setRegisterLoading(false);
     }
+  };
+  
+  const handleSelectPlan = (plan: SubscriptionPlan) => {
+    setSelectedPlan(plan);
+    console.log("Selected plan:", plan.name, plan.tier);
   };
   
   const handleBiometricVerify = () => {
@@ -123,31 +141,51 @@ const AuthPage = () => {
   const nextRegistrationStep = () => {
     if (registrationStep === 'userInfo') {
       if (!registerName || !registerEmail || !registerPassword || !registerConfirmPassword) {
-        alert('Please fill out all fields');
+        toast({
+          title: "Missing Information",
+          description: "Please fill out all fields",
+          variant: "destructive"
+        });
         return;
       }
       
       if (registerPassword !== registerConfirmPassword) {
-        alert('Passwords do not match');
+        toast({
+          title: "Passwords do not match",
+          description: "Please ensure your passwords match",
+          variant: "destructive"
+        });
         return;
       }
       
       setRegistrationStep('userType');
     } else if (registrationStep === 'userType') {
       if (userType !== 'individual' && !organizationName) {
-        alert('Please enter your organization name');
+        toast({
+          title: "Missing Information",
+          description: "Please enter your organization name",
+          variant: "destructive"
+        });
         return;
       }
       
       if (userType === 'company' && !organizationSize) {
-        alert('Please enter your organization size');
+        toast({
+          title: "Missing Information",
+          description: "Please enter your organization size",
+          variant: "destructive"
+        });
         return;
       }
       
       setRegistrationStep('subscription');
     } else if (registrationStep === 'subscription') {
       if (!selectedPlan) {
-        alert('Please select a subscription plan');
+        toast({
+          title: "No Plan Selected",
+          description: "Please select a subscription plan",
+          variant: "destructive"
+        });
         return;
       }
       
@@ -484,7 +522,8 @@ const AuthPage = () => {
                   
                   <SubscriptionPlans 
                     userType={userType}
-                    onSelectPlan={(plan) => setSelectedPlan(plan)}
+                    onSelectPlan={handleSelectPlan}
+                    selectedPlanId={selectedPlan?.id}
                     className="mb-4"
                   />
                   

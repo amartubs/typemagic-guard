@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { SubscriptionPlan, UserType } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ interface SubscriptionPlansProps {
   userType: UserType;
   onSelectPlan: (plan: SubscriptionPlan) => void;
   className?: string;
+  selectedPlanId?: string;
 }
 
 const subscriptionPlans: SubscriptionPlan[] = [
@@ -123,7 +124,8 @@ const subscriptionPlans: SubscriptionPlan[] = [
 const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ 
   userType, 
   onSelectPlan,
-  className
+  className,
+  selectedPlanId
 }) => {
   // Filter plans based on user type
   const availablePlans = subscriptionPlans.filter(plan => 
@@ -135,7 +137,11 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
       {availablePlans.map(plan => (
         <Card 
           key={plan.id} 
-          className={`flex flex-col border-2 ${plan.tier === 'professional' ? 'border-primary shadow-md' : 'border-border'}`}
+          className={`flex flex-col border-2 ${plan.id === selectedPlanId 
+            ? 'border-primary shadow-md' 
+            : plan.tier === 'professional' && !selectedPlanId 
+              ? 'border-primary shadow-md' 
+              : 'border-border'}`}
         >
           <CardHeader>
             <CardTitle>{plan.name}</CardTitle>
@@ -159,9 +165,11 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
             <Button 
               onClick={() => onSelectPlan(plan)} 
               className="w-full"
-              variant={plan.tier === 'professional' ? 'default' : 'outline'}
+              variant={plan.id === selectedPlanId ? 'default' : plan.tier === 'professional' && !selectedPlanId ? 'default' : 'outline'}
             >
-              Select {plan.name} Plan
+              {plan.id === selectedPlanId 
+                ? 'Selected' 
+                : `Select ${plan.name} Plan`}
             </Button>
           </CardFooter>
         </Card>
