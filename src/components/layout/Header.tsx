@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Shield, BarChart3, Lock, User } from 'lucide-react';
@@ -27,7 +28,7 @@ const Header = () => {
             <img 
               src="/lovable-uploads/50734fd5-d45d-4283-b5cc-ace6b57ada22.png" 
               alt="Shoal Logo" 
-              className="h-12 w-auto" 
+              className="h-14 w-auto" 
             />
           </Link>
 
