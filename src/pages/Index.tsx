@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -50,12 +49,7 @@ export default function Index() {
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <img 
-              src="/lovable-uploads/bc422bbc-9a59-41fd-94f1-c8e5dd865c59.png" 
-              alt="Shoal Logo" 
-              className="h-10 w-10"
-            />
-            <span className="font-bold text-xl text-[#9b87f5]">Shoal</span>
+            {/* Logo and name removed from here */}
           </div>
           <div className="flex items-center gap-4">
             <Link to="/demo">
