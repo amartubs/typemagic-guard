@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Demo from "./pages/Demo";
 import Settings from "./pages/Settings";
+import Login from "./pages/Login";
 
 const queryClient = new QueryClient();
 
@@ -25,7 +26,8 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/login" element={<AuthPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/auth" element={<AuthPage />} />
             <Route path="/dashboard" element={
               <PrivateRoute>
                 <Dashboard />
