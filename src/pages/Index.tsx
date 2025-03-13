@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronRight, Key, Shield, Lock, UserCheck, FileCode, BarChart4 } from 'lucide-react';
+import Header from '@/components/layout/Header';
 
 const features = [
   {
@@ -46,21 +47,7 @@ const features = [
 export default function Index() {
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            {/* Logo and name removed from here */}
-          </div>
-          <div className="flex items-center gap-4">
-            <Link to="/demo">
-              <Button variant="ghost">Demo</Button>
-            </Link>
-            <Link to="/login">
-              <Button>Sign In</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="flex-grow">
         <section className="py-20 bg-gradient-to-b from-[#E5DEFF] to-background">
