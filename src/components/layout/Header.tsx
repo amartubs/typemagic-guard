@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Shield, BarChart3, Lock, User } from 'lucide-react';
@@ -23,14 +22,13 @@ const Header = () => {
           {/* Logo */}
           <Link 
             to="/" 
-            className="flex items-center space-x-2"
+            className="flex items-center"
           >
             <img 
               src="/lovable-uploads/50734fd5-d45d-4283-b5cc-ace6b57ada22.png" 
               alt="Shoal Logo" 
-              className="h-10"
+              className="h-12 w-auto" 
             />
-            <span className="font-bold text-xl text-foreground">Shoal</span>
           </Link>
 
           {/* Desktop Navigation */}
