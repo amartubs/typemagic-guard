@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { SocialProvider } from '@/contexts/AuthContext';
+import { Provider } from '@/contexts/auth/types';
 import { Github, Mail } from 'lucide-react';
 
 interface SocialLoginButtonsProps {
-  onProviderClick: (provider: SocialProvider) => void;
+  onProviderClick: (provider: Provider) => void;
   isLoading?: boolean;
   className?: string;
 }
