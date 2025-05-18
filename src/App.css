@@ -42,23 +42,23 @@
   color: #888;
 }
 
-/* Shoal specific styles */
-.shoal-purple {
+/* Shoale specific styles */
+.shoale-purple {
   color: #9b87f5;
 }
 
-.shoal-bg {
+.shoale-bg {
   background-color: #9b87f5;
 }
 
-.shoal-border {
+.shoale-border {
   border-color: #9b87f5;
 }
 
-.shoal-shadow {
+.shoale-shadow {
   box-shadow: 0 4px 14px rgba(155, 135, 245, 0.2);
 }
 
-.shoal-gradient {
+.shoale-gradient {
   background: linear-gradient(135deg, #9b87f5 0%, #7E69AB 100%);
 }

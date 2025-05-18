@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -55,7 +56,7 @@ export default function Index() {
             <div className="flex justify-center mb-8">
               <img 
                 src="/lovable-uploads/bc422bbc-9a59-41fd-94f1-c8e5dd865c59.png" 
-                alt="Shoal Logo" 
+                alt="Shoale Logo" 
                 className="h-24 w-24"
               />
             </div>
@@ -132,12 +133,12 @@ export default function Index() {
           <div className="flex items-center justify-center gap-2 mb-4">
             <img 
               src="/lovable-uploads/bc422bbc-9a59-41fd-94f1-c8e5dd865c59.png" 
-              alt="Shoal Logo" 
+              alt="Shoale Logo" 
               className="h-8 w-8"
             />
-            <span className="font-bold text-[#9b87f5]">Shoal</span>
+            <span className="font-bold text-[#9b87f5]">Shoale</span>
           </div>
-          <p className="text-sm text-gray-300">© 2023 Shoal. All rights reserved.</p>
+          <p className="text-sm text-gray-300">© 2023 Shoale. All rights reserved.</p>
         </div>
       </footer>
     </div>
