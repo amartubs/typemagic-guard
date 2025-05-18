@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Session, User as SupabaseUser } from '@supabase/supabase-js';
 import { User, UserType, SubscriptionTier, SubscriptionDetails } from '@/lib/types';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AuthContextType {
   user: User | null;
@@ -33,23 +35,93 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [twoFactorRequired, setTwoFactorRequired] = useState(false);
   const [tempTwoFactorCode, setTempTwoFactorCode] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-      } catch (error) {
-        console.error('Failed to parse user data:', error);
-        localStorage.removeItem('currentUser');
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log('Auth state changed:', event, session);
+        setSession(session);
+        
+        if (session?.user) {
+          const userData: User = {
+            id: session.user.id,
+            email: session.user.email || '',
+            name: session.user.user_metadata?.name || 'User',
+            role: 'user',
+            securitySettings: {
+              minConfidenceThreshold: 65,
+              learningPeriod: 5,
+              anomalyDetectionSensitivity: 70,
+              securityLevel: 'medium',
+              enforceTwoFactor: false,
+              maxFailedAttempts: 5
+            },
+            lastLogin: Date.now(),
+            status: 'active',
+            subscription: {
+              type: session.user.user_metadata?.userType || 'individual',
+              tier: session.user.user_metadata?.subscriptionTier || 'basic',
+              startDate: Date.now(),
+              endDate: Date.now() + 30 * 24 * 60 * 60 * 1000,
+              autoRenew: true,
+              status: 'active'
+            },
+            organizationName: session.user.user_metadata?.organizationName,
+            organizationSize: session.user.user_metadata?.organizationSize
+          };
+          setUser(userData);
+        } else {
+          setUser(null);
+        }
       }
-    }
-    setLoading(false);
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      
+      if (session?.user) {
+        const userData: User = {
+          id: session.user.id,
+          email: session.user.email || '',
+          name: session.user.user_metadata?.name || 'User',
+          role: 'user',
+          securitySettings: {
+            minConfidenceThreshold: 65,
+            learningPeriod: 5,
+            anomalyDetectionSensitivity: 70,
+            securityLevel: 'medium',
+            enforceTwoFactor: false,
+            maxFailedAttempts: 5
+          },
+          lastLogin: Date.now(),
+          status: 'active',
+          subscription: {
+            type: session.user.user_metadata?.userType || 'individual',
+            tier: session.user.user_metadata?.subscriptionTier || 'basic',
+            startDate: Date.now(),
+            endDate: Date.now() + 30 * 24 * 60 * 60 * 1000,
+            autoRenew: true,
+            status: 'active'
+          },
+          organizationName: session.user.user_metadata?.organizationName,
+          organizationSize: session.user.user_metadata?.organizationSize
+        };
+        setUser(userData);
+      }
+      
+      setLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const mockUsers: User[] = [
@@ -90,44 +162,42 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setLoading(true);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
       
-      const foundUser = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-      
-      if (foundUser && password === 'demo') {
-        if (foundUser.securitySettings.enforceTwoFactor) {
-          setTwoFactorRequired(true);
-          const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
-          setTempTwoFactorCode(randomCode);
-          toast({
-            title: "Two-Factor Authentication Required",
-            description: `A verification code has been sent to your email. For demo purposes, the code is: ${randomCode}`,
-          });
-          return false;
-        }
-        
-        const updatedUser = {
-          ...foundUser,
-          lastLogin: Date.now()
-        };
-        
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-        setUser(updatedUser);
-        
-        toast({
-          title: "Login Successful",
-          description: `Welcome back, ${updatedUser.name}!`,
-        });
-        
-        return true;
-      } else {
+      if (error) {
+        console.error('Login error:', error);
         toast({
           title: "Authentication Failed",
-          description: "Invalid email or password",
+          description: error.message,
           variant: "destructive",
         });
         return false;
       }
+      
+      // If using two-factor auth, handle that flow
+      if (user?.securitySettings.enforceTwoFactor) {
+        setTwoFactorRequired(true);
+        const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
+        setTempTwoFactorCode(randomCode);
+        localStorage.setItem('pendingTwoFactorEmail', email);
+        
+        toast({
+          title: "Two-Factor Authentication Required",
+          description: `A verification code has been sent to your email. For demo purposes, the code is: ${randomCode}`,
+        });
+        
+        return false;
+      }
+      
+      toast({
+        title: "Login Successful",
+        description: `Welcome back!`,
+      });
+      
+      return true;
     } catch (error) {
       console.error('Login error:', error);
       toast({
@@ -223,54 +293,33 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setLoading(true);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+            userType,
+            subscriptionTier,
+            organizationName,
+            organizationSize
+          }
+        }
+      });
       
-      const userExists = mockUsers.some(u => u.email.toLowerCase() === email.toLowerCase());
-      
-      if (userExists) {
+      if (error) {
+        console.error('Registration error:', error);
         toast({
           title: "Registration Failed",
-          description: "An account with this email already exists",
+          description: error.message,
           variant: "destructive",
         });
         return false;
       }
       
-      const subscription: SubscriptionDetails = {
-        type: userType,
-        tier: subscriptionTier,
-        startDate: Date.now(),
-        endDate: subscriptionTier === 'free' ? null : Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days for paid plans
-        autoRenew: subscriptionTier !== 'free',
-        status: 'active'
-      };
-      
-      const newUser: User = {
-        id: `user-${Date.now()}`,
-        email,
-        name,
-        role: 'user',
-        securitySettings: {
-          minConfidenceThreshold: 65,
-          learningPeriod: 5,
-          anomalyDetectionSensitivity: 70,
-          securityLevel: 'medium',
-          enforceTwoFactor: false,
-          maxFailedAttempts: 5
-        },
-        lastLogin: Date.now(),
-        status: 'active',
-        subscription,
-        organizationName: userType !== 'individual' ? organizationName : undefined,
-        organizationSize: userType === 'company' ? organizationSize : undefined
-      };
-      
-      localStorage.setItem('currentUser', JSON.stringify(newUser));
-      setUser(newUser);
-      
       toast({
         title: "Registration Successful",
-        description: "Your account has been created",
+        description: "Your account has been created. Please check your email for verification.",
       });
       
       return true;
@@ -287,9 +336,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('currentUser');
-    setUser(null);
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+      console.error('Error logging out:', error);
+      toast({
+        title: "Logout Failed",
+        description: "An error occurred while logging out",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     navigate('/login');
     
     toast({
@@ -325,48 +384,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setLoading(true);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const googleUser: User = {
-        id: `google-user-${Date.now()}`,
-        email: 'google-user@example.com',
-        name: 'Google User',
-        role: 'user',
-        biometricProfile: {
-          userId: `google-user-${Date.now()}`,
-          keystrokePatterns: [],
-          confidenceScore: 0,
-          lastUpdated: Date.now(),
-          status: 'learning'
-        },
-        securitySettings: {
-          minConfidenceThreshold: 65,
-          learningPeriod: 5,
-          anomalyDetectionSensitivity: 70,
-          securityLevel: 'medium',
-          enforceTwoFactor: false,
-          maxFailedAttempts: 5
-        },
-        lastLogin: Date.now(),
-        status: 'active',
-        subscription: {
-          type: 'individual',
-          tier: 'basic',
-          startDate: Date.now(),
-          endDate: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days from now
-          autoRenew: true,
-          status: 'active'
-        },
-        socialProvider: 'google'
-      };
-      
-      localStorage.setItem('currentUser', JSON.stringify(googleUser));
-      setUser(googleUser);
-      
-      toast({
-        title: "Google Authentication Successful",
-        description: "You've been signed in with Google",
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/dashboard'
+        }
       });
+      
+      if (error) {
+        console.error('Google authentication error:', error);
+        toast({
+          title: "Authentication Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return false;
+      }
       
       return true;
     } catch (error) {
@@ -386,48 +419,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setLoading(true);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const socialUser: User = {
-        id: `${provider}-user-${Date.now()}`,
-        email: `${provider}-user@example.com`,
-        name: `${provider} User`,
-        role: 'user',
-        biometricProfile: {
-          userId: `${provider}-user-${Date.now()}`,
-          keystrokePatterns: [],
-          confidenceScore: 0,
-          lastUpdated: Date.now(),
-          status: 'learning'
-        },
-        securitySettings: {
-          minConfidenceThreshold: 65,
-          learningPeriod: 5,
-          anomalyDetectionSensitivity: 70,
-          securityLevel: 'medium',
-          enforceTwoFactor: false,
-          maxFailedAttempts: 5
-        },
-        lastLogin: Date.now(),
-        status: 'active',
-        subscription: {
-          type: 'individual',
-          tier: 'basic',
-          startDate: Date.now(),
-          endDate: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days from now
-          autoRenew: true,
-          status: 'active'
-        },
-        socialProvider: provider
-      };
-      
-      localStorage.setItem('currentUser', JSON.stringify(socialUser));
-      setUser(socialUser);
-      
-      toast({
-        title: `${provider.charAt(0).toUpperCase() + provider.slice(1)} Authentication Successful`,
-        description: `You've been signed in with ${provider.charAt(0).toUpperCase() + provider.slice(1)}`,
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: window.location.origin + '/dashboard'
+        }
       });
+      
+      if (error) {
+        console.error(`${provider} authentication error:`, error);
+        toast({
+          title: "Authentication Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return false;
+      }
       
       return true;
     } catch (error) {
