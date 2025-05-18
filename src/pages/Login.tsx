@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { User, KeyTiming, KeystrokePattern, AuthenticationResult } from '@/lib/types';
 import { KeystrokeCapture as KeystrokeCaptureService, BiometricAnalyzer, createBiometricProfile } from '@/lib/biometricAuth';
 import { Card } from '@/components/ui/card';
@@ -179,58 +178,69 @@ const LoginPage: React.FC = () => {
         </div>
 
         {loginStep === 'credentials' ? (
-          <form onSubmit={handleCredentialSubmit}>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <UserIcon className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    placeholder="demo@example.com"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
+          <>
+            <form onSubmit={handleCredentialSubmit}>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <div className="relative">
+                    <UserIcon className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      placeholder="demo@example.com"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    placeholder="••••••••"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      placeholder="••••••••"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="biometrics"
-                  className="rounded border-gray-300 text-primary focus:ring-primary"
-                  checked={enableBiometrics}
-                  onChange={(e) => setEnableBiometrics(e.target.checked)}
-                />
-                <Label htmlFor="biometrics" className="text-sm cursor-pointer">
-                  Enable keystroke biometric verification
-                </Label>
-              </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="biometrics"
+                    className="rounded border-gray-300 text-primary focus:ring-primary"
+                    checked={enableBiometrics}
+                    onChange={(e) => setEnableBiometrics(e.target.checked)}
+                  />
+                  <Label htmlFor="biometrics" className="text-sm cursor-pointer">
+                    Enable keystroke biometric verification
+                  </Label>
+                </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Authenticating...' : 'Continue'}
-              </Button>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? 'Authenticating...' : 'Continue'}
+                </Button>
+              </div>
+            </form>
+            
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Don't have an account?{" "}
+                <Link to="/auth" className="font-medium text-primary hover:underline">
+                  Sign up
+                </Link>
+              </p>
             </div>
-          </form>
+          </>
         ) : (
           <div className="space-y-4">
             <div className="p-4 bg-muted rounded-md">
