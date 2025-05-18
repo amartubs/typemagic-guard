@@ -176,8 +176,11 @@ export const logoutUser = async () => {
 
 export const signInWithOAuthProvider = async (provider: Provider) => {
   try {
+    // Convert our Provider type to a type that Supabase accepts
+    const supabaseProvider = provider as 'google' | 'github' | 'apple';
+    
     const { data, error } = await supabase.auth.signInWithOAuth({
-      provider,
+      provider: supabaseProvider,
       options: {
         redirectTo: window.location.origin + '/dashboard'
       }
