@@ -27,7 +27,7 @@ const Header = () => {
           >
             <img 
               src="/lovable-uploads/50734fd5-d45d-4283-b5cc-ace6b57ada22.png" 
-              alt="Shoal Logo" 
+              alt="Shoale Logo" 
               className="h-14 w-auto" 
             />
           </Link>
