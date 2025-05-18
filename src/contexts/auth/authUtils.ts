@@ -1,4 +1,3 @@
-
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { User, UserType, SubscriptionTier } from '@/lib/types';
@@ -205,5 +204,81 @@ export const signInWithOAuthProvider = async (provider: Provider) => {
       variant: "destructive",
     });
     return { success: false, error };
+  }
+};
+
+export const updateUserProfile = async (name: string, email: string) => {
+  try {
+    // First update auth user email if changed
+    const { data: { user }, error: emailError } = await supabase.auth.updateUser({
+      email: email,
+      data: { name }
+    });
+    
+    if (emailError) {
+      console.error('Error updating user email:', emailError);
+      toast({
+        title: "Profile Update Failed",
+        description: emailError.message,
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    toast({
+      title: "Profile Updated",
+      description: "Your profile has been updated successfully.",
+    });
+    
+    // If email was updated, a confirmation email might be sent
+    if (user?.email !== email) {
+      toast({
+        title: "Email Verification Required",
+        description: "We've sent a verification email to your new address. Please check your inbox.",
+      });
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    toast({
+      title: "Profile Update Failed",
+      description: "An unexpected error occurred",
+      variant: "destructive",
+    });
+    return false;
+  }
+};
+
+export const updateUserPassword = async (currentPassword: string, newPassword: string) => {
+  try {
+    const { error } = await supabase.auth.updateUser({ 
+      password: newPassword 
+    });
+    
+    if (error) {
+      console.error('Error updating password:', error);
+      toast({
+        title: "Password Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    toast({
+      title: "Password Updated",
+      description: "Your password has been updated successfully.",
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Error updating password:', error);
+    toast({
+      title: "Password Update Failed",
+      description: "An unexpected error occurred",
+      variant: "destructive",
+    });
+    return false;
   }
 };

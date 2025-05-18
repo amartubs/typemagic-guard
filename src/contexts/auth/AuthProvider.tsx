@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
@@ -13,6 +12,8 @@ import {
   registerWithEmail, 
   logoutUser, 
   signInWithOAuthProvider,
+  updateUserProfile,
+  updateUserPassword,
   mockUsers
 } from './authUtils';
 
@@ -238,6 +239,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const updatePassword = async (currentPassword: string, newPassword: string): Promise<boolean> => {
+    setLoading(true);
+    
+    try {
+      const result = await updateUserPassword(currentPassword, newPassword);
+      return result;
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const updateUserProfileData = async (name: string, email: string): Promise<boolean> => {
+    setLoading(true);
+    
+    try {
+      const result = await updateUserProfile(name, email);
+      
+      if (result && user) {
+        // Update the local user state with new information
+        const updatedUser = { ...user, name, email };
+        setUser(updatedUser);
+      }
+      
+      return result;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -246,6 +276,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       logout, 
       loading, 
       updateUser,
+      updateUserProfile: updateUserProfileData,
+      updatePassword,
       updateSubscription,
       verifyTwoFactorCode,
       sendTwoFactorCode,

@@ -20,6 +20,8 @@ export interface AuthContextType {
   logout: () => void;
   loading: boolean;
   updateUser: (userData: Partial<User>) => void;
+  updateUserProfile: (name: string, email: string) => Promise<boolean>;
+  updatePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
   updateSubscription: (subscriptionData: Partial<SubscriptionDetails>) => void;
   verifyTwoFactorCode: (code: string) => Promise<boolean>;
   sendTwoFactorCode: () => Promise<boolean>;
