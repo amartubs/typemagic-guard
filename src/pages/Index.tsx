@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -53,13 +52,6 @@ export default function Index() {
       <main className="flex-grow">
         <section className="py-20 bg-gradient-to-b from-[#E5DEFF] to-background">
           <div className="container mx-auto px-4 text-center">
-            <div className="flex justify-center mb-8">
-              <img 
-                src="/lovable-uploads/bc422bbc-9a59-41fd-94f1-c8e5dd865c59.png" 
-                alt="Shoale Logo" 
-                className="h-24 w-24"
-              />
-            </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               Secure Authentication Through 
               <span className="text-[#9b87f5] block mt-2">Keystroke Biometrics</span>
@@ -131,11 +123,6 @@ export default function Index() {
       <footer className="border-t py-8 bg-[#1A1F2C] text-white">
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <img 
-              src="/lovable-uploads/bc422bbc-9a59-41fd-94f1-c8e5dd865c59.png" 
-              alt="Shoale Logo" 
-              className="h-8 w-8"
-            />
             <span className="font-bold text-[#9b87f5]">Shoale</span>
           </div>
           <p className="text-sm text-gray-300">© 2023 Shoale. All rights reserved.</p>
