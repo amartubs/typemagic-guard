@@ -25,11 +25,7 @@ const Header = () => {
             to="/" 
             className="flex items-center"
           >
-            <img 
-              src="/lovable-uploads/50734fd5-d45d-4283-b5cc-ace6b57ada22.png" 
-              alt="Shoale Logo" 
-              className="h-14 w-auto" 
-            />
+            <span className="text-xl font-bold text-primary">Shoale</span>
           </Link>
 
           {/* Desktop Navigation */}
