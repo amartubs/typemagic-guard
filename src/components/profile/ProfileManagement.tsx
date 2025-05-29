@@ -33,6 +33,7 @@ import {
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useSecurityValidation } from '@/hooks/useSecurityValidation';
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -54,6 +55,7 @@ type PasswordFormValues = z.infer<typeof passwordSchema>;
 const ProfileManagement: React.FC = () => {
   const { user, updateUserProfile, updatePassword, loading } = useAuth();
   const [passwordChangeMode, setPasswordChangeMode] = useState(false);
+  const { validateField, checkRateLimit, sanitizeInput, validationErrors } = useSecurityValidation();
 
   // Profile form
   const profileForm = useForm<ProfileFormValues>({
@@ -84,11 +86,24 @@ const ProfileManagement: React.FC = () => {
     }
   }, [user, profileForm]);
 
-  // Handle profile update
+  // Handle profile update with security validation
   const onProfileSubmit = async (data: ProfileFormValues) => {
     if (!user) return;
 
-    const success = await updateUserProfile(data.name, data.email);
+    // Check rate limiting
+    if (!checkRateLimit('sensitive')) {
+      return;
+    }
+
+    // Validate inputs
+    const sanitizedName = sanitizeInput(data.name);
+    const sanitizedEmail = data.email.toLowerCase().trim();
+
+    if (!validateField('name', sanitizedName) || !validateField('email', sanitizedEmail)) {
+      return;
+    }
+
+    const success = await updateUserProfile(sanitizedName, sanitizedEmail);
     
     if (success) {
       toast({
@@ -98,9 +113,19 @@ const ProfileManagement: React.FC = () => {
     }
   };
 
-  // Handle password update
+  // Handle password update with security validation
   const onPasswordSubmit = async (data: PasswordFormValues) => {
     if (!user) return;
+
+    // Check rate limiting
+    if (!checkRateLimit('sensitive')) {
+      return;
+    }
+
+    // Validate passwords
+    if (!validateField('password', data.newPassword)) {
+      return;
+    }
 
     if (data.newPassword !== data.confirmPassword) {
       toast({
@@ -154,8 +179,17 @@ const ProfileManagement: React.FC = () => {
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input 
+                        {...field} 
+                        onChange={(e) => {
+                          const sanitized = sanitizeInput(e.target.value);
+                          field.onChange(sanitized);
+                        }}
+                      />
                     </FormControl>
+                    {validationErrors.name && (
+                      <div className="text-sm text-destructive">{validationErrors.name}</div>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -173,6 +207,9 @@ const ProfileManagement: React.FC = () => {
                     <FormDescription>
                       Changing your email will require verification of the new address.
                     </FormDescription>
+                    {validationErrors.email && (
+                      <div className="text-sm text-destructive">{validationErrors.email}</div>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -231,6 +268,9 @@ const ProfileManagement: React.FC = () => {
                       <FormControl>
                         <Input type="password" {...field} />
                       </FormControl>
+                      {validationErrors.password && (
+                        <div className="text-sm text-destructive">{validationErrors.password}</div>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}

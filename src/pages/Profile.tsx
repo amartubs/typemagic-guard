@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProfileManagement from '@/components/profile/ProfileManagement';
 import SubscriptionManager from '@/components/subscription/SubscriptionManager';
+import GDPRCompliance from '@/components/gdpr/GDPRCompliance';
 
 const Profile = () => {
   const { user, loading } = useAuth();
@@ -40,9 +41,10 @@ const Profile = () => {
         
         <div className="max-w-4xl mx-auto">
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="profile">Profile Settings</TabsTrigger>
               <TabsTrigger value="subscription">Subscription</TabsTrigger>
+              <TabsTrigger value="privacy">Privacy & Data</TabsTrigger>
             </TabsList>
             
             <TabsContent value="profile">
@@ -51,6 +53,10 @@ const Profile = () => {
             
             <TabsContent value="subscription">
               <SubscriptionManager />
+            </TabsContent>
+            
+            <TabsContent value="privacy">
+              <GDPRCompliance />
             </TabsContent>
           </Tabs>
         </div>
