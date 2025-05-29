@@ -72,13 +72,21 @@ const KnowledgeBase = () => {
 
       if (error) throw error;
       
-      // Update the article vote count
+      // Get current article data and increment the vote count
+      const { data: currentArticle, error: fetchError } = await supabase
+        .from('knowledge_base_articles')
+        .select('helpful_votes, unhelpful_votes')
+        .eq('id', articleId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
       const field = isHelpful ? 'helpful_votes' : 'unhelpful_votes';
+      const newCount = (currentArticle[field] || 0) + 1;
+      
       const { error: updateError } = await supabase
         .from('knowledge_base_articles')
-        .update({
-          [field]: supabase.raw(`${field} + 1`)
-        })
+        .update({ [field]: newCount })
         .eq('id', articleId);
 
       if (updateError) throw updateError;
@@ -89,11 +97,20 @@ const KnowledgeBase = () => {
 
   const incrementViewCount = async (articleId: string) => {
     try {
+      // Get current view count and increment it
+      const { data: currentArticle, error: fetchError } = await supabase
+        .from('knowledge_base_articles')
+        .select('view_count')
+        .eq('id', articleId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      const newViewCount = (currentArticle.view_count || 0) + 1;
+      
       const { error } = await supabase
         .from('knowledge_base_articles')
-        .update({
-          view_count: supabase.raw('view_count + 1')
-        })
+        .update({ view_count: newViewCount })
         .eq('id', articleId);
 
       if (error) throw error;
