@@ -11,6 +11,7 @@ import ResetPassword from '@/pages/ResetPassword';
 import Dashboard from '@/pages/Dashboard';
 import Profile from '@/pages/Profile';
 import Settings from '@/pages/Settings';
+import Support from '@/pages/Support';
 import NotFound from '@/pages/NotFound';
 import PrivateRoute from '@/components/auth/PrivateRoute';
 import { Toaster } from '@/components/ui/toaster';
@@ -51,6 +52,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <Settings />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/support"
+              element={
+                <PrivateRoute>
+                  <Support />
                 </PrivateRoute>
               }
             />
