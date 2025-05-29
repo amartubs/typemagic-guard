@@ -3,7 +3,9 @@ import React from 'react';
 import { useAuth } from '@/contexts/auth';
 import { Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProfileManagement from '@/components/profile/ProfileManagement';
+import SubscriptionManager from '@/components/subscription/SubscriptionManager';
 
 const Profile = () => {
   const { user, loading } = useAuth();
@@ -36,8 +38,21 @@ const Profile = () => {
       <main className="container mx-auto py-8 px-4">
         <h1 className="text-3xl font-bold mb-8">Your Profile</h1>
         
-        <div className="max-w-3xl mx-auto">
-          <ProfileManagement />
+        <div className="max-w-4xl mx-auto">
+          <Tabs defaultValue="profile" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="profile">Profile Settings</TabsTrigger>
+              <TabsTrigger value="subscription">Subscription</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="profile">
+              <ProfileManagement />
+            </TabsContent>
+            
+            <TabsContent value="subscription">
+              <SubscriptionManager />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
     </div>

@@ -15,6 +15,7 @@ import Demo from "./pages/Demo";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
+import Pricing from "./pages/Pricing";
 import React from "react";
 
 const App = () => {
@@ -32,6 +33,7 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/auth" element={<AuthPage />} />
+                <Route path="/pricing" element={<Pricing />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/dashboard" element={
                   <PrivateRoute>
