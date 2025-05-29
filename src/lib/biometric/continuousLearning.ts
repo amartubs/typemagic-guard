@@ -37,8 +37,11 @@ export class ContinuousLearningEngine {
     // Determine profile status based on learning progress
     const newStatus = this.determineProfileStatus(prunedPatterns, newConfidenceScore);
     
-    // Store encrypted patterns in database
-    await this.storeEncryptedPattern(newPattern);
+    // Store encrypted patterns in database (if we have the biometric_profile_id)
+    const biometricProfileId = await this.getBiometricProfileId(newPattern.userId);
+    if (biometricProfileId) {
+      await this.storeEncryptedPattern(newPattern, biometricProfileId);
+    }
     
     const updatedProfile: BiometricProfile = {
       ...profile,
@@ -52,6 +55,21 @@ export class ContinuousLearningEngine {
     await this.updateProfileInDatabase(updatedProfile);
     
     return updatedProfile;
+  }
+
+  private static async getBiometricProfileId(userId: string): Promise<string | null> {
+    try {
+      const { data } = await supabase
+        .from('biometric_profiles')
+        .select('id')
+        .eq('user_id', userId)
+        .single();
+      
+      return data?.id || null;
+    } catch (error) {
+      console.error('Failed to get biometric profile ID:', error);
+      return null;
+    }
   }
 
   private static prunePatterns(patterns: KeystrokePattern[]): KeystrokePattern[] {
@@ -211,20 +229,24 @@ export class ContinuousLearningEngine {
     return 'learning';
   }
 
-  private static async storeEncryptedPattern(pattern: KeystrokePattern): Promise<void> {
+  private static async storeEncryptedPattern(pattern: KeystrokePattern, biometricProfileId: string): Promise<void> {
     try {
       // Encrypt the pattern data
       const encryptedData = await BiometricEncryption.encryptBiometricData(pattern.timings);
       
-      // Store in database
-      await supabase
+      // Check if keystroke_patterns table exists and store accordingly
+      const { error } = await supabase
         .from('keystroke_patterns')
         .insert({
-          user_id: pattern.userId,
+          biometric_profile_id: biometricProfileId,
           pattern_data: { encrypted: encryptedData },
           context: pattern.context,
           confidence_score: null // Will be calculated by the analysis
         });
+
+      if (error) {
+        console.warn('Failed to store pattern in database (table may not exist):', error.message);
+      }
     } catch (error) {
       console.error('Failed to store encrypted pattern:', error);
       // Don't throw - this shouldn't block the authentication process
