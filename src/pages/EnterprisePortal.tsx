@@ -7,6 +7,7 @@ import { AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import ApiKeyManager from '@/components/enterprise/ApiKeyManager';
 import ApiDocumentation from '@/components/enterprise/ApiDocumentation';
+import WhiteLabelManager from '@/components/enterprise/WhiteLabelManager';
 
 const EnterprisePortal = () => {
   const { user } = useAuth();
@@ -96,21 +97,7 @@ const EnterprisePortal = () => {
           <div className="lg:col-span-3">
             {activeTab === 'api-keys' && <ApiKeyManager />}
             {activeTab === 'api-docs' && <ApiDocumentation />}
-            {activeTab === 'white-label' && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>White-Label Settings</CardTitle>
-                  <CardDescription>
-                    Configure branding and white-label options for your implementation
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-center text-muted-foreground py-10">
-                    White-label configuration options coming soon
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+            {activeTab === 'white-label' && <WhiteLabelManager />}
             {activeTab === 'support' && (
               <Card>
                 <CardHeader>

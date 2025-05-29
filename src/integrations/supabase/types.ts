@@ -425,6 +425,57 @@ export type Database = {
           },
         ]
       }
+      white_label_configs: {
+        Row: {
+          accent_color: string | null
+          company_name: string | null
+          created_at: string
+          custom_css: string | null
+          custom_domain: string | null
+          favicon_url: string | null
+          footer_text: string | null
+          hide_typemagic_branding: boolean | null
+          id: string
+          logo_url: string | null
+          primary_color: string | null
+          secondary_color: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accent_color?: string | null
+          company_name?: string | null
+          created_at?: string
+          custom_css?: string | null
+          custom_domain?: string | null
+          favicon_url?: string | null
+          footer_text?: string | null
+          hide_typemagic_branding?: boolean | null
+          id?: string
+          logo_url?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accent_color?: string | null
+          company_name?: string | null
+          created_at?: string
+          custom_css?: string | null
+          custom_domain?: string | null
+          favicon_url?: string | null
+          footer_text?: string | null
+          hide_typemagic_branding?: boolean | null
+          id?: string
+          logo_url?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
