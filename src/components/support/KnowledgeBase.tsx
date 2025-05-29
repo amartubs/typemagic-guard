@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Search, BookOpen, ThumbsUp, ThumbsDown, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/auth';
 
 interface KnowledgeBaseArticle {
   id: string;
@@ -23,6 +24,7 @@ interface KnowledgeBaseArticle {
 const KnowledgeBase = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const { user } = useAuth();
 
   const { data: articles, isLoading } = useQuery({
     queryKey: ['knowledge-base-articles', searchTerm, selectedCategory],
@@ -57,11 +59,14 @@ const KnowledgeBase = () => {
   ];
 
   const handleVote = async (articleId: string, isHelpful: boolean) => {
+    if (!user) return;
+
     try {
       const { error } = await supabase
         .from('knowledge_base_votes')
         .upsert({
           article_id: articleId,
+          user_id: user.id,
           is_helpful: isHelpful,
         });
 
@@ -69,11 +74,14 @@ const KnowledgeBase = () => {
       
       // Update the article vote count
       const field = isHelpful ? 'helpful_votes' : 'unhelpful_votes';
-      await supabase.rpc('increment', {
-        table_name: 'knowledge_base_articles',
-        row_id: articleId,
-        field_name: field
-      });
+      const { error: updateError } = await supabase
+        .from('knowledge_base_articles')
+        .update({
+          [field]: supabase.raw(`${field} + 1`)
+        })
+        .eq('id', articleId);
+
+      if (updateError) throw updateError;
     } catch (error) {
       console.error('Error voting:', error);
     }
@@ -81,11 +89,14 @@ const KnowledgeBase = () => {
 
   const incrementViewCount = async (articleId: string) => {
     try {
-      await supabase.rpc('increment', {
-        table_name: 'knowledge_base_articles',
-        row_id: articleId,
-        field_name: 'view_count'
-      });
+      const { error } = await supabase
+        .from('knowledge_base_articles')
+        .update({
+          view_count: supabase.raw('view_count + 1')
+        })
+        .eq('id', articleId);
+
+      if (error) throw error;
     } catch (error) {
       console.error('Error incrementing view count:', error);
     }
@@ -179,28 +190,30 @@ const KnowledgeBase = () => {
                       </span>
                     </div>
                     
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleVote(article.id, true);
-                        }}
-                      >
-                        <ThumbsUp className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleVote(article.id, false);
-                        }}
-                      >
-                        <ThumbsDown className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    {user && (
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleVote(article.id, true);
+                          }}
+                        >
+                          <ThumbsUp className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleVote(article.id, false);
+                          }}
+                        >
+                          <ThumbsDown className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
