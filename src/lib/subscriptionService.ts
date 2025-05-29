@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriptionPlan, UserType } from '@/lib/types';
 import { Database } from '@/integrations/supabase/types';
@@ -101,11 +102,7 @@ export class SubscriptionService {
     if (dbPlan.tier === 'enterprise') {
       return ['company'];
     }
-    // Free plan is for individuals and charities
-    if (dbPlan.tier === 'free') {
-      return ['individual', 'charity'];
-    }
-    // Other plans are for all user types
+    // All other plans are for all user types
     return ['individual', 'company', 'charity'];
   }
 
@@ -116,39 +113,39 @@ export class SubscriptionService {
       case 'free':
         features.push(
           'Basic keystroke biometrics',
+          '1 user only',
           'Single device support',
-          'Standard security settings',
-          'Email support'
+          'Community support'
         );
         break;
       case 'basic':
         features.push(
-          'Advanced keystroke biometrics',
-          'Multi-device support (up to 3)',
-          'Custom security settings',
+          'Multi-device support',
+          'Up to 5 users',
           'Basic analytics',
-          'Priority email support'
+          'Email support',
+          'Custom security settings'
         );
         break;
       case 'professional':
         features.push(
-          'Advanced keystroke & mouse biometrics',
-          'Unlimited device support',
-          'Advanced security settings',
-          'Comprehensive analytics',
+          'Advanced biometric analytics',
+          'Up to 20 users',
+          'Full analytics dashboard',
+          'Real-time anomaly detection',
           '24/7 priority support',
-          'Anomaly detection alerts'
+          'Custom security policies'
         );
         break;
       case 'enterprise':
         features.push(
-          'All Professional features',
           'Unlimited users',
-          'Unlimited biometric profiles',
+          'API access',
           'Custom integration support',
           'Dedicated account manager',
+          'Advanced compliance features',
           'SSO integration',
-          'Audit logs & compliance reports'
+          'Audit logs & reporting'
         );
         break;
     }

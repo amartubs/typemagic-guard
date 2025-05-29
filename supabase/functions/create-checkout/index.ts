@@ -45,17 +45,29 @@ serve(async (req) => {
       customerId = customers.data[0].id;
     }
 
-    // Define pricing based on plan and user type
+    // Define pricing based on plan and user type with new pricing structure
     const getPriceAmount = (planId: string, userType: string) => {
       const pricing: Record<string, Record<string, number>> = {
         basic: { individual: 999, company: 4999, charity: 499 }, // $9.99, $49.99, $4.99
-        professional: { individual: 2999, company: 14999, charity: 1499 }, // $29.99, $149.99, $14.99
+        professional: { individual: 1999, company: 9999, charity: 1999 }, // $19.99, $99.99, $19.99
         enterprise: { individual: 9999, company: 49999, charity: 24999 }, // $99.99, $499.99, $249.99
       };
       return pricing[planId]?.[userType] || 0;
     };
 
     const amount = getPriceAmount(planId, userType);
+    
+    // Don't create checkout for free plans
+    if (amount === 0) {
+      return new Response(
+        JSON.stringify({ error: "Free plans don't require checkout" }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 400,
+        }
+      );
+    }
+
     const planNames: Record<string, string> = {
       basic: 'Basic Plan',
       professional: 'Professional Plan',
@@ -83,7 +95,7 @@ serve(async (req) => {
       ],
       mode: "subscription",
       success_url: `${req.headers.get("origin")}/dashboard?subscription=success`,
-      cancel_url: `${req.headers.get("origin")}/profile?subscription=cancelled`,
+      cancel_url: `${req.headers.get("origin")}/pricing?subscription=cancelled`,
       metadata: {
         user_id: user.id,
         plan_id: planId,

@@ -20,21 +20,43 @@ const PricingCards: React.FC<PricingCardsProps> = ({
 }) => {
   const plans: SubscriptionPlan[] = [
     {
-      id: 'basic',
-      name: 'Basic',
-      description: 'Perfect for individuals getting started',
-      tier: 'basic',
-      userTypes: ['individual', 'charity'],
-      price: { individual: 9.99, company: 49.99, charity: 4.99 },
+      id: 'free',
+      name: 'Free',
+      description: 'Basic keystroke biometrics for getting started',
+      tier: 'free',
+      userTypes: ['individual', 'company', 'charity'],
+      price: { individual: 0, company: 0, charity: 0 },
       features: [
-        'Up to 3 devices',
-        'Basic keystroke analytics',
-        'Email support',
-        'Standard security settings'
+        'Basic keystroke biometrics',
+        '1 user only',
+        'Single device support',
+        'Community support'
       ],
       limits: {
         users: 1,
-        biometricProfiles: 3,
+        biometricProfiles: 1,
+        advancedAnalytics: false,
+        customSecuritySettings: false,
+        prioritySupport: false
+      }
+    },
+    {
+      id: 'basic',
+      name: 'Basic',
+      description: 'Multi-device support with basic analytics',
+      tier: 'basic',
+      userTypes: ['individual', 'company', 'charity'],
+      price: { individual: 9.99, company: 49.99, charity: 4.99 },
+      features: [
+        'Multi-device support',
+        'Up to 5 users',
+        'Basic analytics',
+        'Email support',
+        'Custom security settings'
+      ],
+      limits: {
+        users: 5,
+        biometricProfiles: 5,
         advancedAnalytics: false,
         customSecuritySettings: true,
         prioritySupport: false
@@ -43,21 +65,21 @@ const PricingCards: React.FC<PricingCardsProps> = ({
     {
       id: 'professional',
       name: 'Professional',
-      description: 'Advanced features for power users',
+      description: 'Advanced biometrics with full analytics',
       tier: 'professional',
       userTypes: ['individual', 'company', 'charity'],
-      price: { individual: 29.99, company: 149.99, charity: 14.99 },
+      price: { individual: 19.99, company: 99.99, charity: 19.99 },
       features: [
-        'Unlimited devices',
         'Advanced biometric analytics',
+        'Up to 20 users',
+        'Full analytics dashboard',
         'Real-time anomaly detection',
         '24/7 priority support',
-        'Custom security policies',
-        'Usage insights & reports'
+        'Custom security policies'
       ],
       limits: {
-        users: 25,
-        biometricProfiles: 25,
+        users: 20,
+        biometricProfiles: 20,
         advancedAnalytics: true,
         customSecuritySettings: true,
         prioritySupport: true
@@ -66,18 +88,18 @@ const PricingCards: React.FC<PricingCardsProps> = ({
     {
       id: 'enterprise',
       name: 'Enterprise',
-      description: 'Full-scale solution for organizations',
+      description: 'Unlimited users with API access',
       tier: 'enterprise',
       userTypes: ['company'],
       price: { individual: 99.99, company: 499.99, charity: 249.99 },
       features: [
-        'Everything in Professional',
         'Unlimited users',
-        'SSO integration',
+        'API access',
+        'Custom integration support',
         'Dedicated account manager',
-        'Custom integrations',
         'Advanced compliance features',
-        'API access'
+        'SSO integration',
+        'Audit logs & reporting'
       ],
       limits: {
         users: Infinity,
@@ -92,10 +114,11 @@ const PricingCards: React.FC<PricingCardsProps> = ({
   const filteredPlans = plans.filter(plan => plan.userTypes.includes(userType));
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {filteredPlans.map((plan) => {
         const isPopular = plan.tier === 'professional';
         const isCurrent = plan.id === currentPlanId;
+        const isFree = plan.tier === 'free';
         
         return (
           <Card 
@@ -117,10 +140,16 @@ const PricingCards: React.FC<PricingCardsProps> = ({
               <CardTitle className="text-xl">{plan.name}</CardTitle>
               <CardDescription>{plan.description}</CardDescription>
               <div className="mt-4">
-                <span className="text-4xl font-bold">
-                  ${plan.price[userType]}
-                </span>
-                <span className="text-muted-foreground">/month</span>
+                {isFree ? (
+                  <span className="text-4xl font-bold">Free</span>
+                ) : (
+                  <>
+                    <span className="text-4xl font-bold">
+                      ${plan.price[userType]}
+                    </span>
+                    <span className="text-muted-foreground">/month</span>
+                  </>
+                )}
               </div>
             </CardHeader>
             
@@ -138,11 +167,11 @@ const PricingCards: React.FC<PricingCardsProps> = ({
             <CardFooter>
               <Button
                 className="w-full"
-                variant={isCurrent ? 'secondary' : isPopular ? 'default' : 'outline'}
+                variant={isCurrent ? 'secondary' : isPopular ? 'default' : isFree ? 'outline' : 'outline'}
                 onClick={() => onSelectPlan(plan)}
                 disabled={loading || isCurrent}
               >
-                {isCurrent ? 'Current Plan' : `Choose ${plan.name}`}
+                {isCurrent ? 'Current Plan' : isFree ? 'Get Started' : `Choose ${plan.name}`}
               </Button>
             </CardFooter>
           </Card>

@@ -41,11 +41,11 @@ serve(async (req) => {
     });
 
     if (customers.data.length === 0) {
-      // Update user subscription to free/trial
+      // Update user subscription to free
       await supabaseClient
         .from("subscriptions")
         .update({
-          status: "trial",
+          status: "active",
           updated_at: new Date().toISOString(),
         })
         .eq("user_id", user.id);
@@ -80,16 +80,17 @@ serve(async (req) => {
       const subscription = subscriptions.data[0];
       subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
       
-      // Determine tier from price
+      // Determine tier from price with new pricing structure
       const priceId = subscription.items.data[0].price.id;
       const price = await stripe.prices.retrieve(priceId);
       const amount = price.unit_amount || 0;
       
-      if (amount >= 9999) {
+      // Map amounts to tiers based on new pricing
+      if (amount >= 9999 && amount < 2000) { // $99.99+ (Enterprise)
         subscriptionTier = "enterprise";
-      } else if (amount >= 2999) {
+      } else if (amount >= 1999 && amount < 9999) { // $19.99-$99.98 (Professional)
         subscriptionTier = "professional";
-      } else if (amount >= 999) {
+      } else if (amount >= 999 && amount < 1999) { // $9.99-$19.98 (Basic)
         subscriptionTier = "basic";
       }
 
