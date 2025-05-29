@@ -6,6 +6,7 @@ import { User, SubscriptionDetails } from '@/lib/types';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { createUserFromSession } from './userUtils';
+import { ProfileService } from '@/lib/profileService';
 
 export const useAuthState = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -16,13 +17,29 @@ export const useAuthState = () => {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         console.log('Auth state changed:', event, session);
         setSession(session);
         
         if (session?.user) {
-          const userData = createUserFromSession(session);
-          setUser(userData);
+          // Try to get full profile from database
+          try {
+            const fullProfile = await ProfileService.getProfile(session.user.id);
+            if (fullProfile) {
+              setUser(fullProfile);
+              // Update last login
+              await ProfileService.updateLastLogin(session.user.id);
+            } else {
+              // Fallback to session-based user if profile not found
+              const userData = createUserFromSession(session);
+              setUser(userData);
+            }
+          } catch (error) {
+            console.error('Error loading user profile:', error);
+            // Fallback to session-based user
+            const userData = createUserFromSession(session);
+            setUser(userData);
+          }
         } else {
           setUser(null);
         }
@@ -32,12 +49,23 @@ export const useAuthState = () => {
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       
       if (session?.user) {
-        const userData = createUserFromSession(session);
-        setUser(userData);
+        try {
+          const fullProfile = await ProfileService.getProfile(session.user.id);
+          if (fullProfile) {
+            setUser(fullProfile);
+          } else {
+            const userData = createUserFromSession(session);
+            setUser(userData);
+          }
+        } catch (error) {
+          console.error('Error loading user profile:', error);
+          const userData = createUserFromSession(session);
+          setUser(userData);
+        }
       }
       
       setLoading(false);

@@ -1,32 +1,40 @@
 
 import { Session } from '@supabase/supabase-js';
-import { User } from '@/lib/types';
+import { User, SecuritySettings, SubscriptionDetails } from '@/lib/types';
 
 export const createUserFromSession = (session: Session): User => {
-  return {
-    id: session.user.id,
-    email: session.user.email || '',
-    name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-    role: 'user',
-    securitySettings: {
-      minConfidenceThreshold: 65,
-      learningPeriod: 5,
-      anomalyDetectionSensitivity: 70,
-      securityLevel: 'medium',
-      enforceTwoFactor: false,
-      maxFailedAttempts: 5
-    },
-    lastLogin: Date.now(),
+  const { user: authUser } = session;
+  
+  // Create a user object that matches our database schema
+  const user: User = {
+    id: authUser.id,
+    email: authUser.email || '',
+    name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'Unknown User',
+    role: authUser.user_metadata?.role || 'user',
     status: 'active',
-    subscription: {
-      type: session.user.user_metadata?.userType || 'individual',
-      tier: session.user.user_metadata?.subscriptionTier || 'free',
-      startDate: Date.now(),
-      endDate: Date.now() + 30 * 24 * 60 * 60 * 1000,
-      autoRenew: true,
-      status: 'active'
-    },
-    organizationName: session.user.user_metadata?.organizationName,
-    organizationSize: session.user.user_metadata?.organizationSize
+    lastLogin: Date.now(),
+    securitySettings: getDefaultSecuritySettings(),
+    // These will be populated from the database in a real implementation
+    subscription: getDefaultSubscription(),
   };
+
+  return user;
 };
+
+const getDefaultSecuritySettings = (): SecuritySettings => ({
+  minConfidenceThreshold: 65,
+  learningPeriod: 5,
+  anomalyDetectionSensitivity: 70,
+  securityLevel: 'medium',
+  enforceTwoFactor: false,
+  maxFailedAttempts: 5,
+});
+
+const getDefaultSubscription = (): SubscriptionDetails => ({
+  type: 'individual',
+  tier: 'free',
+  startDate: Date.now(),
+  endDate: null,
+  autoRenew: true,
+  status: 'trial',
+});

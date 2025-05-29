@@ -1,9 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SubscriptionPlan, UserType } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Check } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
+import { SubscriptionService } from '@/lib/subscriptionService';
+import { toast } from '@/hooks/use-toast';
 
 interface SubscriptionPlansProps {
   userType: UserType;
@@ -12,129 +14,59 @@ interface SubscriptionPlansProps {
   selectedPlanId?: string;
 }
 
-const subscriptionPlans: SubscriptionPlan[] = [
-  {
-    id: 'free',
-    name: 'Free',
-    description: 'Basic protection for individuals',
-    tier: 'free',
-    userTypes: ['individual', 'charity'],
-    price: {
-      individual: 0,
-      company: 0,
-      charity: 0,
-    },
-    features: [
-      'Basic keystroke biometrics',
-      'Single device support',
-      'Standard security settings',
-      'Email support'
-    ],
-    limits: {
-      users: 1,
-      biometricProfiles: 1,
-      advancedAnalytics: false,
-      customSecuritySettings: false,
-      prioritySupport: false
-    }
-  },
-  {
-    id: 'basic',
-    name: 'Basic',
-    description: 'Enhanced protection for small teams',
-    tier: 'basic',
-    userTypes: ['individual', 'company', 'charity'],
-    price: {
-      individual: 9.99,
-      company: 19.99,
-      charity: 4.99,
-    },
-    features: [
-      'Advanced keystroke biometrics',
-      'Multi-device support (up to 3)',
-      'Custom security settings',
-      'Basic analytics',
-      'Priority email support'
-    ],
-    limits: {
-      users: 5,
-      biometricProfiles: 3,
-      advancedAnalytics: false,
-      customSecuritySettings: true,
-      prioritySupport: false
-    }
-  },
-  {
-    id: 'professional',
-    name: 'Professional',
-    description: 'Professional-grade security',
-    tier: 'professional',
-    userTypes: ['individual', 'company', 'charity'],
-    price: {
-      individual: 19.99,
-      company: 49.99,
-      charity: 9.99,
-    },
-    features: [
-      'Advanced keystroke & mouse biometrics',
-      'Unlimited device support',
-      'Advanced security settings',
-      'Comprehensive analytics',
-      '24/7 priority support',
-      'Anomaly detection alerts'
-    ],
-    limits: {
-      users: 20,
-      biometricProfiles: 10,
-      advancedAnalytics: true,
-      customSecuritySettings: true,
-      prioritySupport: true
-    }
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    description: 'Full-featured enterprise security',
-    tier: 'enterprise',
-    userTypes: ['company'],
-    price: {
-      individual: 0, // Not available for individuals
-      company: 99.99,
-      charity: 0, // Not available for charities
-    },
-    features: [
-      'All Professional features',
-      'Unlimited users',
-      'Unlimited biometric profiles',
-      'Custom integration support',
-      'Dedicated account manager',
-      'SSO integration',
-      'Audit logs & compliance reports'
-    ],
-    limits: {
-      users: Infinity,
-      biometricProfiles: Infinity,
-      advancedAnalytics: true,
-      customSecuritySettings: true,
-      prioritySupport: true
-    }
-  }
-];
-
 const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ 
   userType, 
   onSelectPlan,
   className,
   selectedPlanId
 }) => {
-  // Filter plans based on user type
-  const availablePlans = subscriptionPlans.filter(plan => 
-    plan.userTypes.includes(userType)
-  );
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadPlans = async () => {
+      try {
+        const availablePlans = await SubscriptionService.getAvailablePlans();
+        // Filter plans based on user type
+        const filteredPlans = availablePlans.filter(plan => 
+          plan.userTypes.includes(userType)
+        );
+        setPlans(filteredPlans);
+      } catch (error) {
+        console.error('Error loading subscription plans:', error);
+        toast({
+          title: "Error Loading Plans",
+          description: "Failed to load subscription plans. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPlans();
+  }, [userType]);
+
+  if (loading) {
+    return (
+      <div className={`flex items-center justify-center py-8 ${className}`}>
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Loading subscription plans...</span>
+      </div>
+    );
+  }
+
+  if (plans.length === 0) {
+    return (
+      <div className={`text-center py-8 ${className}`}>
+        <p className="text-muted-foreground">No subscription plans available for your user type.</p>
+      </div>
+    );
+  }
 
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${Math.min(availablePlans.length, 4)} gap-6 ${className}`}>
-      {availablePlans.map(plan => (
+    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${Math.min(plans.length, 4)} gap-6 ${className}`}>
+      {plans.map(plan => (
         <Card 
           key={plan.id} 
           className={`flex flex-col border-2 ${plan.id === selectedPlanId 
