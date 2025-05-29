@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
@@ -6,16 +7,6 @@ import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Provider } from './types';
 import AuthContext from './AuthContext';
-import { 
-  createUserFromSession,
-  loginWithEmail, 
-  registerWithEmail, 
-  logoutUser, 
-  signInWithOAuthProvider,
-  updateUserProfile,
-  updateUserPassword,
-  mockUsers
-} from './authUtils';
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -26,8 +17,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [twoFactorRequired, setTwoFactorRequired] = useState(false);
-  const [tempTwoFactorCode, setTempTwoFactorCode] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const createUserFromSession = (session: Session): User => {
+    return {
+      id: session.user.id,
+      email: session.user.email || '',
+      name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+      role: 'user',
+      securitySettings: {
+        minConfidenceThreshold: 65,
+        learningPeriod: 5,
+        anomalyDetectionSensitivity: 70,
+        securityLevel: 'medium',
+        enforceTwoFactor: false,
+        maxFailedAttempts: 5
+      },
+      lastLogin: Date.now(),
+      status: 'active',
+      subscription: {
+        type: session.user.user_metadata?.userType || 'individual',
+        tier: session.user.user_metadata?.subscriptionTier || 'free',
+        startDate: Date.now(),
+        endDate: Date.now() + 30 * 24 * 60 * 60 * 1000,
+        autoRenew: true,
+        status: 'active'
+      },
+      organizationName: session.user.user_metadata?.organizationName,
+      organizationSize: session.user.user_metadata?.organizationSize
+    };
+  };
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -42,6 +61,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         } else {
           setUser(null);
         }
+        
+        setLoading(false);
       }
     );
 
@@ -66,96 +87,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setLoading(true);
     
     try {
-      const result = await loginWithEmail(email, password);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
       
-      // If using two-factor auth, handle that flow
-      if (user?.securitySettings.enforceTwoFactor) {
-        setTwoFactorRequired(true);
-        const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
-        setTempTwoFactorCode(randomCode);
-        localStorage.setItem('pendingTwoFactorEmail', email);
-        
+      if (error) {
+        console.error('Login error:', error);
         toast({
-          title: "Two-Factor Authentication Required",
-          description: `A verification code has been sent to your email. For demo purposes, the code is: ${randomCode}`,
+          title: "Authentication Failed",
+          description: error.message,
+          variant: "destructive",
         });
-        
         return false;
       }
       
-      return result.success;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const sendTwoFactorCode = async (): Promise<boolean> => {
-    try {
-      if (!tempTwoFactorCode) {
-        const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
-        setTempTwoFactorCode(randomCode);
-      }
-      
       toast({
-        title: "Verification Code Resent",
-        description: `For demo purposes, the code is: ${tempTwoFactorCode}`,
+        title: "Login Successful",
+        description: "Welcome back!",
       });
       
       return true;
     } catch (error) {
-      console.error('Error sending 2FA code:', error);
+      console.error('Login error:', error);
       toast({
-        title: "Failed to Send Code",
+        title: "Login Failed",
         description: "An unexpected error occurred",
         variant: "destructive",
       });
       return false;
-    }
-  };
-
-  const verifyTwoFactorCode = async (code: string): Promise<boolean> => {
-    try {
-      if (code === tempTwoFactorCode) {
-        const storedEmail = localStorage.getItem('pendingTwoFactorEmail');
-        const foundUser = mockUsers.find(u => u.email.toLowerCase() === storedEmail?.toLowerCase());
-        
-        if (foundUser) {
-          const updatedUser = {
-            ...foundUser,
-            lastLogin: Date.now()
-          };
-          
-          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-          setUser(updatedUser);
-          
-          setTwoFactorRequired(false);
-          setTempTwoFactorCode(null);
-          localStorage.removeItem('pendingTwoFactorEmail');
-          
-          toast({
-            title: "Verification Successful",
-            description: `Welcome back, ${updatedUser.name}!`,
-          });
-          
-          return true;
-        }
-      } else {
-        toast({
-          title: "Verification Failed",
-          description: "Invalid verification code",
-          variant: "destructive",
-        });
-      }
-      
-      return false;
-    } catch (error) {
-      console.error('2FA verification error:', error);
-      toast({
-        title: "Verification Failed",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
-      return false;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -171,35 +133,106 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setLoading(true);
     
     try {
-      const result = await registerWithEmail(
-        name, 
-        email, 
-        password, 
-        userType, 
-        subscriptionTier, 
-        organizationName, 
-        organizationSize
-      );
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+            userType,
+            subscriptionTier,
+            organizationName,
+            organizationSize
+          }
+        }
+      });
       
-      return result.success;
+      if (error) {
+        console.error('Registration error:', error);
+        toast({
+          title: "Registration Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return false;
+      }
+      
+      toast({
+        title: "Registration Successful",
+        description: "Your account has been created. Please check your email for verification.",
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast({
+        title: "Registration Failed",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
   const logout = async () => {
-    const result = await logoutUser();
-    if (result.success) {
-      navigate('/login');
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+      console.error('Error logging out:', error);
+      toast({
+        title: "Logout Failed",
+        description: "An error occurred while logging out",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    toast({
+      title: "Logged Out",
+      description: "You have been successfully logged out",
+    });
+    
+    navigate('/');
+  };
+
+  const resetPassword = async (email: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      
+      if (error) {
+        console.error('Password reset error:', error);
+        toast({
+          title: "Password Reset Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return false;
+      }
+      
+      toast({
+        title: "Password Reset Email Sent",
+        description: "Check your email for password reset instructions",
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Password reset error:', error);
+      toast({
+        title: "Password Reset Failed",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+      return false;
     }
   };
 
   const updateUser = (userData: Partial<User>) => {
     if (!user) return;
-    
-    const updatedUser = { ...user, ...userData };
-    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-    setUser(updatedUser);
+    setUser({ ...user, ...userData });
   };
 
   const updateSubscription = (subscriptionData: Partial<SubscriptionDetails>) => {
@@ -207,8 +240,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     const updatedSubscription = { ...user.subscription, ...subscriptionData };
     const updatedUser = { ...user, subscription: updatedSubscription };
-    
-    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
     setUser(updatedUser);
     
     toast({
@@ -217,55 +248,123 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     });
   };
 
-  const signInWithGoogle = async (): Promise<boolean> => {
-    setLoading(true);
-    
-    try {
-      const result = await signInWithOAuthProvider('google');
-      return result.success;
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const signInWithProvider = async (provider: Provider): Promise<boolean> => {
     setLoading(true);
     
     try {
-      const result = await signInWithOAuthProvider(provider);
-      return result.success;
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: provider as 'google' | 'github' | 'apple',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`
+        }
+      });
+      
+      if (error) {
+        console.error(`${provider} authentication error:`, error);
+        toast({
+          title: "Authentication Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error(`${provider} authentication error:`, error);
+      toast({
+        title: "Authentication Failed",
+        description: `Failed to authenticate with ${provider}`,
+        variant: "destructive",
+      });
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
-  const updatePassword = async (currentPassword: string, newPassword: string): Promise<boolean> => {
-    setLoading(true);
-    
+  const updateUserProfile = async (name: string, email: string): Promise<boolean> => {
     try {
-      const result = await updateUserPassword(currentPassword, newPassword);
-      return result;
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  const updateUserProfileData = async (name: string, email: string): Promise<boolean> => {
-    setLoading(true);
-    
-    try {
-      const result = await updateUserProfile(name, email);
+      const { error } = await supabase.auth.updateUser({
+        email: email,
+        data: { name }
+      });
       
-      if (result && user) {
-        // Update the local user state with new information
-        const updatedUser = { ...user, name, email };
-        setUser(updatedUser);
+      if (error) {
+        console.error('Error updating user profile:', error);
+        toast({
+          title: "Profile Update Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return false;
       }
       
-      return result;
-    } finally {
-      setLoading(false);
+      toast({
+        title: "Profile Updated",
+        description: "Your profile has been updated successfully.",
+      });
+      
+      if (user) {
+        setUser({ ...user, name, email });
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      toast({
+        title: "Profile Update Failed",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+      return false;
     }
+  };
+
+  const updatePassword = async (currentPassword: string, newPassword: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase.auth.updateUser({ 
+        password: newPassword 
+      });
+      
+      if (error) {
+        console.error('Error updating password:', error);
+        toast({
+          title: "Password Update Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return false;
+      }
+      
+      toast({
+        title: "Password Updated",
+        description: "Your password has been updated successfully.",
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Error updating password:', error);
+      toast({
+        title: "Password Update Failed",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  // Mock functions for backward compatibility
+  const sendTwoFactorCode = async (): Promise<boolean> => {
+    return true;
+  };
+
+  const verifyTwoFactorCode = async (code: string): Promise<boolean> => {
+    return true;
+  };
+
+  const signInWithGoogle = async (): Promise<boolean> => {
+    return signInWithProvider('google');
   };
 
   return (
@@ -276,15 +375,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       logout, 
       loading, 
       updateUser,
-      updateUserProfile: updateUserProfileData,
+      updateUserProfile,
       updatePassword,
       updateSubscription,
       verifyTwoFactorCode,
       sendTwoFactorCode,
       twoFactorRequired,
-      setTwoFactorRequired,
+      setTwoFactorRequired: () => {},
       signInWithGoogle,
-      signInWithProvider
+      signInWithProvider,
+      resetPassword
     }}>
       {children}
     </AuthContext.Provider>

@@ -14,11 +14,10 @@ import Profile from "./pages/Profile";
 import Demo from "./pages/Demo";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
+import ResetPassword from "./pages/ResetPassword";
 import React from "react";
 
-// Move the queryClient creation inside the component
 const App = () => {
-  // Create a client
   const queryClient = new QueryClient();
   
   return (
@@ -33,6 +32,7 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/auth" element={<AuthPage />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/dashboard" element={
                   <PrivateRoute>
                     <Dashboard />
@@ -49,7 +49,6 @@ const App = () => {
                   </PrivateRoute>
                 } />
                 <Route path="/demo" element={<Demo />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </AuthProvider>

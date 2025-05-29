@@ -2,7 +2,6 @@
 import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { User, UserType, SubscriptionTier, SubscriptionDetails } from '@/lib/types';
 
-// Define our own Provider type that is compatible with Supabase's Provider type
 export type Provider = 'google' | 'github' | 'microsoft' | 'apple';
 
 export interface AuthContextType {
@@ -29,4 +28,5 @@ export interface AuthContextType {
   setTwoFactorRequired: (required: boolean) => void;
   signInWithGoogle: () => Promise<boolean>;
   signInWithProvider: (provider: Provider) => Promise<boolean>;
+  resetPassword?: (email: string) => Promise<boolean>;
 }

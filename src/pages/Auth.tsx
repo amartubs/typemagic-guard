@@ -38,10 +38,11 @@ const AuthPage = () => {
     verifyTwoFactorCode, 
     sendTwoFactorCode,
     signInWithProvider,
-    loading: authLoading
+    loading: authLoading,
+    resetPassword
   } = useAuth();
   
-  const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+  const [activeTab, setActiveTab] = useState<'login' | 'register' | 'forgot'>('login');
   const [registrationStep, setRegistrationStep] = useState<'userInfo' | 'userType' | 'subscription' | 'payment'>('userInfo');
   const [showEmailLogin, setShowEmailLogin] = useState(false);
   
@@ -49,6 +50,10 @@ const AuthPage = () => {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
+  
+  // Forgot password state
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
   
   // Two-factor authentication state
   const [twoFactorCode, setTwoFactorCode] = useState('');
@@ -73,18 +78,10 @@ const AuthPage = () => {
   // Redirect if user is already logged in
   useEffect(() => {
     if (user && !twoFactorRequired) {
-      // Get the intended destination or default to dashboard
       const from = location.state?.from?.pathname || '/dashboard';
       navigate(from);
     }
   }, [user, navigate, location, twoFactorRequired]);
-
-  // Save the email temporarily for 2FA flow
-  useEffect(() => {
-    if (twoFactorRequired && loginEmail) {
-      localStorage.setItem('pendingTwoFactorEmail', loginEmail);
-    }
-  }, [twoFactorRequired, loginEmail]);
 
   const handleKeystrokeCapture = (timings: KeyTiming[]) => {
     setKeystrokeTimings(timings);
@@ -97,10 +94,7 @@ const AuthPage = () => {
     try {
       const success = await login(loginEmail, loginPassword);
       
-      if (success && enableBiometrics) {
-        setBiometricStep(true);
-      } else if (success) {
-        // Navigate to the intended destination or dashboard
+      if (success) {
         const from = location.state?.from?.pathname || '/dashboard';
         navigate(from);
       }
@@ -109,13 +103,36 @@ const AuthPage = () => {
     }
   };
 
+  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!resetPassword) {
+      toast({
+        title: "Feature Not Available",
+        description: "Password reset is not available at this time.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setForgotLoading(true);
+    
+    try {
+      const success = await resetPassword(forgotEmail);
+      
+      if (success) {
+        setActiveTab('login');
+        setForgotEmail('');
+      }
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
   const handleSocialLogin = async (provider: SocialProvider) => {
     const success = await signInWithProvider(provider);
     
-    if (success && enableBiometrics) {
-      setBiometricStep(true);
-    } else if (success) {
-      // Navigate to the intended destination or dashboard
+    if (success) {
       const from = location.state?.from?.pathname || '/dashboard';
       navigate(from);
     }
@@ -129,7 +146,6 @@ const AuthPage = () => {
       const success = await verifyTwoFactorCode(twoFactorCode);
       
       if (success) {
-        // Navigate to the intended destination or dashboard
         const from = location.state?.from?.pathname || '/dashboard';
         navigate(from);
       }
@@ -145,7 +161,6 @@ const AuthPage = () => {
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate passwords match
     if (registerPassword !== registerConfirmPassword) {
       toast({
         title: "Passwords do not match",
@@ -178,12 +193,11 @@ const AuthPage = () => {
       );
       
       if (success) {
-        // Navigate to dashboard after successful registration
         toast({
           title: "Registration Successful",
-          description: "Welcome to TypeMagic Guard!"
+          description: "Welcome to Shoale! Please check your email to verify your account."
         });
-        navigate('/dashboard');
+        setActiveTab('login');
       }
     } finally {
       setRegisterLoading(false);
@@ -196,8 +210,6 @@ const AuthPage = () => {
   };
   
   const handleBiometricVerify = () => {
-    // For demo purposes, we'll just redirect to dashboard
-    // In a real app, you'd verify the keystroke pattern here
     navigate('/dashboard');
   };
   
@@ -256,7 +268,6 @@ const AuthPage = () => {
         return;
       }
       
-      // For demo purposes, we'll skip the payment step
       handleRegisterSubmit(new Event('submit') as any);
     }
   };
@@ -382,12 +393,6 @@ const AuthPage = () => {
               <RefreshCw className="h-4 w-4" />
               Resend Code
             </Button>
-            
-            <div className="text-center text-xs text-muted-foreground mt-4">
-              <p>
-                For demo purposes, the verification code is shown in a toast notification.
-              </p>
-            </div>
           </form>
         </Card>
       </div>
@@ -401,20 +406,21 @@ const AuthPage = () => {
           <div className="flex justify-center mb-4">
             <Shield className="h-12 w-12 text-primary" />
           </div>
-          <h1 className="text-2xl font-bold">TypeMagic Guard</h1>
+          <h1 className="text-2xl font-bold">Shoale</h1>
           <p className="text-muted-foreground mt-2">
             Secure authentication with keystroke biometrics
           </p>
         </div>
 
         <Tabs defaultValue="login" value={activeTab} onValueChange={(value) => {
-          setActiveTab(value as 'login' | 'register');
+          setActiveTab(value as 'login' | 'register' | 'forgot');
           setShowEmailLogin(false);
         }}>
           <div className="px-6">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="register">Register</TabsTrigger>
+              <TabsTrigger value="forgot">Reset</TabsTrigger>
             </TabsList>
           </div>
 
@@ -427,6 +433,26 @@ const AuthPage = () => {
                     isLoading={authLoading} 
                   />
                   
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">
+                        Or continue with email
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="w-full flex items-center gap-2"
+                    onClick={() => setShowEmailLogin(true)}
+                  >
+                    <Mail className="h-4 w-4" />
+                    Sign in with Email
+                  </Button>
+                  
                   <div className="flex items-center space-x-2 mt-4">
                     <input
                       type="checkbox"
@@ -438,10 +464,6 @@ const AuthPage = () => {
                     <Label htmlFor="biometrics" className="text-sm cursor-pointer">
                       Enable keystroke biometric verification
                     </Label>
-                  </div>
-                  
-                  <div className="text-center text-xs text-muted-foreground mt-2">
-                    <p>For demo purposes, any provider will create a mock user account</p>
                   </div>
                 </div>
               ) : (
@@ -462,7 +484,7 @@ const AuthPage = () => {
                       <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                       <Input
                         id="email"
-                        placeholder="demo@example.com"
+                        placeholder="Enter your email"
                         type="email"
                         value={loginEmail}
                         onChange={(e) => setLoginEmail(e.target.value)}
@@ -478,7 +500,7 @@ const AuthPage = () => {
                       <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                       <Input
                         id="password"
-                        placeholder="••••••••"
+                        placeholder="Enter your password"
                         type="password"
                         value={loginPassword}
                         onChange={(e) => setLoginPassword(e.target.value)}
@@ -488,30 +510,81 @@ const AuthPage = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="biometrics"
-                      className="rounded border-gray-300 text-primary focus:ring-primary"
-                      checked={enableBiometrics}
-                      onChange={(e) => setEnableBiometrics(e.target.checked)}
-                    />
-                    <Label htmlFor="biometrics" className="text-sm cursor-pointer">
-                      Enable keystroke biometric verification
-                    </Label>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="biometrics"
+                        className="rounded border-gray-300 text-primary focus:ring-primary"
+                        checked={enableBiometrics}
+                        onChange={(e) => setEnableBiometrics(e.target.checked)}
+                      />
+                      <Label htmlFor="biometrics" className="text-sm cursor-pointer">
+                        Enable biometrics
+                      </Label>
+                    </div>
+                    
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="text-sm p-0 h-auto"
+                      onClick={() => {
+                        setActiveTab('forgot');
+                        setShowEmailLogin(false);
+                      }}
+                    >
+                      Forgot password?
+                    </Button>
                   </div>
 
                   <Button type="submit" className="w-full" disabled={loginLoading}>
-                    {loginLoading ? 'Authenticating...' : 'Sign In'}
+                    {loginLoading ? 'Signing In...' : 'Sign In'}
                   </Button>
-                  
-                  <div className="text-center text-xs text-muted-foreground mt-4">
-                    <p>
-                      For demo: use email "demo@example.com" and password "demo"
-                    </p>
-                  </div>
                 </form>
               )}
+            </CardContent>
+          </TabsContent>
+
+          <TabsContent value="forgot" className="m-0">
+            <CardContent className="p-6">
+              <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-medium">Reset Your Password</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Enter your email address and we'll send you a link to reset your password.
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="forgot-email">Email Address</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                    <Input
+                      id="forgot-email"
+                      placeholder="Enter your email address"
+                      type="email"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <Button type="submit" className="w-full" disabled={forgotLoading}>
+                  {forgotLoading ? 'Sending Reset Link...' : 'Send Reset Link'}
+                </Button>
+                
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full flex items-center justify-center gap-2"
+                  onClick={() => setActiveTab('login')}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Sign In
+                </Button>
+              </form>
             </CardContent>
           </TabsContent>
 
@@ -712,9 +785,9 @@ const AuthPage = () => {
                     
                     <Button 
                       onClick={nextRegistrationStep}
-                      disabled={!selectedPlan}
+                      disabled={!selectedPlan || registerLoading}
                     >
-                      Complete Registration
+                      {registerLoading ? 'Creating Account...' : 'Create Account'}
                     </Button>
                   </div>
                 </div>
