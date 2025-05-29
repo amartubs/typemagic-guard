@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import ApiKeyManager from '@/components/enterprise/ApiKeyManager';
 import ApiDocumentation from '@/components/enterprise/ApiDocumentation';
 import WhiteLabelManager from '@/components/enterprise/WhiteLabelManager';
+import IntegrationTutorials from '@/components/enterprise/IntegrationTutorials';
 
 const EnterprisePortal = () => {
   const { user } = useAuth();
@@ -70,6 +71,16 @@ const EnterprisePortal = () => {
                     </button>
                     <button
                       className={`px-3 py-2 rounded-md text-left text-sm ${
+                        activeTab === 'tutorials'
+                          ? 'bg-primary/10 text-primary font-medium'
+                          : 'hover:bg-muted'
+                      }`}
+                      onClick={() => setActiveTab('tutorials')}
+                    >
+                      Integration Tutorials
+                    </button>
+                    <button
+                      className={`px-3 py-2 rounded-md text-left text-sm ${
                         activeTab === 'white-label'
                           ? 'bg-primary/10 text-primary font-medium'
                           : 'hover:bg-muted'
@@ -97,6 +108,7 @@ const EnterprisePortal = () => {
           <div className="lg:col-span-3">
             {activeTab === 'api-keys' && <ApiKeyManager />}
             {activeTab === 'api-docs' && <ApiDocumentation />}
+            {activeTab === 'tutorials' && <IntegrationTutorials />}
             {activeTab === 'white-label' && <WhiteLabelManager />}
             {activeTab === 'support' && (
               <Card>

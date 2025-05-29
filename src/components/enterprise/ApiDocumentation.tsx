@@ -1,14 +1,14 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Copy, Code, Database, Shield, BarChart } from 'lucide-react';
+import { Copy, Code, Database, Shield, BarChart, Book, Download, ExternalLink, CheckCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const ApiDocumentation = () => {
   const [selectedEndpoint, setSelectedEndpoint] = useState('auth');
+  const [selectedLanguage, setSelectedLanguage] = useState('javascript');
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -49,31 +49,183 @@ const ApiDocumentation = () => {
     }
   ];
 
-  const codeExamples = {
-    auth: {
-      javascript: `// Store biometric authentication data
-const response = await fetch('https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/auth', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': 'tmg_your_api_key_here'
-  },
-  body: JSON.stringify({
-    userId: 'user-123',
-    keystrokeData: {
-      timings: [
-        { key: 'a', pressTime: 1000, releaseTime: 1100, duration: 100 },
-        { key: 'b', pressTime: 1150, releaseTime: 1220, duration: 70 }
+  const integrationGuides = [
+    {
+      id: 'quickstart',
+      title: 'Quick Start Guide',
+      description: 'Get started with TypeMagic Guard in 5 minutes',
+      steps: [
+        'Generate your API key',
+        'Install the SDK or set up HTTP calls',
+        'Initialize the biometric authentication',
+        'Handle authentication responses',
+        'Test your integration'
       ]
     },
-    context: 'login'
-  })
+    {
+      id: 'web-app',
+      title: 'Web Application Integration',
+      description: 'Complete guide for integrating into web applications',
+      steps: [
+        'Add TypeMagic Guard JavaScript SDK',
+        'Initialize keystroke capture',
+        'Implement authentication flow',
+        'Handle success and failure states',
+        'Customize security settings'
+      ]
+    },
+    {
+      id: 'mobile-app',
+      title: 'Mobile Application Integration',
+      description: 'Guide for React Native and mobile web apps',
+      steps: [
+        'Install mobile-compatible SDK',
+        'Set up touch and keyboard event capture',
+        'Configure biometric thresholds',
+        'Implement offline fallback',
+        'Test across devices'
+      ]
+    },
+    {
+      id: 'backend',
+      title: 'Backend API Integration',
+      description: 'Server-to-server authentication validation',
+      steps: [
+        'Set up server-side API calls',
+        'Implement webhook endpoints',
+        'Configure user management',
+        'Set up analytics reporting',
+        'Implement security policies'
+      ]
+    }
+  ];
+
+  const sdkLanguages = [
+    {
+      name: 'JavaScript/TypeScript',
+      version: '2.1.0',
+      install: 'npm install @typemagic/guard-sdk',
+      docs: 'https://docs.typemagic.com/sdk/javascript'
+    },
+    {
+      name: 'Python',
+      version: '1.8.0', 
+      install: 'pip install typemagic-guard',
+      docs: 'https://docs.typemagic.com/sdk/python'
+    },
+    {
+      name: 'PHP',
+      version: '1.5.0',
+      install: 'composer require typemagic/guard-sdk',
+      docs: 'https://docs.typemagic.com/sdk/php'
+    },
+    {
+      name: 'Java',
+      version: '1.6.0',
+      install: 'implementation "com.typemagic:guard-sdk:1.6.0"',
+      docs: 'https://docs.typemagic.com/sdk/java'
+    },
+    {
+      name: 'C#/.NET',
+      version: '1.4.0',
+      install: 'Install-Package TypeMagic.Guard.SDK',
+      docs: 'https://docs.typemagic.com/sdk/dotnet'
+    },
+    {
+      name: 'Ruby',
+      version: '1.3.0',
+      install: 'gem install typemagic-guard',
+      docs: 'https://docs.typemagic.com/sdk/ruby'
+    }
+  ];
+
+  const bestPractices = [
+    {
+      category: 'Security',
+      practices: [
+        'Store API keys securely using environment variables',
+        'Implement proper error handling for authentication failures',
+        'Use HTTPS for all API communications',
+        'Rotate API keys regularly',
+        'Monitor authentication patterns for anomalies'
+      ]
+    },
+    {
+      category: 'Performance',
+      practices: [
+        'Cache biometric profiles when possible',
+        'Implement request batching for bulk operations',
+        'Use webhooks instead of polling for real-time updates',
+        'Set appropriate timeout values for API calls',
+        'Implement retry logic with exponential backoff'
+      ]
+    },
+    {
+      category: 'User Experience',
+      practices: [
+        'Provide clear feedback during authentication',
+        'Implement graceful fallbacks for authentication failures',
+        'Allow users to retrain their biometric profile',
+        'Show confidence scores to help users improve',
+        'Provide accessibility options for users with disabilities'
+      ]
+    }
+  ];
+
+  const codeExamples = {
+    auth: {
+      javascript: `// TypeMagic Guard JavaScript SDK Example
+import { TypeMagicGuard } from '@typemagic/guard-sdk';
+
+// Initialize the SDK
+const tmg = new TypeMagicGuard({
+  apiKey: 'tmg_your_api_key_here',
+  baseUrl: 'https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api'
 });
 
-const result = await response.json();
-console.log('Confidence score:', result.confidenceScore);`,
+// Start keystroke capture
+tmg.startCapture('login-form');
+
+// Authenticate user
+async function authenticateUser(userId) {
+  try {
+    const result = await tmg.authenticate({
+      userId: userId,
+      context: 'login'
+    });
+    
+    console.log('Authentication result:', {
+      success: result.success,
+      confidence: result.confidenceScore,
+      riskLevel: result.riskLevel
+    });
+    
+    if (result.success && result.confidenceScore > 75) {
+      // Grant access
+      window.location.href = '/dashboard';
+    } else {
+      // Request additional verification
+      showTwoFactorPrompt();
+    }
+  } catch (error) {
+    console.error('Authentication failed:', error);
+    handleAuthError(error);
+  }
+}
+
+// Handle authentication errors
+function handleAuthError(error) {
+  if (error.code === 'INSUFFICIENT_DATA') {
+    showMessage('Please type a few more characters to improve accuracy.');
+  } else if (error.code === 'PATTERN_MISMATCH') {
+    showMessage('Typing pattern not recognized. Please try again.');
+  } else {
+    showMessage('Authentication service temporarily unavailable.');
+  }
+}`,
       
-      curl: `curl -X POST \\
+      curl: `# Quick authentication test
+curl -X POST \\
   https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/auth \\
   -H "Content-Type: application/json" \\
   -H "x-api-key: tmg_your_api_key_here" \\
@@ -81,341 +233,490 @@ console.log('Confidence score:', result.confidenceScore);`,
     "userId": "user-123",
     "keystrokeData": {
       "timings": [
-        {"key": "a", "pressTime": 1000, "releaseTime": 1100, "duration": 100}
-      ]
+        {"key": "p", "pressTime": 1000, "releaseTime": 1080, "duration": 80},
+        {"key": "a", "pressTime": 1120, "releaseTime": 1190, "duration": 70},
+        {"key": "s", "pressTime": 1220, "releaseTime": 1300, "duration": 80},
+        {"key": "s", "pressTime": 1340, "releaseTime": 1410, "duration": 70}
+      ],
+      "metadata": {
+        "inputField": "password",
+        "sessionId": "sess_123",
+        "userAgent": "Mozilla/5.0..."
+      }
     },
     "context": "login"
-  }'`,
+  }'
+
+# Expected response:
+# {
+#   "success": true,
+#   "patternId": "pat_456",
+#   "confidenceScore": 87,
+#   "riskLevel": "low",
+#   "recommendations": ["continue"]
+# }`,
       
-      python: `import requests
+      python: `# TypeMagic Guard Python SDK Example
+from typemagic_guard import TypeMagicGuard
+import asyncio
 
-url = "https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/auth"
-headers = {
-    "Content-Type": "application/json",
-    "x-api-key": "tmg_your_api_key_here"
-}
-data = {
-    "userId": "user-123",
-    "keystrokeData": {
+# Initialize the client
+tmg = TypeMagicGuard(
+    api_key='tmg_your_api_key_here',
+    base_url='https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api'
+)
+
+async def authenticate_user(user_id, keystroke_data):
+    """Authenticate user with biometric data"""
+    try:
+        result = await tmg.authenticate(
+            user_id=user_id,
+            keystroke_data=keystroke_data,
+            context='login'
+        )
+        
+        print(f"Confidence Score: {result.confidence_score}%")
+        print(f"Risk Level: {result.risk_level}")
+        
+        if result.success and result.confidence_score >= 75:
+            print("✅ Authentication successful")
+            return True
+        else:
+            print("❌ Authentication failed - additional verification required")
+            return False
+            
+    except Exception as e:
+        print(f"Authentication error: {e}")
+        return False
+
+# Example usage
+async def main():
+    keystroke_data = {
         "timings": [
-            {"key": "a", "pressTime": 1000, "releaseTime": 1100, "duration": 100}
-        ]
-    },
-    "context": "login"
-}
+            {"key": "p", "press_time": 1000, "release_time": 1080, "duration": 80},
+            {"key": "a", "press_time": 1120, "release_time": 1190, "duration": 70}
+        ],
+        "metadata": {
+            "input_field": "password",
+            "session_id": "sess_123"
+        }
+    }
+    
+    success = await authenticate_user("user-123", keystroke_data)
+    if success:
+        print("User granted access to application")
+    else:
+        print("User requires additional verification")
 
-response = requests.post(url, json=data, headers=headers)
-result = response.json()
-print(f"Confidence score: {result['confidenceScore']}")`
+if __name__ == "__main__":
+    asyncio.run(main())`
     },
     users: {
-      javascript: `// Get user information
-const response = await fetch('https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/users?userId=user-123', {
-  method: 'GET',
-  headers: {
-    'x-api-key': 'tmg_your_api_key_here'
-  }
-});
-
-const user = await response.json();
-console.log('User data:', user);
+      javascript: `// User Management SDK Example
+const response = await tmg.users.get('user-123');
+console.log('User data:', response.data);
 
 // List users with pagination
-const listResponse = await fetch('https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/users?page=1&limit=50', {
-  method: 'GET',
-  headers: {
-    'x-api-key': 'tmg_your_api_key_here'
-  }
+const userList = await tmg.users.list({
+  page: 1,
+  limit: 50,
+  filter: { status: 'active' }
 });
-
-const userList = await listResponse.json();
-console.log('Users:', userList.users);
-console.log('Total:', userList.pagination.total);`,
+console.log('Total users:', userList.pagination.total);`,
       
       curl: `# Get specific user
 curl -X GET \\
   "https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/users?userId=user-123" \\
-  -H "x-api-key: tmg_your_api_key_here"
-
-# List users
-curl -X GET \\
-  "https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/users?page=1&limit=50" \\
   -H "x-api-key: tmg_your_api_key_here"`,
       
-      python: `import requests
-
-# Get specific user
-url = "https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/users"
-headers = {"x-api-key": "tmg_your_api_key_here"}
-params = {"userId": "user-123"}
-
-response = requests.get(url, headers=headers, params=params)
-user = response.json()
-print(f"User: {user['name']}")
+      python: `# Get user information
+user = await tmg.users.get("user-123")
+print(f"User: {user.name} ({user.email})")
 
 # List users
-params = {"page": 1, "limit": 50}
-response = requests.get(url, headers=headers, params=params)
-data = response.json()
-print(f"Total users: {data['pagination']['total']}")`
+users = await tmg.users.list(page=1, limit=50)
+print(f"Total users: {users.pagination.total}")`
     },
     analytics: {
-      javascript: `// Get authentication analytics
-const response = await fetch('https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/analytics?type=authentication-attempts&startDate=2024-01-01', {
-  method: 'GET',
-  headers: {
-    'x-api-key': 'tmg_your_api_key_here'
-  }
+      javascript: `// Analytics SDK Example
+const analytics = await tmg.analytics.getAuthenticationAttempts({
+  startDate: '2024-01-01',
+  endDate: '2024-01-31'
 });
-
-const analytics = await response.json();
-console.log('Success rate:', (analytics.successfulAttempts / analytics.totalAttempts * 100).toFixed(2) + '%');
-console.log('Average confidence:', analytics.averageConfidence);
-
-// Get user activity analytics
-const userResponse = await fetch('https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/analytics?type=user-activity', {
-  method: 'GET',
-  headers: {
-    'x-api-key': 'tmg_your_api_key_here'
-  }
-});
-
-const userAnalytics = await userResponse.json();
-console.log('Active users:', userAnalytics.activeUsers);`,
+console.log('Success rate:', analytics.successRate);`,
       
-      curl: `# Authentication analytics
+      curl: `# Get analytics
 curl -X GET \\
-  "https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/analytics?type=authentication-attempts&startDate=2024-01-01" \\
-  -H "x-api-key: tmg_your_api_key_here"
-
-# User activity analytics  
-curl -X GET \\
-  "https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/analytics?type=user-activity" \\
+  "https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/analytics?type=authentication-attempts" \\
   -H "x-api-key: tmg_your_api_key_here"`,
       
-      python: `import requests
-from datetime import datetime, timedelta
-
-headers = {"x-api-key": "tmg_your_api_key_here"}
-base_url = "https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/analytics"
-
-# Authentication analytics
-start_date = (datetime.now() - timedelta(days=30)).isoformat()
-params = {"type": "authentication-attempts", "startDate": start_date}
-response = requests.get(base_url, headers=headers, params=params)
-data = response.json()
-
-success_rate = (data['successfulAttempts'] / data['totalAttempts']) * 100
-print(f"Success rate: {success_rate:.2f}%")
-
-# User activity
-params = {"type": "user-activity"}
-response = requests.get(base_url, headers=headers, params=params)
-user_data = response.json()
-print(f"Active users: {user_data['activeUsers']}")`
+      python: `# Get analytics
+analytics = await tmg.analytics.get_authentication_attempts(
+    start_date="2024-01-01"
+)
+print(f"Success rate: {analytics.success_rate}%")`
     },
     security: {
-      javascript: `// Get security settings
-const response = await fetch('https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/security?userId=user-123', {
-  method: 'GET',
-  headers: {
-    'x-api-key': 'tmg_your_api_key_here'
-  }
-});
+      javascript: `// Security Settings SDK Example
+const settings = await tmg.security.getSettings('user-123');
+console.log('Security level:', settings.securityLevel);
 
-const settings = await response.json();
-console.log('Security level:', settings.security_level);
-console.log('Confidence threshold:', settings.min_confidence_threshold);
-
-// Update security settings
-const updateResponse = await fetch('https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/security?userId=user-123', {
-  method: 'PUT',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': 'tmg_your_api_key_here'
-  },
-  body: JSON.stringify({
-    min_confidence_threshold: 75,
-    security_level: 'high',
-    max_failed_attempts: 3
-  })
-});
-
-const updated = await updateResponse.json();
-console.log('Updated settings:', updated);`,
+// Update settings
+await tmg.security.updateSettings('user-123', {
+  minConfidenceThreshold: 80,
+  securityLevel: 'high'
+});`,
       
-      curl: `# Get security settings
-curl -X GET \\
-  "https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/security?userId=user-123" \\
-  -H "x-api-key: tmg_your_api_key_here"
-
-# Update security settings
+      curl: `# Update security settings
 curl -X PUT \\
   "https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/security?userId=user-123" \\
   -H "Content-Type: application/json" \\
   -H "x-api-key: tmg_your_api_key_here" \\
-  -d '{
-    "min_confidence_threshold": 75,
-    "security_level": "high",
-    "max_failed_attempts": 3
-  }'`,
+  -d '{"min_confidence_threshold": 80}'`,
       
-      python: `import requests
-
-headers = {"x-api-key": "tmg_your_api_key_here"}
-base_url = "https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/security"
-params = {"userId": "user-123"}
-
-# Get security settings
-response = requests.get(base_url, headers=headers, params=params)
-settings = response.json()
-print(f"Security level: {settings['security_level']}")
-
-# Update security settings
-headers["Content-Type"] = "application/json"
-data = {
-    "min_confidence_threshold": 75,
-    "security_level": "high", 
-    "max_failed_attempts": 3
-}
-
-response = requests.put(base_url, headers=headers, params=params, json=data)
-updated = response.json()
-print("Settings updated successfully")`
+      python: `# Update security settings
+await tmg.security.update_settings("user-123", {
+    "min_confidence_threshold": 80,
+    "security_level": "high"
+})`
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold">API Documentation</h2>
-        <p className="text-muted-foreground">
-          Comprehensive guide for integrating TypeMagic Guard APIs
+        <h2 className="text-3xl font-bold">API Documentation & Integration Guides</h2>
+        <p className="text-muted-foreground mt-2">
+          Complete documentation, SDKs, and integration guides for TypeMagic Guard
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="space-y-2">
-          {endpoints.map((endpoint) => {
-            const Icon = endpoint.icon;
-            return (
-              <Card 
-                key={endpoint.id}
-                className={`cursor-pointer transition-colors ${
-                  selectedEndpoint === endpoint.id ? 'bg-primary/5 border-primary' : ''
-                }`}
-                onClick={() => setSelectedEndpoint(endpoint.id)}
-              >
-                <CardContent className="pt-4">
-                  <div className="flex items-start space-x-3">
-                    <Icon className="h-5 w-5 mt-0.5" />
-                    <div>
-                      <h3 className="font-medium">{endpoint.title}</h3>
-                      <p className="text-sm text-muted-foreground">{endpoint.description}</p>
-                      <div className="flex space-x-1 mt-2">
-                        {endpoint.methods.map((method) => (
-                          <Badge key={method} variant="outline" className="text-xs">
-                            {method}
-                          </Badge>
-                        ))}
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="quickstart">Quick Start</TabsTrigger>
+          <TabsTrigger value="endpoints">API Reference</TabsTrigger>
+          <TabsTrigger value="sdks">SDKs</TabsTrigger>
+          <TabsTrigger value="guides">Best Practices</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Book className="h-5 w-5" />
+                Getting Started with TypeMagic Guard
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p>
+                TypeMagic Guard provides enterprise-grade biometric authentication through keystroke dynamics. 
+                Our APIs allow you to seamlessly integrate behavioral biometric security into your applications.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card className="p-4">
+                  <h3 className="font-semibold mb-2">🚀 Quick Integration</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Get started in minutes with our SDKs and comprehensive documentation
+                  </p>
+                </Card>
+                <Card className="p-4">
+                  <h3 className="font-semibold mb-2">🔒 Enterprise Security</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Bank-grade security with configurable confidence thresholds and risk assessment
+                  </p>
+                </Card>
+                <Card className="p-4">
+                  <h3 className="font-semibold mb-2">📊 Rich Analytics</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Detailed insights into authentication patterns and security metrics
+                  </p>
+                </Card>
+                <Card className="p-4">
+                  <h3 className="font-semibold mb-2">🛠️ Developer Friendly</h3>
+                  <p className="text-sm text-muted-foreground">
+                    RESTful APIs, webhook support, and SDKs for popular programming languages
+                  </p>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="quickstart" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {integrationGuides.map((guide) => (
+              <Card key={guide.id}>
+                <CardHeader>
+                  <CardTitle className="text-lg">{guide.title}</CardTitle>
+                  <CardDescription>{guide.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ol className="space-y-2">
+                    {guide.steps.map((step, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="flex-shrink-0 w-6 h-6 bg-primary/10 text-primary rounded-full flex items-center justify-center text-sm font-medium">
+                          {index + 1}
+                        </span>
+                        <span className="text-sm">{step}</span>
+                      </li>
+                    ))}
+                  </ol>
+                  <Button variant="outline" size="sm" className="mt-4">
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    View Full Guide
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="endpoints" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="space-y-2">
+              {endpoints.map((endpoint) => {
+                const Icon = endpoint.icon;
+                return (
+                  <Card 
+                    key={endpoint.id}
+                    className={`cursor-pointer transition-colors ${
+                      selectedEndpoint === endpoint.id ? 'bg-primary/5 border-primary' : ''
+                    }`}
+                    onClick={() => setSelectedEndpoint(endpoint.id)}
+                  >
+                    <CardContent className="pt-4">
+                      <div className="flex items-start space-x-3">
+                        <Icon className="h-5 w-5 mt-0.5" />
+                        <div>
+                          <h3 className="font-medium">{endpoint.title}</h3>
+                          <p className="text-sm text-muted-foreground">{endpoint.description}</p>
+                          <div className="flex space-x-1 mt-2">
+                            {endpoint.methods.map((method) => (
+                              <Badge key={method} variant="outline" className="text-xs">
+                                {method}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
                       </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+
+            <div className="lg:col-span-3">
+              <Card>
+                <CardHeader className="pb-0">
+                  <CardTitle className="text-xl">
+                    {endpoints.find(e => e.id === selectedEndpoint)?.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <div className="space-y-6">
+                    <p>
+                      Base URL: <code className="bg-muted px-1 rounded text-sm">
+                        https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/
+                      </code>
+                    </p>
+
+                    <div className="space-y-4">
+                      <h3 className="font-medium">Authentication</h3>
+                      <p className="text-sm">
+                        All API requests require an API Key to be included in the <code className="bg-muted px-1 rounded text-xs">x-api-key</code> header.
+                        Your API key can be generated in the API Key Manager. Keep your API key secure and do not share it publicly.
+                      </p>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h3 className="font-medium">Code Examples</h3>
+                      
+                      <Tabs value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                        <TabsList>
+                          <TabsTrigger value="javascript">JavaScript</TabsTrigger>
+                          <TabsTrigger value="curl">cURL</TabsTrigger>
+                          <TabsTrigger value="python">Python</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="javascript" className="mt-4">
+                          <div className="relative">
+                            <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
+                              <code>{codeExamples[selectedEndpoint as keyof typeof codeExamples].javascript}</code>
+                            </pre>
+                            <Button 
+                              size="sm"
+                              variant="secondary"
+                              className="absolute top-2 right-2"
+                              onClick={() => copyToClipboard(codeExamples[selectedEndpoint as keyof typeof codeExamples].javascript)}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TabsContent>
+                        <TabsContent value="curl" className="mt-4">
+                          <div className="relative">
+                            <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
+                              <code>{codeExamples[selectedEndpoint as keyof typeof codeExamples].curl}</code>
+                            </pre>
+                            <Button 
+                              size="sm"
+                              variant="secondary"
+                              className="absolute top-2 right-2"
+                              onClick={() => copyToClipboard(codeExamples[selectedEndpoint as keyof typeof codeExamples].curl)}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TabsContent>
+                        <TabsContent value="python" className="mt-4">
+                          <div className="relative">
+                            <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
+                              <code>{codeExamples[selectedEndpoint as keyof typeof codeExamples].python}</code>
+                            </pre>
+                            <Button 
+                              size="sm"
+                              variant="secondary"
+                              className="absolute top-2 right-2"
+                              onClick={() => copyToClipboard(codeExamples[selectedEndpoint as keyof typeof codeExamples].python)}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TabsContent>
+                      </Tabs>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-            );
-          })}
-        </div>
+            </div>
+          </div>
+        </TabsContent>
 
-        <div className="lg:col-span-3">
+        <TabsContent value="sdks" className="space-y-6">
           <Card>
-            <CardHeader className="pb-0">
-              <CardTitle className="text-xl">
-                {endpoints.find(e => e.id === selectedEndpoint)?.title}
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Download className="h-5 w-5" />
+                Official SDKs
               </CardTitle>
+              <CardDescription>
+                Native libraries for popular programming languages and frameworks
+              </CardDescription>
             </CardHeader>
-            <CardContent className="pt-4">
-              <div className="space-y-6">
-                <p>
-                  Base URL: <code className="bg-muted px-1 rounded text-sm">
-                    https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/
-                  </code>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {sdkLanguages.map((sdk) => (
+                  <Card key={sdk.name} className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-semibold">{sdk.name}</h3>
+                      <Badge variant="secondary">v{sdk.version}</Badge>
+                    </div>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-sm font-medium">Installation:</label>
+                        <div className="bg-muted p-2 rounded text-sm font-mono mt-1">
+                          {sdk.install}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" className="flex-1">
+                          <Download className="h-4 w-4 mr-1" />
+                          Download
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+              
+              <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                <h4 className="font-medium mb-2">Community SDKs</h4>
+                <p className="text-sm text-muted-foreground">
+                  Can't find an SDK for your language? Check out our community-maintained libraries or 
+                  contribute your own. We also provide OpenAPI specifications for generating custom clients.
                 </p>
-
-                <div className="space-y-4">
-                  <h3 className="font-medium">Authentication</h3>
-                  <p className="text-sm">
-                    All API requests require an API Key to be included in the <code className="bg-muted px-1 rounded text-xs">x-api-key</code> header.
-                    Your API key can be generated in the API Key Manager. Keep your API key secure and do not share it publicly.
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="font-medium">Code Examples</h3>
-                  
-                  <Tabs defaultValue="javascript">
-                    <TabsList>
-                      <TabsTrigger value="javascript">JavaScript</TabsTrigger>
-                      <TabsTrigger value="curl">cURL</TabsTrigger>
-                      <TabsTrigger value="python">Python</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="javascript" className="mt-4">
-                      <div className="relative">
-                        <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
-                          <code>{codeExamples[selectedEndpoint as keyof typeof codeExamples].javascript}</code>
-                        </pre>
-                        <Button 
-                          size="sm"
-                          variant="secondary"
-                          className="absolute top-2 right-2"
-                          onClick={() => copyToClipboard(codeExamples[selectedEndpoint as keyof typeof codeExamples].javascript)}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TabsContent>
-                    <TabsContent value="curl" className="mt-4">
-                      <div className="relative">
-                        <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
-                          <code>{codeExamples[selectedEndpoint as keyof typeof codeExamples].curl}</code>
-                        </pre>
-                        <Button 
-                          size="sm"
-                          variant="secondary"
-                          className="absolute top-2 right-2"
-                          onClick={() => copyToClipboard(codeExamples[selectedEndpoint as keyof typeof codeExamples].curl)}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TabsContent>
-                    <TabsContent value="python" className="mt-4">
-                      <div className="relative">
-                        <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
-                          <code>{codeExamples[selectedEndpoint as keyof typeof codeExamples].python}</code>
-                        </pre>
-                        <Button 
-                          size="sm"
-                          variant="secondary"
-                          className="absolute top-2 right-2"
-                          onClick={() => copyToClipboard(codeExamples[selectedEndpoint as keyof typeof codeExamples].python)}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </div>
-
-                <Button variant="outline" className="flex items-center space-x-2">
-                  <Code className="h-4 w-4" />
-                  <span>Download SDK Package</span>
+                <Button variant="link" className="p-0 h-auto mt-2">
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                  View Community SDKs
                 </Button>
               </div>
             </CardContent>
           </Card>
-        </div>
-      </div>
+        </TabsContent>
+
+        <TabsContent value="guides" className="space-y-6">
+          <div className="space-y-6">
+            {bestPractices.map((section) => (
+              <Card key={section.category}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    {section.category} Best Practices
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    {section.practices.map((practice, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm">{practice}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Troubleshooting Guide</CardTitle>
+              <CardDescription>
+                Common issues and their solutions
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-4">
+                <div className="border-l-4 border-yellow-500 pl-4">
+                  <h4 className="font-medium">Low Confidence Scores</h4>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Users experiencing low confidence scores may need more training data. 
+                    Ensure they complete the initial training period and consider adjusting 
+                    sensitivity settings for their specific use case.
+                  </p>
+                </div>
+                
+                <div className="border-l-4 border-red-500 pl-4">
+                  <h4 className="font-medium">Authentication Failures</h4>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Check API key permissions, ensure proper error handling, and verify 
+                    that keystroke data is being captured correctly. Review our debugging 
+                    guide for detailed troubleshooting steps.
+                  </p>
+                </div>
+                
+                <div className="border-l-4 border-blue-500 pl-4">
+                  <h4 className="font-medium">Integration Issues</h4>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    For integration problems, check CORS settings, verify SSL/TLS 
+                    configuration, and ensure your application meets minimum browser 
+                    requirements for keystroke capture.
+                  </p>
+                </div>
+              </div>
+              
+              <Button variant="outline" className="mt-4">
+                <ExternalLink className="h-4 w-4 mr-2" />
+                View Full Troubleshooting Guide
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
