@@ -15,6 +15,7 @@ import Dashboard from '@/pages/Dashboard';
 import Profile from '@/pages/Profile';
 import Settings from '@/pages/Settings';
 import Support from '@/pages/Support';
+import EnterprisePortal from '@/pages/EnterprisePortal';
 import NotFound from '@/pages/NotFound';
 import PrivateRoute from '@/components/auth/PrivateRoute';
 import { Toaster } from '@/components/ui/toaster';
@@ -58,6 +59,14 @@ function App() {
                 element={
                   <PrivateRoute>
                     <Settings />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/enterprise"
+                element={
+                  <PrivateRoute>
+                    <EnterprisePortal />
                   </PrivateRoute>
                 }
               />

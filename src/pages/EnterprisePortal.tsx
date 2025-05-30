@@ -3,13 +3,15 @@ import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth";
 import { useSubscription } from "@/hooks/useSubscription";
-import ApiKeyManager from "@/components/enterprise/ApiKeyManager";
+import EnhancedApiKeyManager from "@/components/enterprise/EnhancedApiKeyManager";
 import ApiDocumentation from "@/components/enterprise/ApiDocumentation";
 import IntegrationTutorials from "@/components/enterprise/IntegrationTutorials";
 import WhiteLabelManager from "@/components/enterprise/WhiteLabelManager";
 import EnterpriseSettings from "@/components/enterprise/EnterpriseSettings";
 import AdvancedAnalytics from "@/components/analytics/AdvancedAnalytics";
 import PerformanceMonitor from "@/components/monitoring/PerformanceMonitor";
+import SecurityDashboard from "@/components/security/SecurityDashboard";
+import SystemHealthMonitor from "@/components/monitoring/SystemHealthMonitor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -22,7 +24,8 @@ import {
   BarChart3,
   Activity,
   Lock,
-  Clipboard
+  Shield,
+  Monitor
 } from "lucide-react";
 
 const EnterprisePortal = () => {
@@ -60,7 +63,7 @@ const EnterprisePortal = () => {
               <p className="text-muted-foreground mb-6">
                 The Enterprise Portal is available exclusively to Enterprise subscribers. 
                 Upgrade your plan to access advanced features like API management, white labeling, 
-                and enterprise-grade analytics.
+                security monitoring, and enterprise-grade analytics.
               </p>
               <Button className="gap-2" asChild>
                 <a href="/pricing">
@@ -74,36 +77,36 @@ const EnterprisePortal = () => {
               <div className="flex items-start gap-3 p-4 border rounded-lg">
                 <Key className="h-5 w-5 text-primary mt-0.5" />
                 <div>
-                  <h4 className="font-medium mb-1">API Key Management</h4>
+                  <h4 className="font-medium mb-1">Enhanced API Management</h4>
                   <p className="text-sm text-muted-foreground">
-                    Create and manage API keys for integration with your systems
+                    Advanced API key management with permissions and monitoring
                   </p>
                 </div>
               </div>
               <div className="flex items-start gap-3 p-4 border rounded-lg">
-                <FileText className="h-5 w-5 text-primary mt-0.5" />
+                <Shield className="h-5 w-5 text-primary mt-0.5" />
                 <div>
-                  <h4 className="font-medium mb-1">API Documentation</h4>
+                  <h4 className="font-medium mb-1">Security Dashboard</h4>
                   <p className="text-sm text-muted-foreground">
-                    Comprehensive guides and references for our API
+                    Real-time security monitoring and threat intelligence
                   </p>
                 </div>
               </div>
               <div className="flex items-start gap-3 p-4 border rounded-lg">
-                <Palette className="h-5 w-5 text-primary mt-0.5" />
+                <Monitor className="h-5 w-5 text-primary mt-0.5" />
                 <div>
-                  <h4 className="font-medium mb-1">White Labeling</h4>
+                  <h4 className="font-medium mb-1">System Health Monitoring</h4>
                   <p className="text-sm text-muted-foreground">
-                    Customize the UI with your own branding
+                    Comprehensive system performance and health metrics
                   </p>
                 </div>
               </div>
               <div className="flex items-start gap-3 p-4 border rounded-lg">
                 <BarChart3 className="h-5 w-5 text-primary mt-0.5" />
                 <div>
-                  <h4 className="font-medium mb-1">Enterprise Analytics</h4>
+                  <h4 className="font-medium mb-1">Advanced Analytics</h4>
                   <p className="text-sm text-muted-foreground">
-                    Advanced analytics and reporting capabilities
+                    Deep insights and enterprise-grade reporting
                   </p>
                 </div>
               </div>
@@ -119,12 +122,12 @@ const EnterprisePortal = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Enterprise Portal</h1>
         <p className="text-muted-foreground">
-          Advanced configuration, API management, and analytics for enterprise users
+          Advanced configuration, API management, security monitoring, and analytics for enterprise users
         </p>
       </div>
 
       <Tabs defaultValue="api-keys" className="space-y-8">
-        <TabsList className="grid grid-cols-2 md:grid-cols-6 gap-2">
+        <TabsList className="grid grid-cols-2 md:grid-cols-8 gap-2">
           <TabsTrigger value="api-keys" className="flex items-center gap-2">
             <Key className="h-4 w-4" />
             <span className="hidden sm:inline">API Keys</span>
@@ -137,13 +140,21 @@ const EnterprisePortal = () => {
             <Code className="h-4 w-4" />
             <span className="hidden sm:inline">Integrations</span>
           </TabsTrigger>
-          <TabsTrigger value="white-label" className="flex items-center gap-2">
-            <Palette className="h-4 w-4" />
-            <span className="hidden sm:inline">White Label</span>
+          <TabsTrigger value="security" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            <span className="hidden sm:inline">Security</span>
+          </TabsTrigger>
+          <TabsTrigger value="monitoring" className="flex items-center gap-2">
+            <Monitor className="h-4 w-4" />
+            <span className="hidden sm:inline">Monitoring</span>
           </TabsTrigger>
           <TabsTrigger value="analytics" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
             <span className="hidden sm:inline">Analytics</span>
+          </TabsTrigger>
+          <TabsTrigger value="white-label" className="flex items-center gap-2">
+            <Palette className="h-4 w-4" />
+            <span className="hidden sm:inline">Branding</span>
           </TabsTrigger>
           <TabsTrigger value="settings" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
@@ -152,7 +163,7 @@ const EnterprisePortal = () => {
         </TabsList>
 
         <TabsContent value="api-keys">
-          <ApiKeyManager />
+          <EnhancedApiKeyManager />
         </TabsContent>
 
         <TabsContent value="api-docs">
@@ -163,15 +174,23 @@ const EnterprisePortal = () => {
           <IntegrationTutorials />
         </TabsContent>
 
-        <TabsContent value="white-label">
-          <WhiteLabelManager />
+        <TabsContent value="security">
+          <SecurityDashboard />
+        </TabsContent>
+
+        <TabsContent value="monitoring">
+          <div className="space-y-8">
+            <SystemHealthMonitor />
+            <PerformanceMonitor />
+          </div>
         </TabsContent>
 
         <TabsContent value="analytics">
-          <div className="space-y-8">
-            <AdvancedAnalytics />
-            <PerformanceMonitor />
-          </div>
+          <AdvancedAnalytics />
+        </TabsContent>
+
+        <TabsContent value="white-label">
+          <WhiteLabelManager />
         </TabsContent>
 
         <TabsContent value="settings">
