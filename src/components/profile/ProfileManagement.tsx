@@ -91,7 +91,7 @@ const ProfileManagement: React.FC = () => {
     if (!user) return;
 
     // Check rate limiting
-    if (!checkRateLimit('sensitive')) {
+    if (!checkRateLimit('api')) {
       return;
     }
 
@@ -118,7 +118,7 @@ const ProfileManagement: React.FC = () => {
     if (!user) return;
 
     // Check rate limiting
-    if (!checkRateLimit('sensitive')) {
+    if (!checkRateLimit('api')) {
       return;
     }
 
