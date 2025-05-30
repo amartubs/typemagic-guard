@@ -1,16 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Calendar } from 'lucide-react';
 import { useAuth } from '@/contexts/auth';
 import { useSubscription } from '@/hooks/useSubscription';
-import { Calendar, Download, RefreshCw, Settings } from 'lucide-react';
-import MetricsCards from './MetricsCards';
-import AuthenticationTrendsChart from './AuthenticationTrendsChart';
-import UserBehaviorAnalysis from './UserBehaviorAnalysis';
-import SecurityInsights from './SecurityInsights';
-import CustomReports from './CustomReports';
+import AnalyticsHeader from './AnalyticsHeader';
+import AnalyticsMetrics from './AnalyticsMetrics';
+import AnalyticsTabs from './AnalyticsTabs';
 
 const AdvancedAnalytics: React.FC = () => {
   const { user } = useAuth();
@@ -211,71 +206,21 @@ const AdvancedAnalytics: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header Controls */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-bold">Advanced Analytics</h2>
-          <p className="text-muted-foreground">
-            Comprehensive insights into authentication patterns, security, and user behavior
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Select value={timeRange} onValueChange={(value: '7d' | '30d' | '90d') => setTimeRange(value)}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7d">Last 7 days</SelectItem>
-              <SelectItem value="30d">Last 30 days</SelectItem>
-              <SelectItem value="90d">Last 90 days</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline" onClick={handleRefresh} disabled={refreshing}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
-        </div>
-      </div>
+      <AnalyticsHeader
+        timeRange={timeRange}
+        refreshing={refreshing}
+        onTimeRangeChange={setTimeRange}
+        onRefresh={handleRefresh}
+      />
 
-      {/* Key Metrics */}
-      <MetricsCards metrics={analyticsData.metrics} />
+      <AnalyticsMetrics metrics={analyticsData.metrics} />
 
-      {/* Analytics Tabs */}
-      <Tabs defaultValue="trends" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="trends">Authentication Trends</TabsTrigger>
-          <TabsTrigger value="behavior">User Behavior</TabsTrigger>
-          <TabsTrigger value="security">Security Insights</TabsTrigger>
-          <TabsTrigger value="reports">Custom Reports</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="trends" className="space-y-4">
-          <AuthenticationTrendsChart 
-            data={analyticsData.authTrends} 
-            timeRange={timeRange}
-          />
-        </TabsContent>
-
-        <TabsContent value="behavior" className="space-y-4">
-          <UserBehaviorAnalysis data={analyticsData.userBehavior} />
-        </TabsContent>
-
-        <TabsContent value="security" className="space-y-4">
-          <SecurityInsights 
-            insights={analyticsData.securityInsights.insights}
-            threatTrends={analyticsData.securityInsights.threatTrends}
-            anomalyDetection={analyticsData.securityInsights.anomalyDetection}
-          />
-        </TabsContent>
-
-        <TabsContent value="reports" className="space-y-4">
-          <CustomReports 
-            templates={analyticsData.reportTemplates}
-            onGenerateReport={handleGenerateReport}
-            onCreateTemplate={handleCreateTemplate}
-          />
-        </TabsContent>
-      </Tabs>
+      <AnalyticsTabs
+        timeRange={timeRange}
+        analyticsData={analyticsData}
+        onGenerateReport={handleGenerateReport}
+        onCreateTemplate={handleCreateTemplate}
+      />
     </div>
   );
 };
