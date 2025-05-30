@@ -1,53 +1,154 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/auth';
 import { useSubscription } from '@/hooks/useSubscription';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-  Area,
-  AreaChart
-} from 'recharts';
-import { 
-  TrendingUp, 
-  Users, 
-  Shield, 
-  Activity, 
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  Target
-} from 'lucide-react';
-
-interface AnalyticsData {
-  authenticationTrends: Array<{ date: string; successful: number; failed: number; }>;
-  confidenceScores: Array<{ range: string; count: number; }>;
-  deviceAnalytics: Array<{ device: string; count: number; risk: 'low' | 'medium' | 'high'; }>;
-  timePatterns: Array<{ hour: number; authentications: number; }>;
-  securityEvents: Array<{ type: string; count: number; severity: 'low' | 'medium' | 'high'; }>;
-}
+import { Calendar, Download, RefreshCw, Settings } from 'lucide-react';
+import MetricsCards from './MetricsCards';
+import AuthenticationTrendsChart from './AuthenticationTrendsChart';
+import UserBehaviorAnalysis from './UserBehaviorAnalysis';
+import SecurityInsights from './SecurityInsights';
+import CustomReports from './CustomReports';
 
 const AdvancedAnalytics: React.FC = () => {
   const { user } = useAuth();
   const { canAccessFeature } = useSubscription();
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
+  const [refreshing, setRefreshing] = useState(false);
 
   const hasAdvancedAnalytics = canAccessFeature('advancedAnalytics');
+
+  const [analyticsData, setAnalyticsData] = useState({
+    metrics: {
+      successRate: 94.2,
+      avgConfidence: 87.3,
+      activeUsers: 1247,
+      securityEvents: 23,
+      avgResponseTime: 145,
+      threatLevel: 'low' as const,
+      systemUptime: 99.8,
+      authenticationsToday: 3456
+    },
+    authTrends: [
+      { date: '2024-01-23', successful: 45, failed: 3, suspicious: 1, avgConfidence: 89 },
+      { date: '2024-01-24', successful: 52, failed: 1, suspicious: 0, avgConfidence: 91 },
+      { date: '2024-01-25', successful: 38, failed: 5, suspicious: 2, avgConfidence: 85 },
+      { date: '2024-01-26', successful: 61, failed: 2, suspicious: 1, avgConfidence: 93 },
+      { date: '2024-01-27', successful: 49, failed: 4, suspicious: 1, avgConfidence: 88 },
+      { date: '2024-01-28', successful: 55, failed: 1, suspicious: 0, avgConfidence: 92 },
+      { date: '2024-01-29', successful: 43, failed: 3, suspicious: 2, avgConfidence: 87 }
+    ],
+    userBehavior: {
+      deviceTypes: [
+        { name: 'Desktop - Chrome', value: 45, risk: 'low' as const },
+        { name: 'Mobile - Safari', value: 28, risk: 'low' as const },
+        { name: 'Desktop - Firefox', value: 15, risk: 'medium' as const },
+        { name: 'Mobile - Chrome', value: 10, risk: 'low' as const },
+        { name: 'Unknown Device', value: 2, risk: 'high' as const }
+      ],
+      loginPatterns: [
+        { hour: 0, logins: 12 }, { hour: 6, logins: 45 }, { hour: 9, logins: 156 },
+        { hour: 12, logins: 134 }, { hour: 15, logins: 98 }, { hour: 18, logins: 87 },
+        { hour: 21, logins: 56 }
+      ],
+      locationAnalysis: [
+        { country: 'United States', users: 567, suspicious: 2 },
+        { country: 'United Kingdom', users: 234, suspicious: 0 },
+        { country: 'Germany', users: 189, suspicious: 1 },
+        { country: 'Canada', users: 156, suspicious: 0 },
+        { country: 'Australia', users: 101, suspicious: 3 }
+      ],
+      keystrokePatterns: {
+        avgTypingSpeed: 67,
+        consistencyScore: 84,
+        uniquePatterns: 1247
+      }
+    },
+    securityInsights: {
+      insights: [
+        {
+          id: '1',
+          type: 'threat' as const,
+          severity: 'high' as const,
+          title: 'Unusual Login Pattern Detected',
+          description: 'Multiple failed login attempts from new geographic location detected for 5 users.',
+          timestamp: '2024-01-29T10:30:00Z',
+          affectedUsers: 5,
+          action: 'Monitor and review'
+        },
+        {
+          id: '2',
+          type: 'improvement' as const,
+          severity: 'low' as const,
+          title: 'Confidence Score Improvement',
+          description: 'Average confidence scores have increased by 8% over the last week.',
+          timestamp: '2024-01-29T08:15:00Z'
+        },
+        {
+          id: '3',
+          type: 'anomaly' as const,
+          severity: 'medium' as const,
+          title: 'Keystroke Pattern Anomaly',
+          description: 'Detected unusual typing patterns for user group in marketing department.',
+          timestamp: '2024-01-29T07:45:00Z',
+          affectedUsers: 12,
+          action: 'Schedule retraining'
+        }
+      ],
+      threatTrends: {
+        current: 23,
+        previous: 31,
+        change: -25.8
+      },
+      anomalyDetection: {
+        totalAnomalies: 15,
+        resolvedAnomalies: 12,
+        activeThreats: 3,
+        riskScore: 35
+      }
+    },
+    reportTemplates: [
+      {
+        id: 'security-weekly',
+        name: 'Weekly Security Report',
+        description: 'Comprehensive security analysis with threat detection and user behavior insights',
+        type: 'security' as const,
+        frequency: 'weekly' as const,
+        lastGenerated: '2024-01-22T00:00:00Z',
+        status: 'active' as const
+      },
+      {
+        id: 'performance-daily',
+        name: 'Daily Performance Metrics',
+        description: 'System performance, response times, and uptime statistics',
+        type: 'performance' as const,
+        frequency: 'daily' as const,
+        lastGenerated: '2024-01-29T00:00:00Z',
+        status: 'active' as const
+      },
+      {
+        id: 'user-behavior-monthly',
+        name: 'Monthly User Behavior Analysis',
+        description: 'Detailed analysis of user authentication patterns and device usage',
+        type: 'user_behavior' as const,
+        frequency: 'monthly' as const,
+        lastGenerated: '2024-01-01T00:00:00Z',
+        status: 'active' as const
+      },
+      {
+        id: 'compliance-quarterly',
+        name: 'Quarterly Compliance Report',
+        description: 'GDPR, SOC2, and other compliance metrics and audit trail',
+        type: 'compliance' as const,
+        frequency: 'custom' as const,
+        lastGenerated: '2024-01-01T00:00:00Z',
+        status: 'inactive' as const
+      }
+    ]
+  });
 
   useEffect(() => {
     if (hasAdvancedAnalytics) {
@@ -60,50 +161,9 @@ const AdvancedAnalytics: React.FC = () => {
   const loadAnalyticsData = async () => {
     setLoading(true);
     try {
-      // Mock data - in production this would fetch from your analytics API
+      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setAnalyticsData({
-        authenticationTrends: [
-          { date: '2024-01-01', successful: 45, failed: 3 },
-          { date: '2024-01-02', successful: 52, failed: 1 },
-          { date: '2024-01-03', successful: 38, failed: 5 },
-          { date: '2024-01-04', successful: 61, failed: 2 },
-          { date: '2024-01-05', successful: 49, failed: 4 },
-          { date: '2024-01-06', successful: 55, failed: 1 },
-          { date: '2024-01-07', successful: 43, failed: 3 }
-        ],
-        confidenceScores: [
-          { range: '90-100%', count: 156 },
-          { range: '80-89%', count: 89 },
-          { range: '70-79%', count: 34 },
-          { range: '60-69%', count: 12 },
-          { range: '<60%', count: 5 }
-        ],
-        deviceAnalytics: [
-          { device: 'Desktop - Chrome', count: 145, risk: 'low' },
-          { device: 'Mobile - Safari', count: 89, risk: 'low' },
-          { device: 'Desktop - Firefox', count: 34, risk: 'medium' },
-          { device: 'Mobile - Chrome', count: 67, risk: 'low' },
-          { device: 'Unknown Device', count: 3, risk: 'high' }
-        ],
-        timePatterns: [
-          { hour: 0, authentications: 2 },
-          { hour: 6, authentications: 8 },
-          { hour: 9, authentications: 45 },
-          { hour: 12, authentications: 38 },
-          { hour: 15, authentications: 42 },
-          { hour: 18, authentications: 35 },
-          { hour: 21, authentications: 15 }
-        ],
-        securityEvents: [
-          { type: 'Failed Login', count: 23, severity: 'medium' },
-          { type: 'Suspicious Location', count: 5, severity: 'high' },
-          { type: 'New Device', count: 12, severity: 'low' },
-          { type: 'Rate Limit Hit', count: 3, severity: 'medium' },
-          { type: 'Anomaly Detected', count: 7, severity: 'high' }
-        ]
-      });
+      // Data is already set in state above
     } catch (error) {
       console.error('Error loading analytics:', error);
     } finally {
@@ -111,208 +171,109 @@ const AdvancedAnalytics: React.FC = () => {
     }
   };
 
-  const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#0088FE'];
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadAnalyticsData();
+    setRefreshing(false);
+  };
+
+  const handleGenerateReport = (templateId: string, config: any) => {
+    console.log('Generating report:', templateId, config);
+    // Implementation would trigger report generation
+  };
+
+  const handleCreateTemplate = () => {
+    console.log('Creating new report template');
+    // Implementation would open template creation dialog
+  };
 
   if (!hasAdvancedAnalytics) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Advanced Analytics</CardTitle>
-          <CardDescription>
-            Detailed insights into your authentication patterns and security metrics
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <BarChart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">Premium Feature</h3>
-            <p className="text-muted-foreground">
-              Advanced analytics are available for Professional and Enterprise subscribers.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="text-center py-8">
+        <div className="max-w-md mx-auto">
+          <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-medium mb-2">Premium Feature</h3>
+          <p className="text-muted-foreground">
+            Advanced analytics are available for Professional and Enterprise subscribers.
+          </p>
+        </div>
+      </div>
     );
   }
 
   if (loading) {
     return (
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center">
-              <CheckCircle className="h-8 w-8 text-green-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Success Rate</p>
-                <p className="text-2xl font-bold">94.2%</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center">
-              <TrendingUp className="h-8 w-8 text-blue-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Avg Confidence</p>
-                <p className="text-2xl font-bold">87.3%</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center">
-              <Users className="h-8 w-8 text-purple-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Active Users</p>
-                <p className="text-2xl font-bold">1,247</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center">
-              <AlertTriangle className="h-8 w-8 text-red-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Security Events</p>
-                <p className="text-2xl font-bold">23</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Header Controls */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-bold">Advanced Analytics</h2>
+          <p className="text-muted-foreground">
+            Comprehensive insights into authentication patterns, security, and user behavior
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Select value={timeRange} onValueChange={(value: '7d' | '30d' | '90d') => setTimeRange(value)}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7d">Last 7 days</SelectItem>
+              <SelectItem value="30d">Last 30 days</SelectItem>
+              <SelectItem value="90d">Last 90 days</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" onClick={handleRefresh} disabled={refreshing}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
 
+      {/* Key Metrics */}
+      <MetricsCards metrics={analyticsData.metrics} />
+
+      {/* Analytics Tabs */}
       <Tabs defaultValue="trends" className="space-y-4">
         <TabsList>
           <TabsTrigger value="trends">Authentication Trends</TabsTrigger>
-          <TabsTrigger value="confidence">Confidence Analysis</TabsTrigger>
-          <TabsTrigger value="devices">Device Analytics</TabsTrigger>
-          <TabsTrigger value="security">Security Events</TabsTrigger>
+          <TabsTrigger value="behavior">User Behavior</TabsTrigger>
+          <TabsTrigger value="security">Security Insights</TabsTrigger>
+          <TabsTrigger value="reports">Custom Reports</TabsTrigger>
         </TabsList>
 
         <TabsContent value="trends" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Authentication Trends</CardTitle>
-              <CardDescription>
-                Successful vs failed authentication attempts over time
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={analyticsData?.authenticationTrends}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Area type="monotone" dataKey="successful" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
-                  <Area type="monotone" dataKey="failed" stackId="1" stroke="#ff7300" fill="#ff7300" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          <AuthenticationTrendsChart 
+            data={analyticsData.authTrends} 
+            timeRange={timeRange}
+          />
         </TabsContent>
 
-        <TabsContent value="confidence" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Confidence Score Distribution</CardTitle>
-              <CardDescription>
-                Distribution of authentication confidence scores
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={analyticsData?.confidenceScores}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ range, percent }) => `${range} (${(percent * 100).toFixed(0)}%)`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="count"
-                  >
-                    {analyticsData?.confidenceScores.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="devices" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Device Analytics</CardTitle>
-              <CardDescription>
-                Authentication attempts by device type and risk level
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {analyticsData?.deviceAnalytics.map((device, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-primary"></div>
-                      <span className="font-medium">{device.device}</span>
-                      <Badge variant={
-                        device.risk === 'high' ? 'destructive' : 
-                        device.risk === 'medium' ? 'secondary' : 'default'
-                      }>
-                        {device.risk} risk
-                      </Badge>
-                    </div>
-                    <span className="text-muted-foreground">{device.count} authentications</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="behavior" className="space-y-4">
+          <UserBehaviorAnalysis data={analyticsData.userBehavior} />
         </TabsContent>
 
         <TabsContent value="security" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Security Events</CardTitle>
-              <CardDescription>
-                Security incidents and anomalies detected
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={analyticsData?.securityEvents}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="type" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          <SecurityInsights 
+            insights={analyticsData.securityInsights.insights}
+            threatTrends={analyticsData.securityInsights.threatTrends}
+            anomalyDetection={analyticsData.securityInsights.anomalyDetection}
+          />
+        </TabsContent>
+
+        <TabsContent value="reports" className="space-y-4">
+          <CustomReports 
+            templates={analyticsData.reportTemplates}
+            onGenerateReport={handleGenerateReport}
+            onCreateTemplate={handleCreateTemplate}
+          />
         </TabsContent>
       </Tabs>
     </div>
