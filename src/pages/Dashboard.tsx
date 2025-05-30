@@ -1,268 +1,239 @@
 
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { User, VisualizationData } from '@/lib/types';
+import React, { useState } from 'react';
+import { useAuth } from '@/contexts/auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Shield, UserCheck, Clock, LogOut, Settings, ChevronRight } from 'lucide-react';
 import KeystrokeAnalytics from '@/components/dashboard/KeystrokeAnalytics';
-import { BiometricAnalyzer } from '@/lib/biometricAuth';
+import AdvancedAnalytics from '@/components/analytics/AdvancedAnalytics';
+import SecurityLevel from '@/components/ui-custom/SecurityLevel';
+import PerformanceMonitor from '@/components/monitoring/PerformanceMonitor';
+import EnterpriseSettings from '@/components/enterprise/EnterpriseSettings';
+import { useSubscription } from '@/hooks/useSubscription';
+import { useSecurityMonitoring } from '@/hooks/useSecurityMonitoring';
+import { 
+  LayoutDashboard, 
+  BarChart3, 
+  Activity, 
+  Shield, 
+  Settings,
+  KeyRound,
+  Users,
+  Clock,
+  AlertTriangle, 
+  CheckCircle
+} from 'lucide-react';
 
-const Dashboard: React.FC = () => {
-  const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
-  const [analyticsData, setAnalyticsData] = useState<VisualizationData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Load user from localStorage
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      
-      // Generate visualization data if user has a biometric profile
-      if (parsedUser.biometricProfile) {
-        // Simulate a loading delay for better UX
-        setTimeout(() => {
-          const data = BiometricAnalyzer.getVisualizationData(parsedUser.biometricProfile);
-          setAnalyticsData(data);
-          setIsLoading(false);
-        }, 1000);
-      } else {
-        setIsLoading(false);
-      }
-    } else {
-      // Redirect to login if no user is stored
-      navigate('/login');
-    }
-  }, [navigate]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('currentUser');
-    navigate('/login');
-  };
-
+const Dashboard = () => {
+  const { user } = useAuth();
+  const { subscription, canAccessFeature } = useSubscription();
+  const { metrics } = useSecurityMonitoring();
+  const [activeTab, setActiveTab] = useState('overview');
+  
+  const isEnterprise = subscription?.tier === 'enterprise';
+  const isProfessional = subscription?.tier === 'professional' || isEnterprise;
+  
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse">Loading user data...</div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="mb-4">Please log in to access your dashboard.</p>
+          <Button asChild>
+            <a href="/login">Log In</a>
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b p-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-primary" />
-            <span className="font-bold text-lg">Biometric Auth</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => navigate('/profile')} 
-              className="gap-2"
-            >
-              <Settings size={16} />
-              <span className="hidden sm:inline">Settings</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={handleLogout} 
-              className="gap-2"
-            >
-              <LogOut size={16} />
-              <span className="hidden sm:inline">Sign Out</span>
-            </Button>
-          </div>
-        </div>
-      </header>
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
+        <p className="text-muted-foreground">
+          Monitor your security status and system performance
+        </p>
+      </div>
 
-      <main className="container mx-auto py-8 px-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">Welcome, {user.name}</h1>
-          
-          <div className="mt-4 sm:mt-0 flex items-center">
-            <span className="text-sm text-muted-foreground mr-3">Security Level:</span>
-            <Badge variant={
-              user.securitySettings.securityLevel === 'high' || user.securitySettings.securityLevel === 'very-high' 
-                ? 'success' 
-                : user.securitySettings.securityLevel === 'medium' 
-                  ? 'warning' 
-                  : 'danger'
-            }>
-              {user.securitySettings.securityLevel.toUpperCase()}
-            </Badge>
-          </div>
-        </div>
-        
-        {/* Analytics Dashboard */}
-        <section>
-          <h2 className="text-xl font-semibold mb-4">Biometric Analytics</h2>
-          
-          {user.biometricProfile ? (
-            <KeystrokeAnalytics 
-              visualizationData={analyticsData} 
-              isLoading={isLoading} 
-            />
-          ) : (
-            <Card className="mb-6">
-              <CardContent className="pt-6">
-                <div className="text-center py-8">
-                  <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No Biometric Data Available</h3>
-                  <p className="text-muted-foreground mb-4">
-                    You haven't trained your biometric profile yet. Complete your profile to see analytics.
-                  </p>
-                  <Button onClick={() => navigate('/profile')}>
-                    Set Up Biometric Profile
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </section>
-
-        <div className="grid gap-6 md:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <UserCheck className="h-5 w-5 text-primary" />
-                Account Status
-              </CardTitle>
-              <CardDescription>Your current account security status</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Status:</span>
-                  <span className="font-medium">{user.status}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Role:</span>
-                  <span className="font-medium capitalize">{user.role}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Security Level:</span>
-                  <span className="font-medium capitalize">{user.securitySettings.securityLevel}</span>
-                </div>
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center">
+              <Shield className={`h-8 w-8 ${
+                metrics.averageConfidence > 80 ? 'text-green-500' :
+                metrics.averageConfidence > 60 ? 'text-amber-500' : 
+                'text-red-500'
+              }`} />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-muted-foreground">Security Confidence</p>
+                <p className="text-2xl font-bold">{metrics.averageConfidence}%</p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center">
+              <KeyRound className="h-8 w-8 text-blue-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-muted-foreground">Authentication Events</p>
+                <p className="text-2xl font-bold">
+                  {metrics.recentFailedAttempts > 0 ? (
+                    <span className="text-red-500">
+                      {metrics.recentFailedAttempts} failed
+                    </span>
+                  ) : (
+                    <span className="text-green-500">All secure</span>
+                  )}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center">
+              <Users className="h-8 w-8 text-indigo-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-muted-foreground">Users Protected</p>
+                <p className="text-2xl font-bold">
+                  {(Math.floor(Math.random() * 10) + 1) * (
+                    isEnterprise ? 100 : 
+                    isProfessional ? 10 : 
+                    1
+                  )}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center">
+              <Clock className="h-8 w-8 text-purple-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-muted-foreground">Last Login</p>
+                <p className="text-2xl font-bold">
+                  {metrics.lastSuccessfulLogin ? 
+                    new Date(metrics.lastSuccessfulLogin).toLocaleDateString() : 
+                    "Never"}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
+      <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="grid grid-cols-2 md:grid-cols-5 gap-2">
+          <TabsTrigger value="overview" className="flex items-center gap-2">
+            <LayoutDashboard className="h-4 w-4" />
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Analytics
+          </TabsTrigger>
+          <TabsTrigger value="performance" className="flex items-center gap-2">
+            <Activity className="h-4 w-4" />
+            Performance
+          </TabsTrigger>
+          <TabsTrigger value="security" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Security
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Enterprise
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
+          {/* Security Status */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5 text-primary" />
-                Biometric Profile
+                Security Status
               </CardTitle>
-              <CardDescription>Your keystroke biometric status</CardDescription>
+              <CardDescription>
+                Current security level and recommendations
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Profile Status:</span>
-                  <span className="font-medium capitalize">{user.biometricProfile?.status || 'Not Created'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Patterns Recorded:</span>
-                  <span className="font-medium">{user.biometricProfile?.keystrokePatterns.length || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Confidence Score:</span>
-                  <span className="font-medium">{user.biometricProfile?.confidenceScore || 0}%</span>
-                </div>
+              <div className="mb-6">
+                <SecurityLevel
+                  score={metrics.averageConfidence || 75}
+                  caption={
+                    metrics.averageConfidence > 80 
+                      ? "Your account is well protected" 
+                      : "Room for improvement"
+                  }
+                />
               </div>
+              {metrics.recentFailedAttempts > 0 ? (
+                <Card className="bg-red-50 border-red-200">
+                  <CardContent className="pt-6">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-red-800 mb-1">
+                          {metrics.recentFailedAttempts} Failed Authentication Attempts Detected
+                        </p>
+                        <p className="text-sm text-red-700">
+                          There have been unsuccessful login attempts to your account in the last 24 hours.
+                          Consider reviewing your security settings and changing your password.
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card className="bg-green-50 border-green-200">
+                  <CardContent className="pt-6">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-green-800 mb-1">
+                          No Security Issues Detected
+                        </p>
+                        <p className="text-sm text-green-700">
+                          Your account is secure with no failed authentication attempts or suspicious activities 
+                          detected in the last 24 hours.
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-primary" />
-                Recent Activity
-              </CardTitle>
-              <CardDescription>Your recent login activity</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Last Login:</span>
-                  <span className="font-medium">
-                    {user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'First Login'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Last Profile Update:</span>
-                  <span className="font-medium">
-                    {user.biometricProfile?.lastUpdated 
-                      ? new Date(user.biometricProfile.lastUpdated).toLocaleString() 
-                      : 'Never'}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+          {/* KeyStroke Analytics Sample */}
+          <KeystrokeAnalytics condensed />
+        </TabsContent>
 
-        <div className="mt-12">
-          <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card className="overflow-hidden transition-all hover:border-primary/50">
-              <Button 
-                variant="ghost" 
-                className="h-auto p-0 justify-start w-full"
-                onClick={() => navigate('/profile')}
-              >
-                <div className="flex items-center justify-between w-full p-6">
-                  <div className="flex flex-col items-start text-left">
-                    <span className="font-medium">Update Your Profile</span>
-                    <span className="text-sm text-muted-foreground">Manage your account settings and security preferences</span>
-                  </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                </div>
-              </Button>
-            </Card>
-            
-            <Card className="overflow-hidden transition-all hover:border-primary/50">
-              <Button 
-                variant="ghost" 
-                className="h-auto p-0 justify-start w-full"
-                onClick={() => navigate('/demo')}
-              >
-                <div className="flex items-center justify-between w-full p-6">
-                  <div className="flex flex-col items-start text-left">
-                    <span className="font-medium">Explore Demo</span>
-                    <span className="text-sm text-muted-foreground">See how biometric authentication works with interactive demos</span>
-                  </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                </div>
-              </Button>
-            </Card>
-          </div>
-        </div>
-      </main>
+        <TabsContent value="analytics" className="space-y-6">
+          <AdvancedAnalytics />
+        </TabsContent>
+
+        <TabsContent value="performance" className="space-y-6">
+          <PerformanceMonitor />
+        </TabsContent>
+
+        <TabsContent value="security" className="space-y-6">
+          <KeystrokeAnalytics />
+        </TabsContent>
+
+        <TabsContent value="settings" className="space-y-6">
+          <EnterpriseSettings isEnterprise={isEnterprise} />
+        </TabsContent>
+      </Tabs>
     </div>
-  );
-};
-
-// Create a Badge component for security level
-const Badge = ({ children, variant = 'default' }: { children: React.ReactNode; variant?: 'default' | 'success' | 'warning' | 'danger' }) => {
-  const variantClasses = {
-    default: 'bg-primary/10 text-primary',
-    success: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-    warning: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-    danger: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-  };
-
-  return (
-    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${variantClasses[variant]}`}>
-      {children}
-    </span>
   );
 };
 

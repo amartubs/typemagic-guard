@@ -1,234 +1,270 @@
-
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { VisualizationData } from '@/lib/types';
-import { Badge } from '@/components/ui/badge';
-import { Activity, BarChart3, PieChart as PieChartIcon } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  Cell,
+} from "recharts";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface KeystrokeAnalyticsProps {
-  visualizationData: VisualizationData | null;
-  isLoading?: boolean;
+  condensed?: boolean;
 }
 
-const KeystrokeAnalytics: React.FC<KeystrokeAnalyticsProps> = ({ 
-  visualizationData, 
-  isLoading = false 
-}) => {
-  // Generate demo data if none provided
-  const data = visualizationData || {
-    typingSpeed: [45, 48, 52, 49, 53, 55, 54, 58, 60, 61],
-    keyPressHeatmap: {
-      'a': 65, 'e': 89, 't': 76, 'i': 69, 'o': 80, 
-      'n': 62, 's': 70, 'r': 64, 'h': 35, 'l': 34,
-      'd': 28, 'c': 26, 'u': 23, 'm': 20, 'f': 19,
-      'p': 18, 'g': 17, 'w': 15, 'y': 14, 'b': 13,
-      'v': 10, 'k': 7, 'x': 4, 'j': 3, 'q': 3, 'z': 2
-    },
-    rhythmPatterns: [
-      [12, 28, 40, 35, 25, 18, 32, 45, 50, 60],
-      [22, 38, 30, 45, 35, 28, 42, 35, 40, 50],
-      [32, 28, 50, 25, 45, 38, 22, 55, 30, 40]
-    ],
+const KeystrokeAnalytics: React.FC<KeystrokeAnalyticsProps> = ({ condensed = false }) => {
+  const { canAccessFeature } = useSubscription();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
+  }, []);
+
+  // Mock data for demonstration
+  const [mockData, setMockData] = useState({
     confidenceHistory: [
-      {timestamp: Date.now() - 500000, score: 65},
-      {timestamp: Date.now() - 400000, score: 72},
-      {timestamp: Date.now() - 300000, score: 68},
-      {timestamp: Date.now() - 200000, score: 75},
-      {timestamp: Date.now() - 100000, score: 80},
-      {timestamp: Date.now(), score: 85}
-    ]
-  };
+      { date: "May 24", confidence: 85 },
+      { date: "May 25", confidence: 88 },
+      { date: "May 26", confidence: 90 },
+      { date: "May 27", confidence: 91 },
+      { date: "May 28", confidence: 89 },
+      { date: "May 29", confidence: 92 },
+      { date: "May 30", confidence: 94 },
+    ],
+    typingPatterns: [
+      {
+        key: "KeyA",
+        pressTime: 98,
+        releaseTime: 65,
+        similarity: 92,
+      },
+      {
+        key: "KeyS",
+        pressTime: 105,
+        releaseTime: 72,
+        similarity: 88,
+      },
+      {
+        key: "KeyD",
+        pressTime: 95,
+        releaseTime: 68,
+        similarity: 95,
+      },
+      {
+        key: "KeyF",
+        pressTime: 102,
+        releaseTime: 70,
+        similarity: 91,
+      },
+      {
+        key: "Space",
+        pressTime: 110,
+        releaseTime: 75,
+        similarity: 86,
+      },
+    ],
+  });
 
-  // Transform key press data for pie chart
-  const keyPressData = Object.entries(data.keyPressHeatmap)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8)
-    .map(([key, value]) => ({ name: key, value }));
-
-  // Generate colors for pie chart
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#8dd1e1'];
-
-  // Format timestamp for x-axis
-  const formatTimestamp = (timestamp: number) => {
-    return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 animate-pulse">
-        <Card className="h-80 bg-muted/30"></Card>
-        <Card className="h-80 bg-muted/30"></Card>
-        <Card className="h-80 bg-muted/30"></Card>
-        <Card className="h-80 bg-muted/30"></Card>
-      </div>
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (condensed) {
+    return (
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg">Keystroke Authentication</CardTitle>
+          <CardDescription>
+            Your typing pattern confidence over time
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart
+              data={mockData.confidenceHistory}
+              margin={{
+                top: 5,
+                right: 20,
+                left: 0,
+                bottom: 5,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis domain={[0, 100]} />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="confidence"
+                stroke="#8884d8"
+                activeDot={{ r: 8 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+          <div className="mt-4 text-center">
+            <div className="text-3xl font-bold text-primary">94%</div>
+            <div className="text-sm text-muted-foreground">
+              Current authentication confidence
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-      {/* Typing Speed Chart */}
-      <Card>
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Activity className="h-5 w-5 text-primary" />
-              Typing Speed Trend
-            </CardTitle>
-            <Badge variant="outline" className="font-normal">
-              {data.typingSpeed[data.typingSpeed.length - 1]} WPM
-            </Badge>
-          </div>
-          <CardDescription>Your typing speed over time (words per minute)</CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={data.typingSpeed.map((speed, index) => ({ day: index + 1, speed }))}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis dataKey="day" label={{ value: 'Session', position: 'insideBottom', offset: -5 }} />
-              <YAxis label={{ value: 'WPM', angle: -90, position: 'insideLeft' }} />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'hsl(var(--card))', 
-                  borderColor: 'hsl(var(--border))',
-                  borderRadius: '0.5rem'
-                }} 
-                formatter={(value) => [`${value} WPM`, 'Speed']}
-                labelFormatter={(value) => `Session ${value}`}
-              />
-              <Line type="monotone" dataKey="speed" stroke="hsl(var(--primary))" activeDot={{ r: 8 }} strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* Key Frequency Chart */}
-      <Card>
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <PieChartIcon className="h-5 w-5 text-primary" />
-              Key Usage Distribution
-            </CardTitle>
-            <Badge variant="outline" className="font-normal">
-              Top 8 Keys
-            </Badge>
-          </div>
-          <CardDescription>Most frequently used keys in your typing patterns</CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <ResponsiveContainer width="100%" height={250}>
-            <PieChart>
-              <Pie
-                data={keyPressData}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={80}
-                fill="#8884d8"
-                paddingAngle={2}
-                dataKey="value"
-                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-              >
-                {keyPressData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'hsl(var(--card))', 
-                  borderColor: 'hsl(var(--border))',
-                  borderRadius: '0.5rem'
-                }} 
-                formatter={(value) => [`${value} presses`, 'Frequency']}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* Typing Rhythm Patterns */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-primary" />
-            Typing Rhythm Patterns
-          </CardTitle>
-          <CardDescription>Keystroke timing patterns across different sessions</CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={data.rhythmPatterns[0].map((_, index) => ({
-              index: index + 1,
-              pattern1: data.rhythmPatterns[0][index],
-              pattern2: data.rhythmPatterns[1][index],
-              pattern3: data.rhythmPatterns[2][index]
-            }))}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis dataKey="index" label={{ value: 'Key Transition', position: 'insideBottom', offset: -5 }} />
-              <YAxis label={{ value: 'Time (ms)', angle: -90, position: 'insideLeft' }} />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'hsl(var(--card))', 
-                  borderColor: 'hsl(var(--border))',
-                  borderRadius: '0.5rem'
-                }} 
-              />
-              <Bar dataKey="pattern1" fill="#0088FE" name="Session 1" />
-              <Bar dataKey="pattern2" fill="#00C49F" name="Session 2" />
-              <Bar dataKey="pattern3" fill="#FFBB28" name="Session 3" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* Confidence Score Trend */}
-      <Card>
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Activity className="h-5 w-5 text-primary" />
-              Confidence Score Trend
-            </CardTitle>
-            <Badge variant="outline" className="font-normal">
-              {data.confidenceHistory[data.confidenceHistory.length - 1].score}%
-            </Badge>
-          </div>
-          <CardDescription>Authentication confidence score over time</CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={data.confidenceHistory.map(item => ({
-              time: item.timestamp,
-              score: item.score
-            }))}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis 
-                dataKey="time" 
-                tickFormatter={formatTimestamp}
-                label={{ value: 'Time', position: 'insideBottom', offset: -5 }} 
-              />
-              <YAxis domain={[0, 100]} label={{ value: 'Score (%)', angle: -90, position: 'insideLeft' }} />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'hsl(var(--card))', 
-                  borderColor: 'hsl(var(--border))',
-                  borderRadius: '0.5rem'
-                }} 
-                labelFormatter={formatTimestamp}
-                formatter={(value) => [`${value}%`, 'Confidence']}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="score" 
-                stroke="hsl(var(--primary))" 
-                activeDot={{ r: 8 }} 
-                strokeWidth={2}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+    <div className="space-y-6">
+      <Tabs defaultValue="confidence" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="confidence">Confidence History</TabsTrigger>
+          <TabsTrigger value="patterns">Typing Patterns</TabsTrigger>
+          <TabsTrigger value="anomalies">Anomaly Detection</TabsTrigger>
+        </TabsList>
+        <TabsContent value="confidence">
+          <Card>
+            <CardHeader>
+              <CardTitle>Confidence Score History</CardTitle>
+              <CardDescription>
+                Your pattern recognition confidence over time
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[400px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={mockData.confidenceHistory}
+                    margin={{
+                      top: 20,
+                      right: 30,
+                      left: 20,
+                      bottom: 10,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis domain={[0, 100]} />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="confidence"
+                      stroke="#8884d8"
+                      strokeWidth={2}
+                      activeDot={{ r: 8 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="patterns">
+          <Card>
+            <CardHeader>
+              <CardTitle>Key Press Pattern Analysis</CardTitle>
+              <CardDescription>
+                Timing and pressure analysis of your typing
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[400px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={mockData.typingPatterns}
+                    margin={{
+                      top: 20,
+                      right: 30,
+                      left: 20,
+                      bottom: 10,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="key" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar
+                      dataKey="pressTime"
+                      name="Press Time (ms)"
+                      fill="#8884d8"
+                    />
+                    <Bar
+                      dataKey="releaseTime"
+                      name="Release Time (ms)"
+                      fill="#82ca9d"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="anomalies">
+          <Card>
+            <CardHeader>
+              <CardTitle>Pattern Similarity</CardTitle>
+              <CardDescription>
+                How closely your typing matches your stored profile
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[400px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={mockData.typingPatterns}
+                    margin={{
+                      top: 20,
+                      right: 30,
+                      left: 20,
+                      bottom: 10,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="key" />
+                    <YAxis domain={[0, 100]} />
+                    <Tooltip />
+                    <Bar dataKey="similarity" name="Similarity (%)">
+                      {mockData.typingPatterns.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={
+                            entry.similarity > 90
+                              ? "#82ca9d"
+                              : entry.similarity > 80
+                              ? "#ffc658"
+                              : "#ff8042"
+                          }
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
