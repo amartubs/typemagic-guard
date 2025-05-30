@@ -43,7 +43,6 @@ export const useSecurityValidation = () => {
 
   const validateForm = (data: Record<string, any>): boolean => {
     let isValid = true;
-    const errors: Record<string, string> = {};
 
     Object.entries(data).forEach(([field, value]) => {
       if (!validateField(field, value)) {
@@ -54,15 +53,12 @@ export const useSecurityValidation = () => {
     return isValid;
   };
 
-  const checkRateLimit = (action: string): boolean => {
+  const checkRateLimit = (action: 'login' | 'biometric' | 'api'): boolean => {
     if (!user?.id) return true;
 
-    const config = RateLimiter.configs[action as keyof typeof RateLimiter.configs];
-    if (!config) return true;
-
-    const result = RateLimiter.checkLimit(user.id, action, config);
+    const result = RateLimiter.isAllowed(user.id, action);
     
-    if (!result.allowed) {
+    if (!result) {
       SecurityErrorHandler.handleRateLimitError(user.id);
       return false;
     }
