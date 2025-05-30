@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,9 @@ import {
   Globe, 
   Server,
   ExternalLink,
-  Copy
+  Copy,
+  Webhook,
+  Settings
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -65,6 +66,15 @@ const IntegrationTutorials = () => {
       difficulty: 'Advanced',
       duration: '35 min',
       category: 'Enterprise'
+    },
+    {
+      id: 'webhooks',
+      title: 'Webhook Configuration',
+      description: 'Real-time event notifications and callbacks',
+      icon: Webhook,
+      difficulty: 'Intermediate',
+      duration: '20 min',
+      category: 'Integration'
     }
   ];
 
@@ -282,6 +292,198 @@ const LoginScreen = () => {
 };`
         }
       ]
+    },
+    'backend-api': {
+      overview: 'Implement server-side TypeMagic Guard integration for secure API validation.',
+      prerequisites: [
+        'Backend development experience',
+        'API key management knowledge',
+        'Understanding of HTTP requests'
+      ],
+      steps: [
+        {
+          title: 'Server-Side SDK Installation',
+          content: `Install the appropriate server SDK for your platform:`,
+          code: `# Node.js/Express
+npm install @typemagic/guard-server
+
+# Python/Django
+pip install typemagic-guard-server
+
+# PHP/Laravel
+composer require typemagic/guard-server
+
+# Java/Spring
+implementation 'com.typemagic:guard-server:1.0.0'`
+        },
+        {
+          title: 'Configure Server Integration',
+          content: `Set up the server-side validation endpoint:`,
+          code: `// Node.js Express example
+const express = require('express');
+const { TypeMagicServer } = require('@typemagic/guard-server');
+
+const app = express();
+const tmgServer = new TypeMagicServer({
+  apiKey: process.env.TYPEMAGIC_API_KEY,
+  baseUrl: 'https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api'
+});
+
+app.post('/api/auth/biometric', async (req, res) => {
+  try {
+    const { userId, keystrokeData, context } = req.body;
+    
+    const result = await tmgServer.validateBiometric({
+      userId,
+      keystrokeData,
+      context,
+      ipAddress: req.ip,
+      userAgent: req.get('User-Agent')
+    });
+    
+    res.json({
+      success: result.success,
+      confidenceScore: result.confidenceScore,
+      riskLevel: result.riskLevel,
+      sessionToken: result.success ? generateSessionToken(userId) : null
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Biometric validation failed' });
+  }
+});`
+        }
+      ]
+    },
+    'webhooks': {
+      overview: 'Configure webhooks to receive real-time notifications about authentication events and security alerts.',
+      prerequisites: [
+        'HTTP endpoint for receiving webhooks',
+        'Understanding of webhook security',
+        'SSL certificate for production'
+      ],
+      steps: [
+        {
+          title: 'Configure Webhook Endpoint',
+          content: `Set up your webhook endpoint to receive TypeMagic Guard events:`,
+          code: `// Express.js webhook endpoint
+const express = require('express');
+const crypto = require('crypto');
+
+app.post('/webhooks/typemagic', express.raw({type: 'application/json'}), (req, res) => {
+  const signature = req.headers['x-typemagic-signature'];
+  const payload = req.body;
+  
+  // Verify webhook signature
+  const expectedSignature = crypto
+    .createHmac('sha256', process.env.TYPEMAGIC_WEBHOOK_SECRET)
+    .update(payload, 'utf8')
+    .digest('hex');
+  
+  if (signature !== \`sha256=\${expectedSignature}\`) {
+    return res.status(401).send('Unauthorized');
+  }
+  
+  const event = JSON.parse(payload);
+  
+  switch (event.type) {
+    case 'authentication.success':
+      handleAuthSuccess(event.data);
+      break;
+    case 'authentication.failed':
+      handleAuthFailure(event.data);
+      break;
+    case 'security.alert':
+      handleSecurityAlert(event.data);
+      break;
+    case 'user.pattern_updated':
+      handlePatternUpdate(event.data);
+      break;
+  }
+  
+  res.status(200).send('OK');
+});`
+        },
+        {
+          title: 'Event Handler Implementation',
+          content: `Implement handlers for different webhook events:`,
+          code: `function handleAuthSuccess(data) {
+  console.log('Successful authentication:', {
+    userId: data.userId,
+    confidenceScore: data.confidenceScore,
+    timestamp: data.timestamp
+  });
+  
+  // Update user session
+  updateUserSession(data.userId, {
+    lastAuth: data.timestamp,
+    authMethod: 'biometric',
+    confidence: data.confidenceScore
+  });
+}
+
+function handleAuthFailure(data) {
+  console.log('Failed authentication attempt:', {
+    userId: data.userId,
+    reason: data.reason,
+    ipAddress: data.ipAddress
+  });
+  
+  // Log security event
+  logSecurityEvent({
+    type: 'auth_failure',
+    userId: data.userId,
+    details: data
+  });
+}
+
+function handleSecurityAlert(data) {
+  console.log('Security alert:', data);
+  
+  if (data.severity === 'high') {
+    // Send immediate notification
+    notifySecurityTeam(data);
+    
+    // Consider blocking user if needed
+    if (data.alertType === 'suspicious_pattern') {
+      temporarilyBlockUser(data.userId);
+    }
+  }
+}`
+        },
+        {
+          title: 'Webhook Configuration',
+          content: `Configure your webhook settings through the API or dashboard:`,
+          code: `// Configure webhook via API
+const webhookConfig = {
+  url: 'https://yourapp.com/webhooks/typemagic',
+  events: [
+    'authentication.success',
+    'authentication.failed',
+    'security.alert',
+    'user.pattern_updated'
+  ],
+  secret: 'your_webhook_secret_here'
+};
+
+// Register webhook
+fetch('https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/webhooks', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': 'tmg_your_api_key_here'
+  },
+  body: JSON.stringify(webhookConfig)
+});
+
+// Test webhook
+fetch('https://wybjhqehohapazufkjfb.supabase.co/functions/v1/enterprise-api/webhooks/test', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'tmg_your_api_key_here'
+  }
+});`
+        }
+      ]
     }
   };
 
@@ -361,6 +563,7 @@ const LoginScreen = () => {
                   <TabsTrigger value="steps">Tutorial Steps</TabsTrigger>
                   <TabsTrigger value="prerequisites">Prerequisites</TabsTrigger>
                   <TabsTrigger value="resources">Resources</TabsTrigger>
+                  <TabsTrigger value="frameworks">Frameworks</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="steps" className="space-y-6">
@@ -445,6 +648,112 @@ const LoginScreen = () => {
                           <ExternalLink className="h-4 w-4 mr-2" />
                           Video Tutorial
                         </Button>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="frameworks" className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <Globe className="h-5 w-5" />
+                          React
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          <p className="text-sm text-muted-foreground">Hook-based integration with React components</p>
+                          <Button variant="outline" size="sm" className="w-full">
+                            View React Guide
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <Globe className="h-5 w-5" />
+                          Vue.js
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          <p className="text-sm text-muted-foreground">Composition API and directive support</p>
+                          <Button variant="outline" size="sm" className="w-full">
+                            View Vue Guide
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <Globe className="h-5 w-5" />
+                          Angular
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          <p className="text-sm text-muted-foreground">Service and directive integration</p>
+                          <Button variant="outline" size="sm" className="w-full">
+                            View Angular Guide
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <Smartphone className="h-5 w-5" />
+                          React Native
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          <p className="text-sm text-muted-foreground">Native mobile biometric capture</p>
+                          <Button variant="outline" size="sm" className="w-full">
+                            View RN Guide
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <Server className="h-5 w-5" />
+                          Node.js
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          <p className="text-sm text-muted-foreground">Express middleware and validation</p>
+                          <Button variant="outline" size="sm" className="w-full">
+                            View Node Guide
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <Settings className="h-5 w-5" />
+                          Custom
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          <p className="text-sm text-muted-foreground">REST API integration for any platform</p>
+                          <Button variant="outline" size="sm" className="w-full">
+                            View API Docs
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   </div>
