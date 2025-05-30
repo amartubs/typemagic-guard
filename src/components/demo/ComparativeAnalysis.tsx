@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { KeyTiming } from '@/lib/types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { Compare, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { GitCompare, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 interface TypingSample {
   id: string;
@@ -116,7 +115,7 @@ const ComparativeAnalysis: React.FC<ComparativeAnalysisProps> = ({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Compare className="h-5 w-5" />
+          <GitCompare className="h-5 w-5" />
           Comparative Analysis
         </CardTitle>
       </CardHeader>
