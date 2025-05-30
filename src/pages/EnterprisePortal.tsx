@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth";
 import { useSubscription } from "@/hooks/useSubscription";
-import EnhancedApiKeyManager from "@/components/enterprise/EnhancedApiKeyManager";
+import ApiKeyManager from "@/components/enterprise/ApiKeyManager";
 import ApiDocumentation from "@/components/enterprise/ApiDocumentation";
 import IntegrationTutorials from "@/components/enterprise/IntegrationTutorials";
 import WhiteLabelManager from "@/components/enterprise/WhiteLabelManager";
@@ -152,7 +152,7 @@ const EnterprisePortal = () => {
         </TabsList>
 
         <TabsContent value="api-keys">
-          <EnhancedApiKeyManager />
+          <ApiKeyManager />
         </TabsContent>
 
         <TabsContent value="api-docs">

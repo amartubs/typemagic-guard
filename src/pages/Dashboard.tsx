@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import KeystrokeAnalytics from '@/components/dashboard/KeystrokeAnalytics';
 import AdvancedAnalytics from '@/components/analytics/AdvancedAnalytics';
-import SecurityLevel from '@/components/ui-custom/SecurityLevel';
+import { SecurityLevelSlider } from '@/components/ui-custom/SecurityLevel';
 import PerformanceMonitor from '@/components/monitoring/PerformanceMonitor';
 import EnterpriseSettings from '@/components/enterprise/EnterpriseSettings';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -166,14 +166,16 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="mb-6">
-                <SecurityLevel
-                  score={metrics.averageConfidence || 75}
-                  caption={
-                    metrics.averageConfidence > 80 
-                      ? "Your account is well protected" 
-                      : "Room for improvement"
-                  }
+                <SecurityLevelSlider
+                  value={metrics.averageConfidence || 75}
+                  showLabels={true}
+                  className="mb-2"
                 />
+                <p className="text-center text-sm text-muted-foreground">
+                  {metrics.averageConfidence > 80 
+                    ? "Your account is well protected" 
+                    : "Room for improvement"}
+                </p>
               </div>
               {metrics.recentFailedAttempts > 0 ? (
                 <Card className="bg-red-50 border-red-200">
