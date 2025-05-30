@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/auth';
 import Index from '@/pages/Index';
 import Demo from '@/pages/Demo';
+import DemoEnvironment from '@/pages/DemoEnvironment';
+import Onboarding from '@/pages/Onboarding';
 import Pricing from '@/pages/Pricing';
 import Login from '@/pages/Login';
 import Auth from '@/pages/Auth';
@@ -29,6 +31,8 @@ function App() {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/demo" element={<Demo />} />
+              <Route path="/demo-environment" element={<DemoEnvironment />} />
+              <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/login" element={<Login />} />
               <Route path="/auth" element={<Auth />} />
