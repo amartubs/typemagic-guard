@@ -1,85 +1,73 @@
 
 interface RateLimitConfig {
-  maxAttempts: number;
   windowMs: number;
-  blockDurationMs?: number;
+  maxAttempts: number;
 }
 
 interface RateLimitEntry {
-  attempts: number;
-  firstAttempt: number;
-  blockedUntil?: number;
+  count: number;
+  resetTime: number;
 }
 
 export class RateLimiter {
-  private static storage = new Map<string, RateLimitEntry>();
-
-  private static getKey(userId: string, action: string): string {
-    return `${userId}:${action}`;
-  }
-
-  static checkLimit(
-    userId: string, 
-    action: string, 
-    config: RateLimitConfig
-  ): { allowed: boolean; remainingAttempts: number; resetTime?: number } {
-    const key = this.getKey(userId, action);
-    const now = Date.now();
-    const entry = this.storage.get(key);
-
-    // Check if user is currently blocked
-    if (entry?.blockedUntil && now < entry.blockedUntil) {
-      return {
-        allowed: false,
-        remainingAttempts: 0,
-        resetTime: entry.blockedUntil
-      };
-    }
-
-    // Clean up expired or reset window
-    if (!entry || (now - entry.firstAttempt) > config.windowMs) {
-      this.storage.set(key, {
-        attempts: 1,
-        firstAttempt: now
-      });
-      return {
-        allowed: true,
-        remainingAttempts: config.maxAttempts - 1
-      };
-    }
-
-    // Increment attempts
-    entry.attempts++;
-
-    // Check if limit exceeded
-    if (entry.attempts > config.maxAttempts) {
-      entry.blockedUntil = now + (config.blockDurationMs || config.windowMs);
-      this.storage.set(key, entry);
-      
-      return {
-        allowed: false,
-        remainingAttempts: 0,
-        resetTime: entry.blockedUntil
-      };
-    }
-
-    this.storage.set(key, entry);
-    return {
-      allowed: true,
-      remainingAttempts: config.maxAttempts - entry.attempts
-    };
-  }
-
-  static resetLimit(userId: string, action: string): void {
-    const key = this.getKey(userId, action);
-    this.storage.delete(key);
-  }
-
-  // Predefined rate limit configurations
-  static readonly configs = {
-    login: { maxAttempts: 5, windowMs: 15 * 60 * 1000, blockDurationMs: 30 * 60 * 1000 }, // 5 attempts per 15min, block for 30min
-    biometric: { maxAttempts: 3, windowMs: 5 * 60 * 1000, blockDurationMs: 10 * 60 * 1000 }, // 3 attempts per 5min, block for 10min
-    api: { maxAttempts: 100, windowMs: 60 * 1000 }, // 100 requests per minute
-    sensitive: { maxAttempts: 2, windowMs: 60 * 1000, blockDurationMs: 5 * 60 * 1000 } // 2 attempts per minute, block for 5min
+  private static limits: Map<string, RateLimitEntry> = new Map();
+  
+  private static configs: Record<string, RateLimitConfig> = {
+    login: { windowMs: 15 * 60 * 1000, maxAttempts: 5 }, // 5 attempts per 15 minutes
+    biometric: { windowMs: 5 * 60 * 1000, maxAttempts: 10 }, // 10 attempts per 5 minutes
+    api: { windowMs: 60 * 1000, maxAttempts: 100 } // 100 requests per minute
   };
+
+  static isAllowed(identifier: string, type: keyof typeof this.configs): boolean {
+    const config = this.configs[type];
+    const now = Date.now();
+    const key = `${type}:${identifier}`;
+    
+    let entry = this.limits.get(key);
+    
+    if (!entry || now > entry.resetTime) {
+      entry = {
+        count: 1,
+        resetTime: now + config.windowMs
+      };
+      this.limits.set(key, entry);
+      return true;
+    }
+    
+    if (entry.count >= config.maxAttempts) {
+      return false;
+    }
+    
+    entry.count++;
+    this.limits.set(key, entry);
+    return true;
+  }
+
+  static getRemainingAttempts(identifier: string, type: keyof typeof this.configs): number {
+    const config = this.configs[type];
+    const key = `${type}:${identifier}`;
+    const entry = this.limits.get(key);
+    
+    if (!entry || Date.now() > entry.resetTime) {
+      return config.maxAttempts;
+    }
+    
+    return Math.max(0, config.maxAttempts - entry.count);
+  }
+
+  static getResetTime(identifier: string, type: keyof typeof this.configs): number {
+    const key = `${type}:${identifier}`;
+    const entry = this.limits.get(key);
+    
+    if (!entry || Date.now() > entry.resetTime) {
+      return 0;
+    }
+    
+    return entry.resetTime;
+  }
+
+  static reset(identifier: string, type: keyof typeof this.configs): void {
+    const key = `${type}:${identifier}`;
+    this.limits.delete(key);
+  }
 }
