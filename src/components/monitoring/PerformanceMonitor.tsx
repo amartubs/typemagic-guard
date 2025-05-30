@@ -1,102 +1,218 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { 
-  Activity, 
-  Zap, 
-  Server, 
-  Globe, 
-  AlertCircle, 
-  CheckCircle, 
-  Clock,
-  Cpu,
-  HardDrive,
-  Wifi
-} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { RefreshCw, Download, Settings } from 'lucide-react';
+import RealTimeMetrics from './RealTimeMetrics';
+import UptimeTracker from './UptimeTracker';
+import AlertsPanel from './AlertsPanel';
 
-interface PerformanceMetrics {
-  responseTime: Array<{ timestamp: string; time: number; }>;
-  systemHealth: {
-    cpu: number;
-    memory: number;
-    disk: number;
-    network: number;
-  };
-  apiMetrics: {
-    totalRequests: number;
-    errorRate: number;
-    averageLatency: number;
-    throughput: number;
-  };
-  uptime: {
-    current: number;
-    last30Days: number;
-  };
+interface AlertItem {
+  id: string;
+  type: 'critical' | 'warning' | 'info';
+  title: string;
+  description: string;
+  timestamp: string;
+  resolved: boolean;
+}
+
+interface MetricData {
+  timestamp: string;
+  cpuUsage: number;
+  memoryUsage: number;
+  responseTime: number;
+  requestCount: number;
+}
+
+interface Service {
+  id: string;
+  name: string;
+  status: 'operational' | 'degraded' | 'outage';
+  uptime: number;
+  lastIncident?: string;
+}
+
+interface UptimeData {
+  date: string;
+  uptime: number;
+  incidents: number;
 }
 
 const PerformanceMonitor: React.FC = () => {
-  const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [realTimeData, setRealTimeData] = useState<MetricData[]>([]);
+  const [alerts, setAlerts] = useState<AlertItem[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
+  const [uptimeHistory, setUptimeHistory] = useState<UptimeData[]>([]);
+  const [currentMetrics, setCurrentMetrics] = useState({
+    cpu: 42,
+    memory: 63,
+    activeConnections: 127,
+    requestsPerSecond: 18.5
+  });
 
   useEffect(() => {
-    loadPerformanceMetrics();
-    const interval = setInterval(loadPerformanceMetrics, 30000); // Update every 30 seconds
+    loadInitialData();
+    const interval = setInterval(updateRealTimeData, 5000); // Update every 5 seconds
     return () => clearInterval(interval);
   }, []);
 
-  const loadPerformanceMetrics = async () => {
+  const loadInitialData = async () => {
+    setLoading(true);
     try {
-      // Mock performance data - in production this would fetch from your monitoring API
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      setMetrics({
-        responseTime: [
-          { timestamp: '12:00', time: 120 },
-          { timestamp: '12:05', time: 95 },
-          { timestamp: '12:10', time: 110 },
-          { timestamp: '12:15', time: 85 },
-          { timestamp: '12:20', time: 102 },
-          { timestamp: '12:25', time: 88 },
-          { timestamp: '12:30', time: 92 }
-        ],
-        systemHealth: {
-          cpu: 42,
-          memory: 63,
-          disk: 28,
-          network: 57
+      // Initialize real-time data
+      const initialData: MetricData[] = [];
+      for (let i = 29; i >= 0; i--) {
+        const timestamp = new Date(Date.now() - i * 60000).toISOString();
+        initialData.push({
+          timestamp,
+          cpuUsage: Math.random() * 30 + 20,
+          memoryUsage: Math.random() * 40 + 30,
+          responseTime: Math.random() * 50 + 80,
+          requestCount: Math.floor(Math.random() * 20 + 10)
+        });
+      }
+      setRealTimeData(initialData);
+
+      // Initialize services
+      setServices([
+        {
+          id: '1',
+          name: 'Authentication API',
+          status: 'operational',
+          uptime: 99.98,
+          lastIncident: '2024-01-15'
         },
-        apiMetrics: {
-          totalRequests: 3245,
-          errorRate: 1.3,
-          averageLatency: 94,
-          throughput: 18.5
+        {
+          id: '2',
+          name: 'Biometric Processing',
+          status: 'operational',
+          uptime: 99.95,
         },
-        uptime: {
-          current: 99.98,
-          last30Days: 99.95
+        {
+          id: '3',
+          name: 'Database',
+          status: 'operational',
+          uptime: 100.0,
+        },
+        {
+          id: '4',
+          name: 'File Storage',
+          status: 'degraded',
+          uptime: 99.2,
+          lastIncident: '2024-01-28'
         }
-      });
+      ]);
+
+      // Initialize uptime history
+      const history: UptimeData[] = [];
+      for (let i = 29; i >= 0; i--) {
+        const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+        history.push({
+          date: date.toISOString().split('T')[0],
+          uptime: Math.random() * 1 + 99,
+          incidents: Math.random() > 0.9 ? Math.floor(Math.random() * 3) : 0
+        });
+      }
+      setUptimeHistory(history);
+
+      // Initialize alerts
+      setAlerts([
+        {
+          id: '1',
+          type: 'warning',
+          title: 'High Memory Usage',
+          description: 'Memory usage has exceeded 80% for the past 5 minutes',
+          timestamp: new Date(Date.now() - 300000).toISOString(),
+          resolved: false
+        },
+        {
+          id: '2',
+          type: 'info',
+          title: 'Scheduled Maintenance',
+          description: 'Database maintenance window scheduled for tonight at 2:00 AM',
+          timestamp: new Date(Date.now() - 3600000).toISOString(),
+          resolved: false
+        }
+      ]);
+
     } catch (error) {
-      console.error('Error loading performance metrics:', error);
+      console.error('Error loading performance data:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const getHealthColor = (value: number): string => {
-    if (value < 50) return 'text-green-500';
-    if (value < 80) return 'text-amber-500';
-    return 'text-red-500';
+  const updateRealTimeData = () => {
+    setRealTimeData(prev => {
+      const newData = [...prev.slice(1)]; // Remove oldest point
+      const timestamp = new Date().toISOString();
+      
+      // Add new data point
+      newData.push({
+        timestamp,
+        cpuUsage: Math.random() * 30 + 20,
+        memoryUsage: Math.random() * 40 + 30,
+        responseTime: Math.random() * 50 + 80,
+        requestCount: Math.floor(Math.random() * 20 + 10)
+      });
+
+      return newData;
+    });
+
+    // Update current metrics
+    setCurrentMetrics({
+      cpu: Math.floor(Math.random() * 30 + 20),
+      memory: Math.floor(Math.random() * 40 + 30),
+      activeConnections: Math.floor(Math.random() * 50 + 100),
+      requestsPerSecond: Math.floor(Math.random() * 10 + 15)
+    });
   };
 
-  const getHealthStatus = (value: number): 'healthy' | 'warning' | 'critical' => {
-    if (value < 50) return 'healthy';
-    if (value < 80) return 'warning';
-    return 'critical';
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadInitialData();
+    setRefreshing(false);
   };
+
+  const handleDismissAlert = (alertId: string) => {
+    setAlerts(prev => prev.filter(alert => alert.id !== alertId));
+  };
+
+  const handleResolveAlert = (alertId: string) => {
+    setAlerts(prev => 
+      prev.map(alert => 
+        alert.id === alertId ? { ...alert, resolved: true } : alert
+      )
+    );
+  };
+
+  const handleExportMetrics = () => {
+    const data = {
+      timestamp: new Date().toISOString(),
+      metrics: currentMetrics,
+      recentData: realTimeData.slice(-10),
+      services: services,
+      alerts: alerts.filter(alert => !alert.resolved)
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `performance-metrics-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const overallUptime = services.reduce((sum, service) => sum + service.uptime, 0) / services.length;
 
   if (loading) {
     return (
@@ -112,234 +228,67 @@ const PerformanceMonitor: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <Card>
-        <CardHeader className="pb-2">
+        <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <Server className="h-5 w-5 text-primary" />
-                System Status
+                Performance Monitor
+                <Badge variant="default" className="ml-2">
+                  Live
+                </Badge>
               </CardTitle>
               <CardDescription>
-                Current system performance and health metrics
+                Real-time system performance, uptime tracking, and alert management
               </CardDescription>
             </div>
-            <Badge
-              variant={metrics?.uptime.current === 100 ? 'default' : 'secondary'}
-              className="px-3 py-1"
-            >
-              {metrics?.uptime.current}% Uptime
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* System Health */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Cpu className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">CPU</span>
-                </div>
-                <span className={`text-sm font-bold ${getHealthColor(metrics?.systemHealth.cpu || 0)}`}>
-                  {metrics?.systemHealth.cpu}%
-                </span>
-              </div>
-              <div className="w-full h-2 bg-muted rounded overflow-hidden">
-                <div 
-                  className={`h-full ${
-                    getHealthStatus(metrics?.systemHealth.cpu || 0) === 'critical' ? 'bg-red-500' : 
-                    getHealthStatus(metrics?.systemHealth.cpu || 0) === 'warning' ? 'bg-amber-500' : 
-                    'bg-green-500'
-                  }`}
-                  style={{ width: `${metrics?.systemHealth.cpu || 0}%` }}
-                ></div>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <HardDrive className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Memory</span>
-                </div>
-                <span className={`text-sm font-bold ${getHealthColor(metrics?.systemHealth.memory || 0)}`}>
-                  {metrics?.systemHealth.memory}%
-                </span>
-              </div>
-              <div className="w-full h-2 bg-muted rounded overflow-hidden">
-                <div 
-                  className={`h-full ${
-                    getHealthStatus(metrics?.systemHealth.memory || 0) === 'critical' ? 'bg-red-500' : 
-                    getHealthStatus(metrics?.systemHealth.memory || 0) === 'warning' ? 'bg-amber-500' : 
-                    'bg-green-500'
-                  }`}
-                  style={{ width: `${metrics?.systemHealth.memory || 0}%` }}
-                ></div>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <HardDrive className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Disk</span>
-                </div>
-                <span className={`text-sm font-bold ${getHealthColor(metrics?.systemHealth.disk || 0)}`}>
-                  {metrics?.systemHealth.disk}%
-                </span>
-              </div>
-              <div className="w-full h-2 bg-muted rounded overflow-hidden">
-                <div 
-                  className={`h-full ${
-                    getHealthStatus(metrics?.systemHealth.disk || 0) === 'critical' ? 'bg-red-500' : 
-                    getHealthStatus(metrics?.systemHealth.disk || 0) === 'warning' ? 'bg-amber-500' : 
-                    'bg-green-500'
-                  }`}
-                  style={{ width: `${metrics?.systemHealth.disk || 0}%` }}
-                ></div>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Wifi className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Network</span>
-                </div>
-                <span className={`text-sm font-bold ${getHealthColor(metrics?.systemHealth.network || 0)}`}>
-                  {metrics?.systemHealth.network}%
-                </span>
-              </div>
-              <div className="w-full h-2 bg-muted rounded overflow-hidden">
-                <div 
-                  className={`h-full ${
-                    getHealthStatus(metrics?.systemHealth.network || 0) === 'critical' ? 'bg-red-500' : 
-                    getHealthStatus(metrics?.systemHealth.network || 0) === 'warning' ? 'bg-amber-500' : 
-                    'bg-green-500'
-                  }`}
-                  style={{ width: `${metrics?.systemHealth.network || 0}%` }}
-                ></div>
-              </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={handleExportMetrics}>
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+              <Button variant="outline" size="sm">
+                <Settings className="h-4 w-4 mr-2" />
+                Configure
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
             </div>
           </div>
-        </CardContent>
-      </Card>
-      
-      {/* Response Time Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Activity className="h-5 w-5 text-primary" />
-            API Response Times
-          </CardTitle>
-          <CardDescription>
-            Average response time over the last 30 minutes
-          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={metrics?.responseTime}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="timestamp" />
-              <YAxis domain={[0, 'auto']} />
-              <Tooltip formatter={(value) => [`${value} ms`, 'Response Time']} />
-              <Line 
-                type="monotone" 
-                dataKey="time" 
-                stroke="#8884d8" 
-                activeDot={{ r: 8 }} 
-                strokeWidth={2} 
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
       </Card>
-      
-      {/* API Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Globe className="h-5 w-5 text-primary" />
-              API Metrics
-            </CardTitle>
-            <CardDescription>
-              Key performance indicators for the API
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-muted rounded-lg">
-                <p className="text-sm text-muted-foreground mb-1">Total Requests</p>
-                <p className="text-2xl font-bold">{metrics?.apiMetrics.totalRequests.toLocaleString()}</p>
-              </div>
-              <div className="p-4 bg-muted rounded-lg">
-                <p className="text-sm text-muted-foreground mb-1">Error Rate</p>
-                <p className={`text-2xl font-bold ${metrics?.apiMetrics.errorRate < 2 ? 'text-green-600' : 'text-red-600'}`}>
-                  {metrics?.apiMetrics.errorRate}%
-                </p>
-              </div>
-              <div className="p-4 bg-muted rounded-lg">
-                <p className="text-sm text-muted-foreground mb-1">Avg. Latency</p>
-                <p className="text-2xl font-bold">{metrics?.apiMetrics.averageLatency} ms</p>
-              </div>
-              <div className="p-4 bg-muted rounded-lg">
-                <p className="text-sm text-muted-foreground mb-1">Throughput</p>
-                <p className="text-2xl font-bold">{metrics?.apiMetrics.throughput} req/s</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-primary" />
-              Uptime Status
-            </CardTitle>
-            <CardDescription>
-              System reliability and uptime metrics
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-col items-center justify-center p-6">
-              <div className="w-32 h-32 rounded-full border-8 border-primary flex items-center justify-center mb-4">
-                <span className="text-3xl font-bold">{metrics?.uptime.current}%</span>
-              </div>
-              <p className="text-lg font-semibold">Current Uptime</p>
-              <p className="text-sm text-muted-foreground">
-                30-day average: {metrics?.uptime.last30Days}%
-              </p>
-              <div className="flex items-center mt-2">
-                {metrics?.uptime.current >= 99.9 ? (
-                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                ) : (
-                  <AlertCircle className="h-4 w-4 text-amber-500 mr-2" />
-                )}
-                <span className="text-sm">
-                  {metrics?.uptime.current >= 99.9 ? 'All systems operational' : 'Minor issues detected'}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
-      {/* Status Alert */}
-      <Alert className={metrics?.apiMetrics.errorRate < 2 ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}>
-        {metrics?.apiMetrics.errorRate < 2 ? (
-          <CheckCircle className="h-4 w-4 text-green-600" />
-        ) : (
-          <AlertCircle className="h-4 w-4 text-amber-600" />
-        )}
-        <AlertDescription className={metrics?.apiMetrics.errorRate < 2 ? 'text-green-800' : 'text-amber-800'}>
-          {metrics?.apiMetrics.errorRate < 2 
-            ? 'All systems are operating normally. No performance issues detected.' 
-            : 'Minor performance issues detected. The team has been notified and is working on a resolution.'
-          }
-        </AlertDescription>
-      </Alert>
+      {/* Monitoring Tabs */}
+      <Tabs defaultValue="metrics" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="metrics">Real-time Metrics</TabsTrigger>
+          <TabsTrigger value="uptime">Uptime & Status</TabsTrigger>
+          <TabsTrigger value="alerts">Alerts & Notifications</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="metrics" className="space-y-4">
+          <RealTimeMetrics data={realTimeData} currentMetrics={currentMetrics} />
+        </TabsContent>
+
+        <TabsContent value="uptime" className="space-y-4">
+          <UptimeTracker 
+            services={services}
+            uptimeHistory={uptimeHistory}
+            overallUptime={overallUptime}
+          />
+        </TabsContent>
+
+        <TabsContent value="alerts" className="space-y-4">
+          <AlertsPanel 
+            alerts={alerts}
+            onDismissAlert={handleDismissAlert}
+            onResolveAlert={handleResolveAlert}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
