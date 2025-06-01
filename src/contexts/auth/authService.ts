@@ -7,6 +7,8 @@ import { Provider } from './types';
 export const authOperations = {
   async login(email: string, password: string): Promise<boolean> {
     try {
+      console.log('Attempting login for:', email);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -14,25 +16,37 @@ export const authOperations = {
       
       if (error) {
         console.error('Login error:', error);
+        
+        // Handle specific error types
+        let errorMessage = 'Login failed. Please try again.';
+        if (error.message.includes('Invalid login credentials')) {
+          errorMessage = 'Invalid email or password. Please check your credentials.';
+        } else if (error.message.includes('Email not confirmed')) {
+          errorMessage = 'Please check your email and confirm your account before logging in.';
+        } else if (error.message.includes('Too many requests')) {
+          errorMessage = 'Too many login attempts. Please wait a few minutes before trying again.';
+        }
+        
         toast({
-          title: "Authentication Failed",
-          description: error.message,
+          title: "Login Failed",
+          description: errorMessage,
           variant: "destructive",
         });
         return false;
       }
       
+      console.log('Login successful for user:', data.user?.email);
       toast({
-        title: "Login Successful",
-        description: "Welcome back!",
+        title: "Welcome back!",
+        description: "You have been successfully logged in.",
       });
       
       return true;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Unexpected login error:', error);
       toast({
-        title: "Login Failed",
-        description: "An unexpected error occurred",
+        title: "Connection Error",
+        description: "Unable to connect to authentication service. Please check your internet connection and try again.",
         variant: "destructive",
       });
       return false;
@@ -49,41 +63,86 @@ export const authOperations = {
     organizationSize?: number
   ): Promise<boolean> {
     try {
+      console.log('Attempting registration for:', email);
+      
+      // Validate inputs
+      if (!name.trim() || !email.trim() || !password.trim()) {
+        toast({
+          title: "Registration Failed",
+          description: "Please fill in all required fields.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      if (password.length < 6) {
+        toast({
+          title: "Registration Failed",
+          description: "Password must be at least 6 characters long.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: email.trim(),
         password,
         options: {
           data: {
-            name,
+            name: name.trim(),
             userType,
             subscriptionTier,
-            organizationName,
+            organizationName: organizationName?.trim(),
             organizationSize
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/dashboard`
         }
       });
       
       if (error) {
         console.error('Registration error:', error);
+        
+        // Handle specific error types
+        let errorMessage = 'Registration failed. Please try again.';
+        if (error.message.includes('User already registered')) {
+          errorMessage = 'An account with this email already exists. Please try logging in instead.';
+        } else if (error.message.includes('Password should be')) {
+          errorMessage = error.message;
+        } else if (error.message.includes('Invalid email')) {
+          errorMessage = 'Please enter a valid email address.';
+        } else if (error.message.includes('Signup is disabled')) {
+          errorMessage = 'Account registration is currently disabled. Please contact support.';
+        }
+        
         toast({
           title: "Registration Failed",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive",
         });
         return false;
       }
       
-      toast({
-        title: "Registration Successful",
-        description: "Your account has been created. Please check your email for verification.",
-      });
+      console.log('Registration successful for user:', data.user?.email);
+      
+      // Check if email confirmation is required
+      if (data.user && !data.session) {
+        toast({
+          title: "Registration Successful!",
+          description: "Please check your email and click the confirmation link to activate your account.",
+        });
+      } else {
+        toast({
+          title: "Welcome to Shoale!",
+          description: "Your account has been created successfully.",
+        });
+      }
       
       return true;
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('Unexpected registration error:', error);
       toast({
-        title: "Registration Failed",
-        description: "An unexpected error occurred",
+        title: "Connection Error",
+        description: "Unable to connect to registration service. Please check your internet connection and try again.",
         variant: "destructive",
       });
       return false;
@@ -92,15 +151,32 @@ export const authOperations = {
 
   async resetPassword(email: string): Promise<boolean> {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      console.log('Attempting password reset for:', email);
+      
+      if (!email.trim()) {
+        toast({
+          title: "Password Reset Failed",
+          description: "Please enter your email address.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: `${window.location.origin}/reset-password`,
       });
       
       if (error) {
         console.error('Password reset error:', error);
+        
+        let errorMessage = 'Password reset failed. Please try again.';
+        if (error.message.includes('Invalid email')) {
+          errorMessage = 'Please enter a valid email address.';
+        }
+        
         toast({
           title: "Password Reset Failed",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive",
         });
         return false;
@@ -108,15 +184,15 @@ export const authOperations = {
       
       toast({
         title: "Password Reset Email Sent",
-        description: "Check your email for password reset instructions",
+        description: "Check your email for password reset instructions. The link will expire in 1 hour.",
       });
       
       return true;
     } catch (error) {
-      console.error('Password reset error:', error);
+      console.error('Unexpected password reset error:', error);
       toast({
-        title: "Password Reset Failed",
-        description: "An unexpected error occurred",
+        title: "Connection Error",
+        description: "Unable to send password reset email. Please try again later.",
         variant: "destructive",
       });
       return false;
@@ -125,6 +201,8 @@ export const authOperations = {
 
   async signInWithProvider(provider: Provider): Promise<boolean> {
     try {
+      console.log('Attempting social login with:', provider);
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: provider as 'google' | 'github' | 'apple',
         options: {
@@ -134,9 +212,15 @@ export const authOperations = {
       
       if (error) {
         console.error(`${provider} authentication error:`, error);
+        
+        let errorMessage = `Failed to authenticate with ${provider}. Please try again.`;
+        if (error.message.includes('OAuth')) {
+          errorMessage = `${provider} authentication is not properly configured. Please contact support.`;
+        }
+        
         toast({
           title: "Authentication Failed",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive",
         });
         return false;
@@ -144,10 +228,10 @@ export const authOperations = {
       
       return true;
     } catch (error) {
-      console.error(`${provider} authentication error:`, error);
+      console.error(`Unexpected ${provider} authentication error:`, error);
       toast({
-        title: "Authentication Failed",
-        description: `Failed to authenticate with ${provider}`,
+        title: "Connection Error",
+        description: `Unable to connect to ${provider}. Please try again later.`,
         variant: "destructive",
       });
       return false;
@@ -157,8 +241,8 @@ export const authOperations = {
   async updateUserProfile(name: string, email: string): Promise<boolean> {
     try {
       const { error } = await supabase.auth.updateUser({
-        email: email,
-        data: { name }
+        email: email.trim(),
+        data: { name: name.trim() }
       });
       
       if (error) {
@@ -178,10 +262,10 @@ export const authOperations = {
       
       return true;
     } catch (error) {
-      console.error('Error updating user profile:', error);
+      console.error('Unexpected profile update error:', error);
       toast({
-        title: "Profile Update Failed",
-        description: "An unexpected error occurred",
+        title: "Update Failed",
+        description: "An unexpected error occurred while updating your profile.",
         variant: "destructive",
       });
       return false;
@@ -190,6 +274,15 @@ export const authOperations = {
 
   async updatePassword(currentPassword: string, newPassword: string): Promise<boolean> {
     try {
+      if (newPassword.length < 6) {
+        toast({
+          title: "Password Update Failed",
+          description: "New password must be at least 6 characters long.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
       const { error } = await supabase.auth.updateUser({ 
         password: newPassword 
       });
@@ -211,10 +304,10 @@ export const authOperations = {
       
       return true;
     } catch (error) {
-      console.error('Error updating password:', error);
+      console.error('Unexpected password update error:', error);
       toast({
-        title: "Password Update Failed",
-        description: "An unexpected error occurred",
+        title: "Update Failed",
+        description: "An unexpected error occurred while updating your password.",
         variant: "destructive",
       });
       return false;
