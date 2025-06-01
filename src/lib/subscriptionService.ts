@@ -7,71 +7,192 @@ type DbSubscriptionPlan = Database['public']['Tables']['subscription_plans']['Ro
 
 export class SubscriptionService {
   static async getAvailablePlans(): Promise<SubscriptionPlan[]> {
-    const { data, error } = await supabase
-      .from('subscription_plans')
-      .select('*')
-      .eq('active', true)
-      .order('tier');
+    try {
+      const { data, error } = await supabase
+        .from('subscription_plans')
+        .select('*')
+        .eq('active', true)
+        .order('tier');
 
-    if (error) {
-      console.error('Error fetching subscription plans:', error);
-      return [];
+      if (error) {
+        console.error('Error fetching subscription plans:', error);
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        console.warn('No subscription plans found in database');
+        return this.getDefaultPlans();
+      }
+
+      return data.map(plan => this.mapDbPlanToSubscriptionPlan(plan));
+    } catch (error) {
+      console.error('Error in getAvailablePlans:', error);
+      // Return default plans as fallback
+      return this.getDefaultPlans();
     }
+  }
 
-    return data.map(this.mapDbPlanToSubscriptionPlan);
+  static getDefaultPlans(): SubscriptionPlan[] {
+    return [
+      {
+        id: 'free',
+        name: 'Free',
+        description: 'Basic keystroke biometrics for getting started',
+        tier: 'free',
+        userTypes: ['individual', 'company', 'charity'],
+        price: { individual: 0, company: 0, charity: 0 },
+        features: [
+          'Basic keystroke biometrics',
+          '1 user only',
+          'Single device support',
+          'Community support'
+        ],
+        limits: {
+          users: 1,
+          biometricProfiles: 1,
+          advancedAnalytics: false,
+          customSecuritySettings: false,
+          prioritySupport: false
+        }
+      },
+      {
+        id: 'basic',
+        name: 'Basic',
+        description: 'Multi-device support with basic analytics',
+        tier: 'basic',
+        userTypes: ['individual', 'company', 'charity'],
+        price: { individual: 9.99, company: 49.99, charity: 4.99 },
+        features: [
+          'Multi-device support',
+          'Up to 5 users',
+          'Basic analytics',
+          'Email support',
+          'Custom security settings'
+        ],
+        limits: {
+          users: 5,
+          biometricProfiles: 5,
+          advancedAnalytics: false,
+          customSecuritySettings: true,
+          prioritySupport: false
+        }
+      },
+      {
+        id: 'professional',
+        name: 'Professional',
+        description: 'Advanced biometrics with full analytics',
+        tier: 'professional',
+        userTypes: ['individual', 'company', 'charity'],
+        price: { individual: 19.99, company: 99.99, charity: 19.99 },
+        features: [
+          'Advanced biometric analytics',
+          'Up to 20 users',
+          'Full analytics dashboard',
+          'Real-time anomaly detection',
+          '24/7 priority support',
+          'Custom security policies'
+        ],
+        limits: {
+          users: 20,
+          biometricProfiles: 20,
+          advancedAnalytics: true,
+          customSecuritySettings: true,
+          prioritySupport: true
+        }
+      },
+      {
+        id: 'enterprise',
+        name: 'Enterprise',
+        description: 'Unlimited users with API access',
+        tier: 'enterprise',
+        userTypes: ['company'],
+        price: { individual: 99.99, company: 499.99, charity: 249.99 },
+        features: [
+          'Unlimited users',
+          'API access',
+          'Custom integration support',
+          'Dedicated account manager',
+          'Advanced compliance features',
+          'SSO integration',
+          'Audit logs & reporting'
+        ],
+        limits: {
+          users: Infinity,
+          biometricProfiles: Infinity,
+          advancedAnalytics: true,
+          customSecuritySettings: true,
+          prioritySupport: true
+        }
+      }
+    ];
   }
 
   static async getPlanById(planId: string): Promise<SubscriptionPlan | null> {
-    const { data, error } = await supabase
-      .from('subscription_plans')
-      .select('*')
-      .eq('id', planId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('subscription_plans')
+        .select('*')
+        .eq('id', planId)
+        .single();
 
-    if (error) {
-      console.error('Error fetching subscription plan:', error);
+      if (error) {
+        console.error('Error fetching subscription plan:', error);
+        return null;
+      }
+
+      return this.mapDbPlanToSubscriptionPlan(data);
+    } catch (error) {
+      console.error('Error in getPlanById:', error);
       return null;
     }
-
-    return this.mapDbPlanToSubscriptionPlan(data);
   }
 
   static async getUserSubscription(userId: string) {
-    const { data, error } = await supabase
-      .from('subscriptions')
-      .select(`
-        *,
-        plan:subscription_plans(*)
-      `)
-      .eq('user_id', userId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select(`
+          *,
+          plan:subscription_plans(*)
+        `)
+        .eq('user_id', userId)
+        .single();
 
-    if (error) {
-      console.error('Error fetching user subscription:', error);
+      if (error) {
+        console.error('Error fetching user subscription:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in getUserSubscription:', error);
       return null;
     }
-
-    return data;
   }
 
   static async createSubscription(userId: string, planId: string) {
-    const { data, error } = await supabase
-      .from('subscriptions')
-      .upsert({
-        user_id: userId,
-        plan_id: planId,
-        status: 'active',
-        start_date: new Date().toISOString(),
-      })
-      .select()
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .upsert({
+          user_id: userId,
+          plan_id: planId,
+          status: 'active',
+          start_date: new Date().toISOString(),
+        })
+        .select()
+        .single();
 
-    if (error) {
-      console.error('Error creating subscription:', error);
+      if (error) {
+        console.error('Error creating subscription:', error);
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in createSubscription:', error);
       throw error;
     }
-
-    return data;
   }
 
   private static mapDbPlanToSubscriptionPlan(dbPlan: DbSubscriptionPlan): SubscriptionPlan {

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { SubscriptionPlan, UserType } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, RefreshCw } from 'lucide-react';
 import { SubscriptionService } from '@/lib/subscriptionService';
 import { toast } from '@/hooks/use-toast';
 
@@ -22,30 +22,55 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
 }) => {
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadPlans = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('Loading subscription plans...');
+      
+      const availablePlans = await SubscriptionService.getAvailablePlans();
+      console.log('Loaded plans:', availablePlans);
+      
+      // Filter plans based on user type
+      const filteredPlans = availablePlans.filter(plan => 
+        plan.userTypes.includes(userType)
+      );
+      
+      console.log('Filtered plans for user type', userType, ':', filteredPlans);
+      setPlans(filteredPlans);
+      
+      if (filteredPlans.length === 0) {
+        setError(`No subscription plans available for ${userType} users`);
+      }
+    } catch (error) {
+      console.error('Error loading subscription plans:', error);
+      setError('Failed to load subscription plans. Please try again.');
+      toast({
+        title: "Error Loading Plans",
+        description: "Failed to load subscription plans. Using default plans.",
+        variant: "destructive",
+      });
+      
+      // Load default plans as fallback
+      const defaultPlans = SubscriptionService.getDefaultPlans();
+      const filteredDefaultPlans = defaultPlans.filter(plan => 
+        plan.userTypes.includes(userType)
+      );
+      setPlans(filteredDefaultPlans);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadPlans = async () => {
-      try {
-        const availablePlans = await SubscriptionService.getAvailablePlans();
-        // Filter plans based on user type
-        const filteredPlans = availablePlans.filter(plan => 
-          plan.userTypes.includes(userType)
-        );
-        setPlans(filteredPlans);
-      } catch (error) {
-        console.error('Error loading subscription plans:', error);
-        toast({
-          title: "Error Loading Plans",
-          description: "Failed to load subscription plans. Please try again.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadPlans();
   }, [userType]);
+
+  const handleRetry = () => {
+    loadPlans();
+  };
 
   if (loading) {
     return (
@@ -56,10 +81,14 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
     );
   }
 
-  if (plans.length === 0) {
+  if (error && plans.length === 0) {
     return (
       <div className={`text-center py-8 ${className}`}>
-        <p className="text-muted-foreground">No subscription plans available for your user type.</p>
+        <p className="text-muted-foreground mb-4">{error}</p>
+        <Button onClick={handleRetry} variant="outline" className="flex items-center gap-2">
+          <RefreshCw className="h-4 w-4" />
+          Try Again
+        </Button>
       </div>
     );
   }
