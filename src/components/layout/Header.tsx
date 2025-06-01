@@ -77,7 +77,7 @@ const Header = () => {
                   isActive('/support') ? 'text-[#9b87f5]' : 'text-foreground/60'
                 }`}
               >
-                Resources
+                Docs
               </Link>
             </>
           )}
@@ -104,7 +104,7 @@ const Header = () => {
                     Settings
                   </Link>
                 </DropdownMenuItem>
-                {user.user_type === 'company' && (
+                {user.subscription?.type === 'company' && (
                   <DropdownMenuItem asChild>
                     <Link to="/enterprise" className="cursor-pointer">
                       Enterprise Portal
@@ -165,6 +165,13 @@ const Header = () => {
                       Settings
                     </Link>
                   </DropdownMenuItem>
+                  {user.subscription?.type === 'company' && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/enterprise" className="cursor-pointer">
+                        Enterprise Portal
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={logout} className="cursor-pointer">
                     Sign Out
                   </DropdownMenuItem>
@@ -183,7 +190,7 @@ const Header = () => {
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/support" className="cursor-pointer">
-                      Resources
+                      Docs
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
