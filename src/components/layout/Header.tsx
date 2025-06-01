@@ -26,38 +26,61 @@ const Header = () => {
         </Link>
 
         <nav className="hidden md:flex items-center space-x-6">
-          <Link 
-            to="/demo-environment" 
-            className={`text-sm font-medium transition-colors hover:text-[#9b87f5] ${
-              isActive('/demo-environment') ? 'text-[#9b87f5]' : 'text-foreground/60'
-            }`}
-          >
-            Interactive Demo
-          </Link>
-          <Link 
-            to="/demo" 
-            className={`text-sm font-medium transition-colors hover:text-[#9b87f5] ${
-              isActive('/demo') ? 'text-[#9b87f5]' : 'text-foreground/60'
-            }`}
-          >
-            Demo
-          </Link>
-          <Link 
-            to="/pricing" 
-            className={`text-sm font-medium transition-colors hover:text-[#9b87f5] ${
-              isActive('/pricing') ? 'text-[#9b87f5]' : 'text-foreground/60'
-            }`}
-          >
-            Pricing
-          </Link>
-          <Link 
-            to="/support" 
-            className={`text-sm font-medium transition-colors hover:text-[#9b87f5] ${
-              isActive('/support') ? 'text-[#9b87f5]' : 'text-foreground/60'
-            }`}
-          >
-            Support
-          </Link>
+          {user ? (
+            <>
+              <Link 
+                to="/dashboard" 
+                className={`text-sm font-medium transition-colors hover:text-[#9b87f5] ${
+                  isActive('/dashboard') ? 'text-[#9b87f5]' : 'text-foreground/60'
+                }`}
+              >
+                Dashboard
+              </Link>
+              <Link 
+                to="/demo" 
+                className={`text-sm font-medium transition-colors hover:text-[#9b87f5] ${
+                  isActive('/demo') || isActive('/demo-environment') ? 'text-[#9b87f5]' : 'text-foreground/60'
+                }`}
+              >
+                Demo
+              </Link>
+              <Link 
+                to="/support" 
+                className={`text-sm font-medium transition-colors hover:text-[#9b87f5] ${
+                  isActive('/support') ? 'text-[#9b87f5]' : 'text-foreground/60'
+                }`}
+              >
+                Support
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link 
+                to="/demo" 
+                className={`text-sm font-medium transition-colors hover:text-[#9b87f5] ${
+                  isActive('/demo') || isActive('/demo-environment') ? 'text-[#9b87f5]' : 'text-foreground/60'
+                }`}
+              >
+                Demo
+              </Link>
+              <Link 
+                to="/pricing" 
+                className={`text-sm font-medium transition-colors hover:text-[#9b87f5] ${
+                  isActive('/pricing') ? 'text-[#9b87f5]' : 'text-foreground/60'
+                }`}
+              >
+                Pricing
+              </Link>
+              <Link 
+                to="/support" 
+                className={`text-sm font-medium transition-colors hover:text-[#9b87f5] ${
+                  isActive('/support') ? 'text-[#9b87f5]' : 'text-foreground/60'
+                }`}
+              >
+                Resources
+              </Link>
+            </>
+          )}
         </nav>
 
         <div className="flex items-center space-x-4">
@@ -72,11 +95,6 @@ const Header = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56 bg-background border shadow-lg z-50" align="end" forceMount>
                 <DropdownMenuItem asChild>
-                  <Link to="/dashboard" className="cursor-pointer">
-                    Dashboard
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
                   <Link to="/profile" className="cursor-pointer">
                     Profile
                   </Link>
@@ -86,6 +104,13 @@ const Header = () => {
                     Settings
                   </Link>
                 </DropdownMenuItem>
+                {user.user_type === 'company' && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/enterprise" className="cursor-pointer">
+                      Enterprise Portal
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={logout} className="cursor-pointer">
                   Sign Out
                 </DropdownMenuItem>
@@ -113,26 +138,66 @@ const Header = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 bg-background border shadow-lg z-50" align="end">
-              <DropdownMenuItem asChild>
-                <Link to="/demo-environment" className="cursor-pointer">
-                  Interactive Demo
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/demo" className="cursor-pointer">
-                  Demo
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/pricing" className="cursor-pointer">
-                  Pricing
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/support" className="cursor-pointer">
-                  Support
-                </Link>
-              </DropdownMenuItem>
+              {user ? (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="cursor-pointer">
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/demo" className="cursor-pointer">
+                      Demo
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/support" className="cursor-pointer">
+                      Support
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="cursor-pointer">
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings" className="cursor-pointer">
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={logout} className="cursor-pointer">
+                    Sign Out
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link to="/demo" className="cursor-pointer">
+                      Demo
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/pricing" className="cursor-pointer">
+                      Pricing
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/support" className="cursor-pointer">
+                      Resources
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/login" className="cursor-pointer">
+                      Sign In
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/onboarding" className="cursor-pointer">
+                      Get Started
+                    </Link>
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

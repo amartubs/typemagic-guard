@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronRight, Key, Shield, Lock, UserCheck, FileCode, BarChart4 } from 'lucide-react';
 import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 import SEOHead from '@/components/seo/SEOHead';
 import ValuePropositionTest from '@/components/optimization/ValuePropositionTest';
 import ConversionTracker from '@/components/optimization/ConversionTracker';
@@ -22,31 +23,31 @@ const features = [
     icon: <UserCheck className="h-6 w-6 text-primary" />,
     title: 'Continuous Authentication',
     description: 'Constantly monitors typing behavior to ensure ongoing security',
-    link: '/profile'
+    link: '/demo'
   },
   {
     icon: <Lock className="h-6 w-6 text-primary" />,
     title: 'Multi-layered Security',
     description: 'Combines passwords with behavioral biometrics for enhanced protection',
-    link: '/login'
+    link: '/pricing'
   },
   {
     icon: <BarChart4 className="h-6 w-6 text-primary" />,
     title: 'Analytics & Reporting',
     description: 'Detailed insights into security patterns and potential threats',
-    link: '/dashboard'
+    link: '/demo'
   },
   {
     icon: <FileCode className="h-6 w-6 text-primary" />,
     title: 'Easy Integration',
     description: 'Seamlessly integrate with existing authentication systems',
-    link: '/demo'
+    link: '/support'
   },
   {
     icon: <Shield className="h-6 w-6 text-primary" />,
     title: 'Fraud Prevention',
     description: 'Stops unauthorized access even with stolen credentials',
-    link: '/dashboard'
+    link: '/pricing'
   }
 ];
 
@@ -142,24 +143,25 @@ export default function Index() {
               <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
                 Experience the future of authentication with our cutting-edge keystroke biometrics platform.
               </p>
-              <Link to="/login" onClick={handleGetStartedClick}>
-                <Button size="lg" className="gap-2 bg-[#9b87f5] hover:bg-[#7E69AB]">
-                  Sign In to Dashboard
-                  <ChevronRight size={18} />
-                </Button>
-              </Link>
+              <div className="flex gap-4 justify-center">
+                <Link to="/demo">
+                  <Button size="lg" variant="outline" className="gap-2">
+                    Try Demo
+                    <ChevronRight size={18} />
+                  </Button>
+                </Link>
+                <Link to="/onboarding" onClick={handleGetStartedClick}>
+                  <Button size="lg" className="gap-2 bg-[#9b87f5] hover:bg-[#7E69AB]">
+                    Get Started
+                    <ChevronRight size={18} />
+                  </Button>
+                </Link>
+              </div>
             </div>
           </section>
         </main>
 
-        <footer className="border-t py-8 bg-[#1A1F2C] text-white">
-          <div className="container mx-auto px-4 text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <span className="font-bold text-[#9b87f5]">Shoale</span>
-            </div>
-            <p className="text-sm text-gray-300">© 2023 Shoale. All rights reserved.</p>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </ConversionTracker>
   );
