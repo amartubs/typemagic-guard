@@ -35,6 +35,14 @@ const SimpleRegistrationForm: React.FC<SimpleRegistrationFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Form submission started with:', {
+      name: name.trim(),
+      email: email.trim(),
+      userType,
+      organizationName: organizationName.trim(),
+      organizationSize
+    });
+    
     // Validation
     if (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
       toast({
@@ -81,20 +89,29 @@ const SimpleRegistrationForm: React.FC<SimpleRegistrationFormProps> = ({
       return;
     }
 
-    await onSubmit(
-      name.trim(),
-      email.trim(),
-      password,
-      userType,
-      userType !== 'individual' ? organizationName.trim() : undefined,
-      userType === 'company' ? organizationSize : undefined
-    );
+    try {
+      await onSubmit(
+        name.trim(),
+        email.trim(),
+        password,
+        userType,
+        userType !== 'individual' ? organizationName.trim() : undefined,
+        userType === 'company' ? organizationSize : undefined
+      );
+    } catch (error) {
+      console.error('Registration form error:', error);
+      toast({
+        title: "Registration Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="register-name">Full Name</Label>
+        <Label htmlFor="register-name">Full Name *</Label>
         <div className="relative">
           <UserIcon className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
           <Input
@@ -105,12 +122,13 @@ const SimpleRegistrationForm: React.FC<SimpleRegistrationFormProps> = ({
             onChange={(e) => setName(e.target.value)}
             className="pl-10"
             required
+            disabled={loading}
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="register-email">Email</Label>
+        <Label htmlFor="register-email">Email *</Label>
         <div className="relative">
           <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
           <Input
@@ -121,12 +139,13 @@ const SimpleRegistrationForm: React.FC<SimpleRegistrationFormProps> = ({
             onChange={(e) => setEmail(e.target.value)}
             className="pl-10"
             required
+            disabled={loading}
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="register-password">Password</Label>
+        <Label htmlFor="register-password">Password *</Label>
         <div className="relative">
           <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
           <Input
@@ -137,12 +156,14 @@ const SimpleRegistrationForm: React.FC<SimpleRegistrationFormProps> = ({
             onChange={(e) => setPassword(e.target.value)}
             className="pl-10"
             required
+            disabled={loading}
+            minLength={6}
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="confirm-password">Confirm Password</Label>
+        <Label htmlFor="confirm-password">Confirm Password *</Label>
         <div className="relative">
           <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
           <Input
@@ -153,6 +174,8 @@ const SimpleRegistrationForm: React.FC<SimpleRegistrationFormProps> = ({
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="pl-10"
             required
+            disabled={loading}
+            minLength={6}
           />
         </div>
       </div>
@@ -163,6 +186,7 @@ const SimpleRegistrationForm: React.FC<SimpleRegistrationFormProps> = ({
           value={userType} 
           onValueChange={(value) => setUserType(value as UserType)}
           className="space-y-2"
+          disabled={loading}
         >
           <div className="flex items-center space-x-2 rounded-md border p-2 cursor-pointer hover:bg-muted">
             <RadioGroupItem value="individual" id="individual" />
@@ -192,20 +216,21 @@ const SimpleRegistrationForm: React.FC<SimpleRegistrationFormProps> = ({
       
       {userType !== 'individual' && (
         <div className="space-y-2">
-          <Label htmlFor="organization-name">Organization Name</Label>
+          <Label htmlFor="organization-name">Organization Name *</Label>
           <Input
             id="organization-name"
             placeholder="Organization Name"
             value={organizationName}
             onChange={(e) => setOrganizationName(e.target.value)}
             required
+            disabled={loading}
           />
         </div>
       )}
       
       {userType === 'company' && (
         <div className="space-y-2">
-          <Label htmlFor="organization-size">Organization Size</Label>
+          <Label htmlFor="organization-size">Organization Size *</Label>
           <div className="relative">
             <Users className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
             <Input
@@ -217,6 +242,7 @@ const SimpleRegistrationForm: React.FC<SimpleRegistrationFormProps> = ({
               onChange={(e) => setOrganizationSize(Number(e.target.value) || undefined)}
               className="pl-10"
               required
+              disabled={loading}
             />
           </div>
         </div>
@@ -225,6 +251,10 @@ const SimpleRegistrationForm: React.FC<SimpleRegistrationFormProps> = ({
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? 'Creating Account...' : 'Create Account'}
       </Button>
+      
+      <div className="text-center text-xs text-muted-foreground">
+        <p>* Required fields</p>
+      </div>
     </form>
   );
 };

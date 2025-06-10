@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { UserType, SubscriptionTier } from '@/lib/types';
@@ -84,16 +83,32 @@ export const authOperations = {
         return false;
       }
 
+      // Check if user already exists
+      const { data: existingUsers } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('email', email.trim())
+        .limit(1);
+
+      if (existingUsers && existingUsers.length > 0) {
+        toast({
+          title: "Registration Failed",
+          description: "An account with this email already exists. Please try logging in instead.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
         options: {
           data: {
             name: name.trim(),
-            userType,
-            subscriptionTier,
-            organizationName: organizationName?.trim(),
-            organizationSize
+            user_type: userType,
+            subscription_tier: subscriptionTier,
+            organization_name: organizationName?.trim(),
+            organization_size: organizationSize
           },
           emailRedirectTo: `${window.location.origin}/dashboard`
         }
@@ -112,6 +127,8 @@ export const authOperations = {
           errorMessage = 'Please enter a valid email address.';
         } else if (error.message.includes('Signup is disabled')) {
           errorMessage = 'Account registration is currently disabled. Please contact support.';
+        } else if (error.message.includes('Unable to validate email address')) {
+          errorMessage = 'Please enter a valid email address.';
         }
         
         toast({
@@ -122,7 +139,7 @@ export const authOperations = {
         return false;
       }
       
-      console.log('Registration successful for user:', data.user?.email);
+      console.log('Registration response:', { user: data.user, session: data.session });
       
       // Check if email confirmation is required
       if (data.user && !data.session) {
@@ -130,11 +147,18 @@ export const authOperations = {
           title: "Registration Successful!",
           description: "Please check your email and click the confirmation link to activate your account.",
         });
-      } else {
+      } else if (data.user && data.session) {
         toast({
           title: "Welcome to Shoale!",
           description: "Your account has been created successfully.",
         });
+      } else {
+        toast({
+          title: "Registration Issue",
+          description: "Registration may have failed. Please try again or contact support.",
+          variant: "destructive",
+        });
+        return false;
       }
       
       return true;
