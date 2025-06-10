@@ -21,7 +21,28 @@ export const authOperations = {
         if (error.message.includes('Invalid login credentials')) {
           errorMessage = 'Invalid email or password. Please check your credentials.';
         } else if (error.message.includes('Email not confirmed')) {
-          errorMessage = 'Please check your email and confirm your account before logging in.';
+          errorMessage = 'Please check your email and confirm your account before logging in. If you didn\'t receive the email, you can request a new confirmation email.';
+          
+          // Show additional option to resend confirmation
+          toast({
+            title: "Email Confirmation Required",
+            description: errorMessage,
+            variant: "destructive",
+          });
+          
+          // Offer to resend confirmation email
+          setTimeout(() => {
+            toast({
+              title: "Resend Confirmation?",
+              description: "Would you like us to send another confirmation email?",
+              action: {
+                altText: "Resend",
+                onClick: () => this.resendConfirmation(email)
+              }
+            });
+          }, 2000);
+          
+          return false;
         } else if (error.message.includes('Too many requests')) {
           errorMessage = 'Too many login attempts. Please wait a few minutes before trying again.';
         }
@@ -46,6 +67,43 @@ export const authOperations = {
       toast({
         title: "Connection Error",
         description: "Unable to connect to authentication service. Please check your internet connection and try again.",
+        variant: "destructive",
+      });
+      return false;
+    }
+  },
+
+  async resendConfirmation(email: string): Promise<boolean> {
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`
+        }
+      });
+      
+      if (error) {
+        console.error('Error resending confirmation:', error);
+        toast({
+          title: "Resend Failed",
+          description: "Could not resend confirmation email. Please try again later.",
+          variant: "destructive",
+        });
+        return false;
+      }
+      
+      toast({
+        title: "Confirmation Email Sent",
+        description: "Please check your email for the confirmation link.",
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Unexpected resend error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again later.",
         variant: "destructive",
       });
       return false;
@@ -145,7 +203,7 @@ export const authOperations = {
       if (data.user && !data.session) {
         toast({
           title: "Registration Successful!",
-          description: "Please check your email and click the confirmation link to activate your account.",
+          description: "Please check your email and click the confirmation link to activate your account. Then you can log in.",
         });
       } else if (data.user && data.session) {
         toast({

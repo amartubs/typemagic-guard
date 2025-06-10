@@ -11,7 +11,7 @@ import TwoFactorForm from '@/components/auth/TwoFactorForm';
 import BiometricVerification from '@/components/auth/BiometricVerification';
 import SimpleRegistrationForm from '@/components/auth/SimpleRegistrationForm';
 import { useAuth, SocialProvider } from '@/contexts/AuthContext';
-import { Shield, Mail } from 'lucide-react';
+import { Shield, Mail, CheckCircle } from 'lucide-react';
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -30,6 +30,7 @@ const AuthPage = () => {
   
   const [activeTab, setActiveTab] = useState<'login' | 'register' | 'forgot'>('login');
   const [showEmailLogin, setShowEmailLogin] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
   
   // Login state
   const [loginLoading, setLoginLoading] = useState(false);
@@ -138,7 +139,8 @@ const AuthPage = () => {
       );
       
       if (success) {
-        setActiveTab('login');
+        setRegistrationSuccess(true);
+        // Don't automatically switch to login tab - let user confirm their email first
       }
     } finally {
       setRegisterLoading(false);
@@ -190,6 +192,7 @@ const AuthPage = () => {
         <Tabs defaultValue="login" value={activeTab} onValueChange={(value) => {
           setActiveTab(value as 'login' | 'register' | 'forgot');
           setShowEmailLogin(false);
+          setRegistrationSuccess(false);
         }}>
           <div className="px-6">
             <TabsList className="grid w-full grid-cols-3">
@@ -256,10 +259,35 @@ const AuthPage = () => {
 
           <TabsContent value="register" className="m-0">
             <CardContent className="p-6">
-              <SimpleRegistrationForm 
-                onSubmit={handleRegisterSubmit}
-                loading={registerLoading}
-              />
+              {registrationSuccess ? (
+                <div className="text-center space-y-4">
+                  <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
+                  <h2 className="text-xl font-semibold">Check Your Email!</h2>
+                  <p className="text-muted-foreground">
+                    We've sent you a confirmation link. Please check your email and click the link to activate your account.
+                  </p>
+                  <div className="space-y-2">
+                    <Button 
+                      onClick={() => setActiveTab('login')} 
+                      className="w-full"
+                    >
+                      Go to Login
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      onClick={() => setRegistrationSuccess(false)}
+                      className="w-full"
+                    >
+                      Register Another Account
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <SimpleRegistrationForm 
+                  onSubmit={handleRegisterSubmit}
+                  loading={registerLoading}
+                />
+              )}
             </CardContent>
           </TabsContent>
         </Tabs>
