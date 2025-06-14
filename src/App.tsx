@@ -16,6 +16,7 @@ import Profile from '@/pages/Profile';
 import Settings from '@/pages/Settings';
 import Support from '@/pages/Support';
 import EnterprisePortal from '@/pages/EnterprisePortal';
+import PatentDrawingsPage from '@/pages/PatentDrawingsPage';
 import NotFound from '@/pages/NotFound';
 import PrivateRoute from '@/components/auth/PrivateRoute';
 import { Toaster } from '@/components/ui/toaster';
@@ -38,6 +39,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/patent-drawings" element={<PatentDrawingsPage />} />
               <Route
                 path="/dashboard"
                 element={
