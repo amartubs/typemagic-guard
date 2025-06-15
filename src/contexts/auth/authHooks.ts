@@ -16,48 +16,51 @@ export const useAuthState = () => {
 
   useEffect(() => {
     let mounted = true;
+    let initializationComplete = false;
 
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session);
-        
-        if (!mounted) return;
-        
-        setSession(session);
-        
-        if (session?.user) {
-          try {
-            // Try to get full profile from database
-            const fullProfile = await ProfileService.getProfile(session.user.id);
-            if (fullProfile && mounted) {
-              setUser(fullProfile);
-              // Update last login
-              await ProfileService.updateLastLogin(session.user.id);
-            } else if (mounted) {
-              // Fallback to session-based user if profile not found
-              const userData = createUserFromSession(session);
-              setUser(userData);
-            }
-          } catch (error) {
-            console.error('Error loading user profile:', error);
-            if (mounted) {
-              // Fallback to session-based user
-              const userData = createUserFromSession(session);
-              setUser(userData);
-            }
+    // Function to handle auth state changes
+    const handleAuthStateChange = async (event: string, session: Session | null) => {
+      console.log('Auth state changed:', event, session ? 'session exists' : 'no session');
+      
+      if (!mounted) return;
+      
+      setSession(session);
+      
+      if (session?.user) {
+        try {
+          // Try to get full profile from database
+          const fullProfile = await ProfileService.getProfile(session.user.id);
+          if (fullProfile && mounted) {
+            setUser(fullProfile);
+            // Update last login
+            await ProfileService.updateLastLogin(session.user.id);
+          } else if (mounted) {
+            // Fallback to session-based user if profile not found
+            const userData = createUserFromSession(session);
+            setUser(userData);
           }
-        } else if (mounted) {
-          setUser(null);
+        } catch (error) {
+          console.error('Error loading user profile:', error);
+          if (mounted) {
+            // Fallback to session-based user
+            const userData = createUserFromSession(session);
+            setUser(userData);
+          }
         }
-        
-        if (mounted) {
-          setLoading(false);
-        }
+      } else if (mounted) {
+        setUser(null);
       }
-    );
+      
+      // Only set loading to false after initial setup is complete
+      if (mounted && initializationComplete) {
+        setLoading(false);
+      }
+    };
 
-    // THEN check for existing session
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
+
+    // Initialize auth state
     const initializeAuth = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -66,45 +69,28 @@ export const useAuthState = () => {
           console.error('Error getting session:', error);
           if (mounted) {
             setLoading(false);
+            initializationComplete = true;
           }
           return;
         }
 
-        if (!mounted) return;
-        
-        setSession(session);
-        
-        if (session?.user) {
-          try {
-            const fullProfile = await ProfileService.getProfile(session.user.id);
-            if (fullProfile && mounted) {
-              setUser(fullProfile);
-            } else if (mounted) {
-              const userData = createUserFromSession(session);
-              setUser(userData);
-            }
-          } catch (error) {
-            console.error('Error loading user profile:', error);
-            if (mounted) {
-              const userData = createUserFromSession(session);
-              setUser(userData);
-            }
-          }
-        }
-        
         if (mounted) {
+          await handleAuthStateChange('INITIAL_SESSION', session);
+          initializationComplete = true;
           setLoading(false);
         }
       } catch (error) {
         console.error('Unexpected error during auth initialization:', error);
         if (mounted) {
           setLoading(false);
+          initializationComplete = true;
         }
       }
     };
 
     initializeAuth();
 
+    // Cleanup
     return () => {
       mounted = false;
       subscription.unsubscribe();
@@ -146,24 +132,33 @@ export const useAuthActions = (setLoading: (loading: boolean) => void) => {
   const navigate = useNavigate();
 
   const logout = async () => {
-    const { error } = await supabase.auth.signOut();
-    
-    if (error) {
-      console.error('Error logging out:', error);
+    try {
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Error logging out:', error);
+        toast({
+          title: "Logout Failed",
+          description: "An error occurred while logging out",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out",
+      });
+      
+      navigate('/');
+    } catch (error) {
+      console.error('Unexpected logout error:', error);
       toast({
         title: "Logout Failed",
-        description: "An error occurred while logging out",
+        description: "An unexpected error occurred while logging out",
         variant: "destructive",
       });
-      return;
     }
-    
-    toast({
-      title: "Logged Out",
-      description: "You have been successfully logged out",
-    });
-    
-    navigate('/');
   };
 
   // Mock functions for backward compatibility
