@@ -15,63 +15,98 @@ export const useAuthState = () => {
   const [twoFactorRequired, setTwoFactorRequired] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session);
+        
+        if (!mounted) return;
+        
         setSession(session);
         
         if (session?.user) {
-          // Try to get full profile from database
           try {
+            // Try to get full profile from database
             const fullProfile = await ProfileService.getProfile(session.user.id);
-            if (fullProfile) {
+            if (fullProfile && mounted) {
               setUser(fullProfile);
               // Update last login
               await ProfileService.updateLastLogin(session.user.id);
-            } else {
+            } else if (mounted) {
               // Fallback to session-based user if profile not found
               const userData = createUserFromSession(session);
               setUser(userData);
             }
           } catch (error) {
             console.error('Error loading user profile:', error);
-            // Fallback to session-based user
-            const userData = createUserFromSession(session);
-            setUser(userData);
+            if (mounted) {
+              // Fallback to session-based user
+              const userData = createUserFromSession(session);
+              setUser(userData);
+            }
           }
-        } else {
+        } else if (mounted) {
           setUser(null);
         }
         
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      
-      if (session?.user) {
-        try {
-          const fullProfile = await ProfileService.getProfile(session.user.id);
-          if (fullProfile) {
-            setUser(fullProfile);
-          } else {
-            const userData = createUserFromSession(session);
-            setUser(userData);
+    const initializeAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting session:', error);
+          if (mounted) {
+            setLoading(false);
           }
-        } catch (error) {
-          console.error('Error loading user profile:', error);
-          const userData = createUserFromSession(session);
-          setUser(userData);
+          return;
+        }
+
+        if (!mounted) return;
+        
+        setSession(session);
+        
+        if (session?.user) {
+          try {
+            const fullProfile = await ProfileService.getProfile(session.user.id);
+            if (fullProfile && mounted) {
+              setUser(fullProfile);
+            } else if (mounted) {
+              const userData = createUserFromSession(session);
+              setUser(userData);
+            }
+          } catch (error) {
+            console.error('Error loading user profile:', error);
+            if (mounted) {
+              const userData = createUserFromSession(session);
+              setUser(userData);
+            }
+          }
+        }
+        
+        if (mounted) {
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Unexpected error during auth initialization:', error);
+        if (mounted) {
+          setLoading(false);
         }
       }
-      
-      setLoading(false);
-    });
+    };
+
+    initializeAuth();
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
