@@ -12,6 +12,7 @@ import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth';
 import { supabase } from '@/integrations/supabase/client';
 import { Key, Copy, Trash2, Plus, Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import type { Tables } from '@/integrations/supabase/types';
 
 interface ApiKey {
   id: string;
@@ -69,7 +70,23 @@ const EnhancedApiKeyManager = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setApiKeys(data || []);
+      
+      // Convert the database data to our expected format
+      const formattedKeys: ApiKey[] = (data || []).map(key => ({
+        id: key.id,
+        name: key.name,
+        key_prefix: key.key_prefix,
+        permissions: Array.isArray(key.permissions) ? key.permissions as string[] : [],
+        rate_limit: key.rate_limit || 1000,
+        is_active: key.is_active || false,
+        created_at: key.created_at || '',
+        last_used: key.last_used || undefined,
+        expires_at: key.expires_at || undefined,
+        key_hash: key.key_hash,
+        user_id: key.user_id || ''
+      }));
+
+      setApiKeys(formattedKeys);
     } catch (error) {
       console.error('Error fetching API keys:', error);
       toast({
@@ -135,8 +152,23 @@ const EnhancedApiKeyManager = () => {
 
       if (error) throw error;
 
+      // Convert the response data to our expected format
+      const formattedApiKey: ApiKey = {
+        id: data.id,
+        name: data.name,
+        key_prefix: data.key_prefix,
+        permissions: Array.isArray(data.permissions) ? data.permissions as string[] : [],
+        rate_limit: data.rate_limit || 1000,
+        is_active: data.is_active || false,
+        created_at: data.created_at || '',
+        last_used: data.last_used || undefined,
+        expires_at: data.expires_at || undefined,
+        key_hash: data.key_hash,
+        user_id: data.user_id || ''
+      };
+
       // Add the full key for display (only shown once)
-      const newApiKey: NewApiKey = { ...data, full_key: fullKey };
+      const newApiKey: NewApiKey = { ...formattedApiKey, full_key: fullKey };
       setApiKeys(prev => [newApiKey, ...prev]);
 
       // Copy to clipboard
@@ -227,7 +259,7 @@ const EnhancedApiKeyManager = () => {
     });
   };
 
-  const isExpired = (expiresAt: string | null) => {
+  const isExpired = (expiresAt: string | null | undefined) => {
     if (!expiresAt) return false;
     return new Date(expiresAt) < new Date();
   };
