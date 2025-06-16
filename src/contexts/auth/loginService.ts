@@ -20,7 +20,7 @@ export const loginOperations = {
         if (error.message.includes('Invalid login credentials')) {
           errorMessage = 'Invalid email or password. Please check your credentials.';
         } else if (error.message.includes('Email not confirmed')) {
-          errorMessage = 'Please check your email and confirm your account before logging in. If you didn\'t receive the email, you can try registering again to resend the confirmation email.';
+          errorMessage = 'Please check your email and confirm your account before logging in.';
         } else if (error.message.includes('Too many requests')) {
           errorMessage = 'Too many login attempts. Please wait a few minutes before trying again.';
         }
@@ -33,13 +33,16 @@ export const loginOperations = {
         return false;
       }
       
-      console.log('Login successful for user:', data.user?.email);
-      toast({
-        title: "Welcome back!",
-        description: "You have been successfully logged in.",
-      });
+      if (data.user) {
+        console.log('Login successful for user:', data.user.email);
+        toast({
+          title: "Welcome back!",
+          description: "You have been successfully logged in.",
+        });
+        return true;
+      }
       
-      return true;
+      return false;
     } catch (error) {
       console.error('Unexpected login error:', error);
       toast({

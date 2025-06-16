@@ -50,22 +50,26 @@ const AuthPage = () => {
 
   // Redirect if user is already logged in
   useEffect(() => {
-    if (user && !twoFactorRequired) {
+    if (user && !twoFactorRequired && !authLoading) {
       const from = location.state?.from?.pathname || '/dashboard';
-      navigate(from);
+      console.log('User is authenticated, redirecting to:', from);
+      navigate(from, { replace: true });
     }
-  }, [user, navigate, location, twoFactorRequired]);
+  }, [user, navigate, location, twoFactorRequired, authLoading]);
 
   const handleLoginSubmit = async (email: string, password: string) => {
     setLoginLoading(true);
     
     try {
+      console.log('Submitting login form');
       const success = await login(email, password);
       
       if (success) {
-        const from = location.state?.from?.pathname || '/dashboard';
-        navigate(from);
+        console.log('Login successful, should redirect soon');
+        // Don't manually navigate here, let the useEffect handle it
       }
+    } catch (error) {
+      console.error('Login submission error:', error);
     } finally {
       setLoginLoading(false);
     }
