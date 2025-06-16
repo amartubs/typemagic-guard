@@ -8,6 +8,7 @@ import { MessageCircle, Send, X, Minimize2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/auth';
 import { toast } from '@/hooks/use-toast';
+import { chatAgentSimulator } from '@/lib/services/chatAgentSimulator';
 
 interface ChatMessage {
   id: string;
@@ -67,6 +68,8 @@ const LiveChatWidget = () => {
     },
     onSuccess: (session) => {
       setCurrentSession(session);
+      // Start agent simulation
+      chatAgentSimulator.startAgentSimulation(session.id);
       toast({
         title: "Chat Started",
         description: "You've been added to the support queue. An agent will be with you shortly.",
@@ -91,6 +94,32 @@ const LiveChatWidget = () => {
     onSuccess: () => {
       setMessage('');
       queryClient.invalidateQueries({ queryKey: ['chat-messages'] });
+    },
+  });
+
+  const endSessionMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentSession) return;
+
+      const { error } = await supabase
+        .from('live_chat_sessions')
+        .update({ 
+          status: 'ended',
+          ended_at: new Date().toISOString()
+        })
+        .eq('id', currentSession.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      if (currentSession) {
+        chatAgentSimulator.stopSimulation(currentSession.id);
+      }
+      setCurrentSession(null);
+      toast({
+        title: "Chat Ended",
+        description: "Your chat session has been ended.",
+      });
     },
   });
 
@@ -153,9 +182,18 @@ const LiveChatWidget = () => {
             </p>
           )}
           {currentSession?.status === 'active' && (
-            <p className="text-sm text-green-600">
-              Connected to support agent
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-green-600">
+                Connected to support agent
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => endSessionMutation.mutate()}
+              >
+                End Chat
+              </Button>
+            </div>
           )}
         </CardHeader>
 

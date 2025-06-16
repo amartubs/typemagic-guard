@@ -2,15 +2,20 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MessageSquare, BookOpen, MessageCircle, HelpCircle } from 'lucide-react';
+import { MessageSquare, BookOpen, MessageCircle, HelpCircle, Settings } from 'lucide-react';
 import SupportTicketList from './SupportTicketList';
+import SupportTicketDetail from './SupportTicketDetail';
 import CreateTicketForm from './CreateTicketForm';
 import KnowledgeBase from './KnowledgeBase';
+import KnowledgeBaseManager from './KnowledgeBaseManager';
 import LiveChatWidget from './LiveChatWidget';
+import { useAuth } from '@/contexts/auth';
 
 const CustomerSupport = () => {
+  const { user } = useAuth();
   const [activeView, setActiveView] = useState<'list' | 'create' | 'view'>('list');
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('tickets');
 
   const handleCreateTicket = () => {
     setActiveView('create');
@@ -26,6 +31,9 @@ const CustomerSupport = () => {
     setSelectedTicketId(null);
   };
 
+  // Check if user is admin (in a real app, this would be from user roles)
+  const isAdmin = user?.role === 'admin';
+
   return (
     <>
       <div className="space-y-8">
@@ -36,8 +44,8 @@ const CustomerSupport = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="tickets" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-3' : 'grid-cols-2'}`}>
             <TabsTrigger value="tickets" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               Support Tickets
@@ -46,6 +54,12 @@ const CustomerSupport = () => {
               <BookOpen className="h-4 w-4" />
               Knowledge Base
             </TabsTrigger>
+            {isAdmin && (
+              <TabsTrigger value="admin" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Admin
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="tickets" className="space-y-6">
@@ -58,11 +72,23 @@ const CustomerSupport = () => {
             {activeView === 'create' && (
               <CreateTicketForm onBack={handleBackToList} />
             )}
+            {activeView === 'view' && selectedTicketId && (
+              <SupportTicketDetail
+                ticketId={selectedTicketId}
+                onBack={handleBackToList}
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="knowledge" className="space-y-6">
             <KnowledgeBase />
           </TabsContent>
+
+          {isAdmin && (
+            <TabsContent value="admin" className="space-y-6">
+              <KnowledgeBaseManager />
+            </TabsContent>
+          )}
         </Tabs>
 
         {/* Support tier information */}
