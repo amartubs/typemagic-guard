@@ -44,22 +44,47 @@ const BiometricMonitor: React.FC = () => {
   const loadBiometricData = async () => {
     try {
       setLoading(true);
+      console.log('Loading biometric data...');
       
       // Load all biometric profiles with user data
-      const { data: profiles } = await supabase
+      const { data: profiles, error } = await supabase
         .from('biometric_profiles')
         .select(`
           *,
-          profiles!biometric_profiles_user_id_fkey(email),
+          profiles!biometric_profiles_user_id_fkey(id, email, name),
           keystroke_patterns!keystroke_patterns_biometric_profile_id_fkey(*)
         `);
 
-      if (!profiles) return;
+      if (error) {
+        console.error('Error loading biometric profiles:', error);
+        return;
+      }
+
+      console.log('Loaded profiles:', profiles);
+
+      if (!profiles || profiles.length === 0) {
+        console.log('No biometric profiles found');
+        setUserAnalyses([]);
+        setSystemMetrics({
+          totalProfiles: 0,
+          averageConfidence: 0,
+          fraudDetectionRate: 0,
+          learningProfiles: 0,
+          activeProfiles: 0,
+          lockedProfiles: 0
+        });
+        return;
+      }
 
       const analyses: UserProfileAnalysis[] = [];
       
       for (const dbProfile of profiles) {
-        if (!dbProfile.profiles?.email) continue;
+        console.log('Processing profile:', dbProfile);
+        
+        if (!dbProfile.profiles?.email) {
+          console.log('Skipping profile without user email:', dbProfile.user_id);
+          continue;
+        }
         
         // Reconstruct BiometricProfile object
         const profile: BiometricProfile = {
@@ -69,67 +94,81 @@ const BiometricMonitor: React.FC = () => {
             patternId: kp.id,
             timings: kp.pattern_data?.timings || [],
             timestamp: new Date(kp.created_at).getTime(),
-            context: kp.context
+            context: kp.context || 'unknown'
           })) || [],
-          confidenceScore: dbProfile.confidence_score,
+          confidenceScore: dbProfile.confidence_score || 0,
           lastUpdated: new Date(dbProfile.last_updated).getTime(),
-          status: dbProfile.status
+          status: dbProfile.status || 'learning'
         };
 
-        // Skip profiles with no patterns
-        if (profile.keystrokePatterns.length === 0) continue;
+        console.log('Reconstructed profile for user:', profile.userId, 'patterns:', profile.keystrokePatterns.length);
 
-        // Calculate metrics using advanced analyzer
+        // Create mock pattern for analysis if no patterns exist
         const mockPattern: KeystrokePattern = {
           userId: profile.userId,
-          patternId: 'analysis',
-          timings: [],
+          patternId: 'analysis-mock',
+          timings: [100, 150, 120, 80, 200], // Mock timing data
           timestamp: Date.now(),
           context: 'analysis'
         };
 
-        // Create dummy analysis for metrics calculation
-        const dummyResult = AdvancedBiometricAnalyzer.analyzePatternWithFraudDetection(
+        // Calculate metrics using advanced analyzer
+        const analysisResult = AdvancedBiometricAnalyzer.analyzePatternWithFraudDetection(
           profile, 
           mockPattern
         );
 
         const learningMetrics = ContinuousLearningEngine.calculateLearningMetrics(profile);
         
-        // Calculate risk score
+        // Calculate risk score based on various factors
         let riskScore = 0;
-        if (dummyResult.fraudIndicators.machineGeneratedPattern) riskScore += 40;
-        if (dummyResult.fraudIndicators.suspiciousTimingPatterns) riskScore += 30;
+        if (analysisResult.fraudIndicators.machineGeneratedPattern) riskScore += 40;
+        if (analysisResult.fraudIndicators.suspiciousTimingPatterns) riskScore += 30;
+        if (analysisResult.fraudIndicators.copyPasteDetected) riskScore += 20;
         if (profile.confidenceScore < 50) riskScore += 20;
         if (profile.status === 'locked') riskScore += 50;
         
-        analyses.push({
+        const userAnalysis: UserProfileAnalysis = {
           userId: profile.userId,
           userEmail: dbProfile.profiles.email,
           profile,
-          metrics: dummyResult.metrics,
-          fraudIndicators: dummyResult.fraudIndicators,
+          metrics: analysisResult.metrics,
+          fraudIndicators: analysisResult.fraudIndicators,
           learningMetrics,
           riskScore: Math.min(100, riskScore)
-        });
+        };
+        
+        analyses.push(userAnalysis);
+        console.log('Added analysis for user:', userAnalysis.userEmail);
       }
 
+      console.log('Total analyses created:', analyses.length);
       setUserAnalyses(analyses);
       
       // Calculate system metrics
-      const systemMetrics: SystemMetrics = {
-        totalProfiles: analyses.length,
-        averageConfidence: analyses.reduce((sum, a) => sum + a.profile.confidenceScore, 0) / analyses.length,
-        fraudDetectionRate: (analyses.filter(a => 
-          a.fraudIndicators.machineGeneratedPattern || 
-          a.fraudIndicators.suspiciousTimingPatterns
-        ).length / analyses.length) * 100,
-        learningProfiles: analyses.filter(a => a.profile.status === 'learning').length,
-        activeProfiles: analyses.filter(a => a.profile.status === 'active').length,
-        lockedProfiles: analyses.filter(a => a.profile.status === 'locked').length
-      };
-      
-      setSystemMetrics(systemMetrics);
+      if (analyses.length > 0) {
+        const systemMetrics: SystemMetrics = {
+          totalProfiles: analyses.length,
+          averageConfidence: analyses.reduce((sum, a) => sum + a.profile.confidenceScore, 0) / analyses.length,
+          fraudDetectionRate: (analyses.filter(a => 
+            a.fraudIndicators.machineGeneratedPattern || 
+            a.fraudIndicators.suspiciousTimingPatterns
+          ).length / analyses.length) * 100,
+          learningProfiles: analyses.filter(a => a.profile.status === 'learning').length,
+          activeProfiles: analyses.filter(a => a.profile.status === 'active').length,
+          lockedProfiles: analyses.filter(a => a.profile.status === 'locked').length
+        };
+        setSystemMetrics(systemMetrics);
+      } else {
+        setSystemMetrics({
+          totalProfiles: 0,
+          averageConfidence: 0,
+          fraudDetectionRate: 0,
+          learningProfiles: 0,
+          activeProfiles: 0,
+          lockedProfiles: 0
+        });
+      }
       
     } catch (error) {
       console.error('Error loading biometric data:', error);
@@ -174,7 +213,7 @@ const BiometricMonitor: React.FC = () => {
     .sort((a, b) => a.timestamp - b.timestamp)
     .map((pattern, index) => ({
       session: index + 1,
-      confidence: 50 + (index * 3), // Simulated confidence growth
+      confidence: Math.min(100, 30 + (index * 5)), // Simulated confidence growth
       stability: selectedUserAnalysis.learningMetrics.stabilityScore * 100
     })) || [];
 
@@ -239,31 +278,33 @@ const BiometricMonitor: React.FC = () => {
       </div>
 
       {/* Confidence Distribution Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Confidence Score Distribution</CardTitle>
-          <CardDescription>
-            Each point represents a user's biometric profile confidence
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <ScatterChart data={confidenceDistribution}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="x" hide />
-              <YAxis domain={[0, 100]} />
-              <Tooltip 
-                formatter={(value, name, props) => [
-                  `${value}%`,
-                  'Confidence',
-                  props.payload?.email
-                ]}
-              />
-              <Scatter dataKey="y" fill="hsl(var(--primary))" />
-            </ScatterChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      {userAnalyses.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Confidence Score Distribution</CardTitle>
+            <CardDescription>
+              Each point represents a user's biometric profile confidence
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <ScatterChart data={confidenceDistribution}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="x" hide />
+                <YAxis domain={[0, 100]} />
+                <Tooltip 
+                  formatter={(value, name, props) => [
+                    `${value}%`,
+                    'Confidence',
+                    props.payload?.email
+                  ]}
+                />
+                <Scatter dataKey="y" fill="hsl(var(--primary))" />
+              </ScatterChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
 
       {/* User Selection and Detailed Analysis */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -276,20 +317,33 @@ const BiometricMonitor: React.FC = () => {
             <div className="space-y-4">
               <Select value={selectedUser} onValueChange={setSelectedUser}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a user to analyze" />
+                  <SelectValue placeholder={userAnalyses.length > 0 ? "Select a user to analyze" : "No users available"} />
                 </SelectTrigger>
                 <SelectContent>
-                  {userAnalyses.map((analysis) => (
-                    <SelectItem key={analysis.userId} value={analysis.userId}>
-                      {analysis.userEmail} ({analysis.profile.status})
+                  {userAnalyses.length > 0 ? (
+                    userAnalyses.map((analysis) => (
+                      <SelectItem key={analysis.userId} value={analysis.userId}>
+                        {analysis.userEmail} ({analysis.profile.status})
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-users" disabled>
+                      No biometric profiles found
                     </SelectItem>
-                  ))}
+                  )}
                 </SelectContent>
               </Select>
               
               <Button onClick={refreshData} disabled={refreshing} className="w-full">
                 {refreshing ? 'Refreshing...' : 'Refresh Data'}
               </Button>
+
+              {userAnalyses.length === 0 && (
+                <div className="text-sm text-muted-foreground p-4 border rounded-lg">
+                  <p>No biometric profiles found in the database.</p>
+                  <p className="mt-2">Users need to complete the biometric enrollment process to appear here.</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -395,43 +449,45 @@ const BiometricMonitor: React.FC = () => {
       )}
 
       {/* User List with Risk Assessment */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Risk Assessment Overview</CardTitle>
-          <CardDescription>Users sorted by risk score</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {userAnalyses
-              .sort((a, b) => b.riskScore - a.riskScore)
-              .slice(0, 10)
-              .map((analysis) => (
-                <div 
-                  key={analysis.userId} 
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
-                  onClick={() => setSelectedUser(analysis.userId)}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${getStatusColor(analysis.profile.status)}`} />
-                    <div>
-                      <p className="font-medium">{analysis.userEmail}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {analysis.profile.keystrokePatterns.length} patterns, 
-                        {analysis.profile.confidenceScore}% confidence
-                      </p>
+      {userAnalyses.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Risk Assessment Overview</CardTitle>
+            <CardDescription>Users sorted by risk score</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {userAnalyses
+                .sort((a, b) => b.riskScore - a.riskScore)
+                .slice(0, 10)
+                .map((analysis) => (
+                  <div 
+                    key={analysis.userId} 
+                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
+                    onClick={() => setSelectedUser(analysis.userId)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-3 h-3 rounded-full ${getStatusColor(analysis.profile.status)}`} />
+                      <div>
+                        <p className="font-medium">{analysis.userEmail}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {analysis.profile.keystrokePatterns.length} patterns, 
+                          {analysis.profile.confidenceScore}% confidence
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className={`text-lg font-bold ${getRiskColor(analysis.riskScore)}`}>
+                        {analysis.riskScore}%
+                      </div>
+                      <p className="text-xs text-muted-foreground">Risk</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className={`text-lg font-bold ${getRiskColor(analysis.riskScore)}`}>
-                      {analysis.riskScore}%
-                    </div>
-                    <p className="text-xs text-muted-foreground">Risk</p>
-                  </div>
-                </div>
-              ))}
-          </div>
-        </CardContent>
-      </Card>
+                ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
