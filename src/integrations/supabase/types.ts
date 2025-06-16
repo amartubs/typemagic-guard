@@ -371,6 +371,9 @@ export type Database = {
           organization_size: number | null
           role: string
           status: Database["public"]["Enums"]["user_status"]
+          subscription_end_date: string | null
+          subscription_status: string | null
+          subscription_tier: string | null
           updated_at: string
           user_type: Database["public"]["Enums"]["user_type"]
         }
@@ -384,6 +387,9 @@ export type Database = {
           organization_size?: number | null
           role?: string
           status?: Database["public"]["Enums"]["user_status"]
+          subscription_end_date?: string | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"]
         }
@@ -397,6 +403,9 @@ export type Database = {
           organization_size?: number | null
           role?: string
           status?: Database["public"]["Enums"]["user_status"]
+          subscription_end_date?: string | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"]
         }
@@ -439,15 +448,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "security_settings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       subscribers: {
         Row: {

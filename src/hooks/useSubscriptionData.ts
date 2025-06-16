@@ -44,17 +44,25 @@ export const useSubscriptionData = () => {
 
     try {
       // Check both subscribers and profiles tables
-      const { data: subscriberData } = await supabase
+      const { data: subscriberData, error: subscriberError } = await supabase
         .from('subscribers')
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
 
-      const { data: profileData } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('subscription_tier, subscription_status')
         .eq('id', user.id)
         .single();
+
+      if (profileError) {
+        console.error('Error fetching profile data:', profileError);
+      }
+
+      if (subscriberError && subscriberError.code !== 'PGRST116') {
+        console.error('Error fetching subscriber data:', subscriberError);
+      }
 
       // Use profile data as primary source, fallback to subscriber data
       const subscriptionTier = profileData?.subscription_tier || subscriberData?.subscription_tier || 'free';

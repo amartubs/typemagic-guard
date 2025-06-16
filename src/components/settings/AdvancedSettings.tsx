@@ -28,8 +28,10 @@ interface SecuritySettings {
   learning_period: number;
   anomaly_detection_sensitivity: number;
   max_failed_attempts: number;
-  security_level: 'low' | 'medium' | 'high';
+  security_level: 'low' | 'medium' | 'high' | 'very-high';
   enforce_two_factor: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 const AdvancedSettings: React.FC = () => {
@@ -41,7 +43,7 @@ const AdvancedSettings: React.FC = () => {
     learning_period: 5,
     anomaly_detection_sensitivity: 70,
     max_failed_attempts: 5,
-    security_level: 'medium' as const,
+    security_level: 'medium' as 'low' | 'medium' | 'high' | 'very-high',
     enforce_two_factor: false,
   });
 
@@ -136,7 +138,8 @@ const AdvancedSettings: React.FC = () => {
     switch (level) {
       case 'low': return 'bg-yellow-100 text-yellow-800';
       case 'medium': return 'bg-blue-100 text-blue-800';
-      case 'high': return 'bg-red-100 text-red-800';
+      case 'high': return 'bg-orange-100 text-orange-800';
+      case 'very-high': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -271,14 +274,14 @@ const AdvancedSettings: React.FC = () => {
               Security Level
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {['low', 'medium', 'high'].map((level) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {(['low', 'medium', 'high', 'very-high'] as const).map((level) => (
                 <Card 
                   key={level}
                   className={`cursor-pointer transition-colors ${
                     formData.security_level === level ? 'ring-2 ring-primary' : ''
                   }`}
-                  onClick={() => setFormData(prev => ({ ...prev, security_level: level as any }))}
+                  onClick={() => setFormData(prev => ({ ...prev, security_level: level }))}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
@@ -292,7 +295,8 @@ const AdvancedSettings: React.FC = () => {
                     <p className="text-sm text-muted-foreground">
                       {level === 'low' && 'Balanced security and usability'}
                       {level === 'medium' && 'Standard security recommended for most users'}
-                      {level === 'high' && 'Maximum security with strict authentication'}
+                      {level === 'high' && 'Enhanced security with stricter authentication'}
+                      {level === 'very-high' && 'Maximum security with strict authentication'}
                     </p>
                   </CardContent>
                 </Card>
