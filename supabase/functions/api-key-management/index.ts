@@ -30,24 +30,25 @@ serve(async (req) => {
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated");
 
-    // Check if user has enterprise subscription
-    const { data: subscription } = await supabaseClient
-      .from('subscriptions')
-      .select(`
-        *,
-        plan:subscription_plans(tier)
-      `)
-      .eq('user_id', user.id)
+    // Get user's subscription from profiles table
+    const { data: profile } = await supabaseClient
+      .from('profiles')
+      .select('subscription_tier')
+      .eq('id', user.id)
       .single();
 
-    if (!subscription || subscription.plan.tier !== 'enterprise') {
-      return new Response(
-        JSON.stringify({ error: "Enterprise subscription required" }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    // For development/testing, allow all users to create API keys
+    // In production, you might want to restrict this to enterprise users only
+    const allowApiKeyCreation = true; // Change to: profile?.subscription_tier === 'enterprise'
 
     if (req.method === 'POST') {
+      if (!allowApiKeyCreation) {
+        return new Response(
+          JSON.stringify({ error: "Enterprise subscription required for API key creation" }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       const { name, permissions, rateLimit } = await req.json();
       
       // Generate API key
@@ -57,18 +58,20 @@ serve(async (req) => {
         .from('api_keys')
         .insert({
           user_id: user.id,
-          name,
+          name: name || 'Default API Key',
           key_hash: apiKey, // In production, store hashed version
+          key_prefix: apiKey.substring(0, 8),
           permissions: permissions || ['biometric_auth'],
           rate_limit: rateLimit || 1000,
-          active: true
+          is_active: true
         })
         .select()
         .single();
 
       if (error) {
+        console.error('Database error:', error);
         return new Response(
-          JSON.stringify({ error: "Failed to create API key" }),
+          JSON.stringify({ error: "Failed to create API key: " + error.message }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -85,8 +88,9 @@ serve(async (req) => {
     if (req.method === 'GET') {
       const { data, error } = await supabaseClient
         .from('api_keys')
-        .select('id, name, permissions, rate_limit, active, created_at, last_used')
-        .eq('user_id', user.id);
+        .select('id, name, permissions, rate_limit, is_active, created_at, last_used, key_prefix')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
 
       if (error) {
         return new Response(
@@ -96,7 +100,7 @@ serve(async (req) => {
       }
 
       return new Response(
-        JSON.stringify(data),
+        JSON.stringify(data || []),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

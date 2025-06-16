@@ -1,83 +1,89 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Download, FileText, Database, Clock } from 'lucide-react';
+import { Download, FileText } from 'lucide-react';
 
 const DataExport: React.FC = () => {
   const { user } = useAuth();
-  const [exportLoading, setExportLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleDataExport = async () => {
-    if (!user) return;
-    
-    setExportLoading(true);
+    if (!user?.id) return;
+
+    setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('gdpr-export');
-      
-      if (error) throw error;
-      
-      // Create and download the export file
-      const blob = new Blob([JSON.stringify(data, null, 2)], { 
-        type: 'application/json' 
+      // Call the GDPR export function
+      const { data, error } = await supabase.functions.invoke('gdpr-export', {
+        body: { userId: user.id }
       });
+
+      if (error) {
+        console.error('Error exporting data:', error);
+        toast({
+          title: "Export Failed",
+          description: "Failed to export your data. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create and download the file
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `gdpr-export-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `user-data-export-${new Date().toISOString().split('T')[0]}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      
+
       toast({
-        title: "Data Export Complete",
-        description: "Your personal data has been exported and downloaded.",
+        title: "Export Successful",
+        description: "Your data has been exported and downloaded.",
       });
-    } catch (error) {
-      console.error('Export error:', error);
+    } catch (err) {
+      console.error('Error in data export:', err);
       toast({
         title: "Export Failed",
-        description: "Failed to export your data. Please try again.",
+        description: "An unexpected error occurred during data export.",
         variant: "destructive",
       });
     } finally {
-      setExportLoading(false);
+      setLoading(false);
     }
   };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <Download className="h-5 w-5 text-blue-500" />
-        <h3 className="text-lg font-medium">Data Export</h3>
+        <FileText className="h-5 w-5 text-primary" />
+        <h3 className="text-lg font-semibold">Data Export</h3>
       </div>
-      <p className="text-muted-foreground">
-        Download a complete copy of your personal data stored in our system.
+      
+      <p className="text-sm text-muted-foreground">
+        Download a complete copy of your personal data stored in our system. This includes your profile information, 
+        biometric patterns, authentication logs, and usage analytics.
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
-        <div className="flex items-center gap-2">
-          <FileText className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm">Profile Information</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Database className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm">Biometric Data</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Clock className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm">Activity Logs</span>
-        </div>
-      </div>
+
+      <Alert>
+        <AlertDescription>
+          The exported data will be in JSON format and may contain sensitive information. 
+          Please store it securely and do not share it with unauthorized parties.
+        </AlertDescription>
+      </Alert>
+
       <Button 
-        onClick={handleDataExport}
-        disabled={exportLoading}
-        className="gap-2"
+        onClick={handleDataExport} 
+        disabled={loading}
+        className="flex items-center gap-2"
       >
         <Download className="h-4 w-4" />
-        {exportLoading ? 'Exporting...' : 'Export My Data'}
+        {loading ? 'Exporting...' : 'Export My Data'}
       </Button>
     </div>
   );

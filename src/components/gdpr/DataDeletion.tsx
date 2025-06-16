@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -9,92 +12,134 @@ import { Trash2, AlertTriangle } from 'lucide-react';
 
 const DataDeletion: React.FC = () => {
   const { user } = useAuth();
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [confirmationText, setConfirmationText] = useState('');
+  const [acknowledgements, setAcknowledgements] = useState({
+    understand: false,
+    irreversible: false,
+    exportFirst: false,
+  });
+
+  const isConfirmationValid = confirmationText === 'DELETE MY ACCOUNT' && 
+    Object.values(acknowledgements).every(Boolean);
 
   const handleDataDeletion = async () => {
-    if (!user) return;
-    
-    setDeleteLoading(true);
+    if (!user?.id || !isConfirmationValid) return;
+
+    setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('gdpr-delete');
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Account Deletion Initiated",
-        description: "Your account and data deletion has been processed.",
+      // Call the GDPR deletion function
+      const { error } = await supabase.functions.invoke('gdpr-delete', {
+        body: { userId: user.id }
       });
-      
-      // Sign out the user after deletion
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error('Deletion error:', error);
+
+      if (error) {
+        console.error('Error deleting data:', error);
+        toast({
+          title: "Deletion Failed",
+          description: "Failed to delete your data. Please contact support.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Account Scheduled for Deletion",
+        description: "Your account and all associated data will be permanently deleted within 30 days.",
+      });
+
+      // Redirect to a goodbye page or logout
+      window.location.href = '/';
+    } catch (err) {
+      console.error('Error in data deletion:', err);
       toast({
         title: "Deletion Failed",
-        description: "Failed to delete your data. Please contact support.",
+        description: "An unexpected error occurred during account deletion.",
         variant: "destructive",
       });
     } finally {
-      setDeleteLoading(false);
-      setShowDeleteConfirm(false);
+      setLoading(false);
     }
   };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <Trash2 className="h-5 w-5 text-red-500" />
-        <h3 className="text-lg font-medium">Data Deletion</h3>
+        <Trash2 className="h-5 w-5 text-destructive" />
+        <h3 className="text-lg font-semibold text-destructive">Account Deletion</h3>
       </div>
       
-      <Alert className="border-amber-200 bg-amber-50">
-        <AlertTriangle className="h-4 w-4 text-amber-600" />
-        <AlertDescription className="text-amber-800">
-          <strong>Warning:</strong> This action cannot be undone. All your data, 
-          including biometric profiles, will be permanently deleted.
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>
+          <strong>Warning:</strong> This action is irreversible. Once you delete your account, 
+          all your data including biometric patterns, authentication logs, and profile information 
+          will be permanently removed from our systems.
         </AlertDescription>
       </Alert>
 
-      {!showDeleteConfirm ? (
-        <Button 
-          variant="outline"
-          onClick={() => setShowDeleteConfirm(true)}
-          className="gap-2 border-red-200 text-red-600 hover:bg-red-50"
-        >
-          <Trash2 className="h-4 w-4" />
-          Request Account Deletion
-        </Button>
-      ) : (
-        <div className="space-y-4 p-4 border border-red-200 rounded-lg bg-red-50">
-          <p className="font-medium text-red-800">
-            Are you absolutely sure you want to delete your account?
-          </p>
-          <ul className="text-sm text-red-700 space-y-1">
-            <li>• All biometric data will be permanently removed</li>
-            <li>• Your profile and preferences will be deleted</li>
-            <li>• Active subscriptions will be cancelled</li>
-            <li>• This action cannot be reversed</li>
-          </ul>
-          <div className="flex gap-2">
-            <Button 
-              variant="destructive"
-              onClick={handleDataDeletion}
-              disabled={deleteLoading}
-              className="gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-              {deleteLoading ? 'Deleting...' : 'Yes, Delete Everything'}
-            </Button>
-            <Button 
-              variant="outline"
-              onClick={() => setShowDeleteConfirm(false)}
-            >
-              Cancel
-            </Button>
-          </div>
+      <div className="space-y-3">
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="understand"
+            checked={acknowledgements.understand}
+            onCheckedChange={(checked) => 
+              setAcknowledgements(prev => ({ ...prev, understand: checked as boolean }))
+            }
+          />
+          <Label htmlFor="understand" className="text-sm">
+            I understand that this action cannot be undone
+          </Label>
         </div>
-      )}
+
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="irreversible"
+            checked={acknowledgements.irreversible}
+            onCheckedChange={(checked) => 
+              setAcknowledgements(prev => ({ ...prev, irreversible: checked as boolean }))
+            }
+          />
+          <Label htmlFor="irreversible" className="text-sm">
+            I understand that all my data will be permanently deleted
+          </Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="exportFirst"
+            checked={acknowledgements.exportFirst}
+            onCheckedChange={(checked) => 
+              setAcknowledgements(prev => ({ ...prev, exportFirst: checked as boolean }))
+            }
+          />
+          <Label htmlFor="exportFirst" className="text-sm">
+            I have exported my data if needed
+          </Label>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="confirmation">
+          Type "DELETE MY ACCOUNT" to confirm:
+        </Label>
+        <Input
+          id="confirmation"
+          value={confirmationText}
+          onChange={(e) => setConfirmationText(e.target.value)}
+          placeholder="DELETE MY ACCOUNT"
+        />
+      </div>
+
+      <Button 
+        variant="destructive"
+        onClick={handleDataDeletion} 
+        disabled={loading || !isConfirmationValid}
+        className="flex items-center gap-2"
+      >
+        <Trash2 className="h-4 w-4" />
+        {loading ? 'Deleting Account...' : 'Delete My Account'}
+      </Button>
     </div>
   );
 };

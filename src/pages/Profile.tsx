@@ -7,6 +7,7 @@ import ProductionSubscriptionManager from '@/components/subscription/ProductionS
 import GDPRManagement from '@/components/gdpr/GDPRManagement';
 import TwoFactorSetup from '@/components/security/TwoFactorSetup';
 import ApiKeyManager from '@/components/enterprise/ApiKeyManager';
+import AdvancedSettings from '@/components/settings/AdvancedSettings';
 import ProtectedLayout from '@/components/layout/ProtectedLayout';
 import { 
   User, 
@@ -89,13 +90,7 @@ const Profile = () => {
           </TabsContent>
 
           <TabsContent value="advanced">
-            <div className="text-center py-8">
-              <Settings className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">Advanced Settings</h3>
-              <p className="text-muted-foreground">
-                Advanced configuration options will be available here.
-              </p>
-            </div>
+            <AdvancedSettings />
           </TabsContent>
         </Tabs>
       </div>
