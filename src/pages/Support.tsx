@@ -4,13 +4,12 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CustomerSupport from '@/components/support/CustomerSupport';
-import Header from '@/components/layout/Header';
+import ProtectedLayout from '@/components/layout/ProtectedLayout';
 
 const Support = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container mx-auto px-4 py-8">
+    <ProtectedLayout>
+      <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
           <Button variant="outline" size="sm" asChild>
             <Link to="/dashboard" className="flex items-center gap-2">
@@ -20,8 +19,8 @@ const Support = () => {
           </Button>
         </div>
         <CustomerSupport />
-      </main>
-    </div>
+      </div>
+    </ProtectedLayout>
   );
 };
 
