@@ -16,9 +16,7 @@ export const useAuthState = () => {
 
   useEffect(() => {
     let mounted = true;
-    let initializationComplete = false;
 
-    // Function to handle auth state changes
     const handleAuthStateChange = async (event: string, session: Session | null) => {
       console.log('Auth state changed:', event, session ? 'session exists' : 'no session');
       
@@ -51,8 +49,8 @@ export const useAuthState = () => {
         setUser(null);
       }
       
-      // Only set loading to false after initial setup is complete
-      if (mounted && initializationComplete) {
+      // Set loading to false after processing
+      if (mounted) {
         setLoading(false);
       }
     };
@@ -69,21 +67,17 @@ export const useAuthState = () => {
           console.error('Error getting session:', error);
           if (mounted) {
             setLoading(false);
-            initializationComplete = true;
           }
           return;
         }
 
         if (mounted) {
           await handleAuthStateChange('INITIAL_SESSION', session);
-          initializationComplete = true;
-          setLoading(false);
         }
       } catch (error) {
         console.error('Unexpected error during auth initialization:', error);
         if (mounted) {
           setLoading(false);
-          initializationComplete = true;
         }
       }
     };

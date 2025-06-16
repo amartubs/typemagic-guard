@@ -12,14 +12,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const authState = useAuthState();
   const authActions = useAuthActions(authState.setLoading);
 
-  // Reduced timeout and better handling
+  // Safety timeout to prevent infinite loading
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (authState.loading) {
         console.warn('Auth loading timeout reached, forcing loading to false');
         authState.setLoading(false);
       }
-    }, 5000); // Reduced to 5 seconds
+    }, 3000); // 3 second timeout
 
     return () => clearTimeout(timeout);
   }, [authState.loading, authState.setLoading]);

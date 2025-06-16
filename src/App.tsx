@@ -18,11 +18,18 @@ import Support from '@/pages/Support';
 import EnterprisePortal from '@/pages/EnterprisePortal';
 import PatentDrawingsPage from '@/pages/PatentDrawingsPage';
 import NotFound from '@/pages/NotFound';
+import Admin from '@/pages/Admin';
 import PrivateRoute from '@/components/auth/PrivateRoute';
 import { Toaster } from '@/components/ui/toaster';
-import Admin from '@/pages/Admin';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function App() {
   return (
@@ -31,6 +38,7 @@ function App() {
         <AuthProvider>
           <div className="min-h-screen bg-background text-foreground">
             <Routes>
+              {/* Public routes */}
               <Route path="/" element={<Index />} />
               <Route path="/demo" element={<Demo />} />
               <Route path="/demo-environment" element={<DemoEnvironment />} />
@@ -40,6 +48,8 @@ function App() {
               <Route path="/auth" element={<Auth />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/patent-drawings" element={<PatentDrawingsPage />} />
+              
+              {/* Protected routes */}
               <Route
                 path="/dashboard"
                 element={
@@ -88,6 +98,8 @@ function App() {
                   </PrivateRoute>
                 }
               />
+              
+              {/* 404 fallback */}
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Toaster />

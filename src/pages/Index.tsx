@@ -94,18 +94,20 @@ export default function Index() {
           description="Protect your application with invisible keystroke biometric authentication. Stop fraud with behavioral patterns that can't be stolen or duplicated."
           keywords={['keystroke biometrics', 'behavioral authentication', 'fraud prevention', 'continuous authentication', 'typing biometrics', 'security platform']}
           schema={structuredData}
-          canonical={window.location.href}
+          canonical={typeof window !== 'undefined' ? window.location.href : ''}
         />
         
         <Header />
 
         <main className="flex-grow">
+          {/* Hero Section */}
           <section className="py-20 bg-gradient-to-b from-[#E5DEFF] to-background">
             <div className="container mx-auto px-4">
               <ValuePropositionTest />
             </div>
           </section>
 
+          {/* Features Section */}
           <section className="py-16 bg-background">
             <div className="container mx-auto px-4">
               <h2 className="text-3xl font-bold text-center mb-12">Key Features</h2>
@@ -137,6 +139,7 @@ export default function Index() {
             </div>
           </section>
 
+          {/* CTA Section */}
           <section className="py-16 bg-[#E5DEFF]/50">
             <div className="container mx-auto px-4 text-center">
               <h2 className="text-3xl font-bold mb-6">Ready to get started?</h2>
@@ -150,7 +153,7 @@ export default function Index() {
                     <ChevronRight size={18} />
                   </Button>
                 </Link>
-                <Link to="/onboarding" onClick={handleGetStartedClick}>
+                <Link to="/auth" onClick={handleGetStartedClick}>
                   <Button size="lg" className="gap-2 bg-[#9b87f5] hover:bg-[#7E69AB]">
                     Get Started
                     <ChevronRight size={18} />
