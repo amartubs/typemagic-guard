@@ -29,7 +29,9 @@ import {
   Star,
   CreditCard,
   BookOpen,
-  Users
+  Users,
+  TestTube,
+  Lock
 } from 'lucide-react';
 
 const MainNavigation = () => {
@@ -39,9 +41,11 @@ const MainNavigation = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  const isAdmin = user?.role === 'admin';
-  const isEnterprise = user?.subscription?.tier === 'enterprise';
-  const isProfessionalOrHigher = ['professional', 'enterprise'].includes(user?.subscription?.tier || '');
+  // Check if user is superadmin
+  const isSuperAdmin = user?.email === 'craigfubara@yahoo.co.uk';
+  const isAdmin = user?.role === 'admin' || isSuperAdmin;
+  const isEnterprise = user?.subscription?.tier === 'enterprise' || isSuperAdmin;
+  const isProfessionalOrHigher = ['professional', 'enterprise'].includes(user?.subscription?.tier || '') || isSuperAdmin;
 
   const handleLogout = async () => {
     await logout();
@@ -78,6 +82,17 @@ const MainNavigation = () => {
               <Link to="/features" className="flex items-center gap-2">
                 <Star className="h-4 w-4" />
                 Features
+              </Link>
+            </Button>
+
+            <Button
+              variant={isActive('/demo-environment') ? 'default' : 'ghost'}
+              size="sm"
+              asChild
+            >
+              <Link to="/demo-environment" className="flex items-center gap-2">
+                <TestTube className="h-4 w-4" />
+                Demo Environment
               </Link>
             </Button>
 
@@ -130,6 +145,32 @@ const MainNavigation = () => {
                 </Link>
               </Button>
             )}
+
+            {isSuperAdmin && (
+              <>
+                <Button
+                  variant={isActive('/auth') ? 'default' : 'ghost'}
+                  size="sm"
+                  asChild
+                >
+                  <Link to="/auth" className="flex items-center gap-2">
+                    <Key className="h-4 w-4" />
+                    Auth
+                  </Link>
+                </Button>
+                
+                <Button
+                  variant={isActive('/reset-password') ? 'default' : 'ghost'}
+                  size="sm"
+                  asChild
+                >
+                  <Link to="/reset-password" className="flex items-center gap-2">
+                    <Lock className="h-4 w-4" />
+                    Reset Password
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
 
@@ -158,6 +199,13 @@ const MainNavigation = () => {
                     <Link to="/features" className="flex items-center gap-2">
                       <Star className="h-4 w-4" />
                       Features
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem asChild>
+                    <Link to="/demo-environment" className="flex items-center gap-2">
+                      <TestTube className="h-4 w-4" />
+                      Demo Environment
                     </Link>
                   </DropdownMenuItem>
 
@@ -194,6 +242,24 @@ const MainNavigation = () => {
                       </Link>
                     </DropdownMenuItem>
                   )}
+
+                  {isSuperAdmin && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link to="/auth" className="flex items-center gap-2">
+                          <Key className="h-4 w-4" />
+                          Auth
+                        </Link>
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuItem asChild>
+                        <Link to="/reset-password" className="flex items-center gap-2">
+                          <Lock className="h-4 w-4" />
+                          Reset Password
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -214,10 +280,13 @@ const MainNavigation = () => {
                 <div>
                   <p className="font-medium">{user?.name || 'User'}</p>
                   <p className="text-xs text-muted-foreground">{user?.email}</p>
-                  {isAdmin && (
+                  {isSuperAdmin && (
+                    <p className="text-xs text-purple-600 font-medium">Super Admin</p>
+                  )}
+                  {isAdmin && !isSuperAdmin && (
                     <p className="text-xs text-primary font-medium">Admin</p>
                   )}
-                  {isEnterprise && (
+                  {isEnterprise && !isSuperAdmin && (
                     <p className="text-xs text-purple-600 font-medium">Enterprise</p>
                   )}
                 </div>
