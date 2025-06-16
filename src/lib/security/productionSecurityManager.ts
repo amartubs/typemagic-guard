@@ -20,13 +20,13 @@ export class ProductionSecurityManager {
         return false;
       }
 
-      // Check if session is expired
-      const now = Date.now();
-      const sessionStart = new Date(session.created_at).getTime();
-      
-      if (now - sessionStart > this.SESSION_TIMEOUT) {
-        await this.logoutUser();
-        return false;
+      // Check if session is expired using expires_at
+      if (session.expires_at) {
+        const now = Math.floor(Date.now() / 1000); // Convert to seconds
+        if (now >= session.expires_at) {
+          await this.logoutUser();
+          return false;
+        }
       }
 
       return true;
