@@ -48,8 +48,10 @@ function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/patent-drawings" element={<PatentDrawingsPage />} />
               
-              {/* Redirect /login to /auth */}
+              {/* Legacy redirects */}
               <Route path="/login" element={<Navigate to="/auth" replace />} />
+              <Route path="/register" element={<Navigate to="/auth" replace />} />
+              <Route path="/signup" element={<Navigate to="/auth" replace />} />
               
               {/* Protected routes */}
               <Route
@@ -107,6 +109,12 @@ function App() {
                     <Admin />
                   </PrivateRoute>
                 }
+              />
+              
+              {/* Analytics route redirect */}
+              <Route 
+                path="/analytics" 
+                element={<Navigate to="/dashboard" replace />} 
               />
               
               {/* 404 fallback */}

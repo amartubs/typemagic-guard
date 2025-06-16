@@ -24,14 +24,11 @@ import {
   Menu,
   Crown,
   Key,
-  Database,
-  Monitor,
   Star,
   CreditCard,
-  BookOpen,
-  Users,
   TestTube,
-  Lock
+  Lock,
+  BookOpen
 } from 'lucide-react';
 
 const MainNavigation = () => {
@@ -49,7 +46,33 @@ const MainNavigation = () => {
 
   const handleLogout = async () => {
     await logout();
+    navigate('/');
   };
+
+  // Main navigation items for desktop
+  const mainNavItems = [
+    { path: '/dashboard', label: 'Dashboard', icon: Home, show: true },
+    { path: '/features', label: 'Features', icon: Star, show: true },
+    { path: '/demo-environment', label: 'Demo Environment', icon: TestTube, show: true },
+    { path: '/pricing', label: 'Pricing', icon: CreditCard, show: true },
+    { path: '/dashboard', label: 'Analytics', icon: BarChart3, show: isProfessionalOrHigher },
+    { path: '/enterprise', label: 'Enterprise', icon: Building2, show: isEnterprise },
+    { path: '/admin', label: 'Admin', icon: Crown, show: isAdmin },
+  ];
+
+  // Super admin only items
+  const superAdminItems = [
+    { path: '/auth', label: 'Auth', icon: Key },
+    { path: '/reset-password', label: 'Reset Password', icon: Lock },
+  ];
+
+  // User menu items
+  const userMenuItems = [
+    { path: '/profile', label: 'Profile', icon: User },
+    { path: '/settings', label: 'Settings', icon: Settings },
+    { path: '/onboarding', label: 'Getting Started', icon: BookOpen },
+    { path: '/support', label: 'Support', icon: HelpCircle },
+  ];
 
   return (
     <nav className="bg-background border-b border-border px-4 py-3">
@@ -63,114 +86,33 @@ const MainNavigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button
-              variant={isActive('/dashboard') ? 'default' : 'ghost'}
-              size="sm"
-              asChild
-            >
-              <Link to="/dashboard" className="flex items-center gap-2">
-                <Home className="h-4 w-4" />
-                Dashboard
-              </Link>
-            </Button>
-
-            <Button
-              variant={isActive('/features') ? 'default' : 'ghost'}
-              size="sm"
-              asChild
-            >
-              <Link to="/features" className="flex items-center gap-2">
-                <Star className="h-4 w-4" />
-                Features
-              </Link>
-            </Button>
-
-            <Button
-              variant={isActive('/demo-environment') ? 'default' : 'ghost'}
-              size="sm"
-              asChild
-            >
-              <Link to="/demo-environment" className="flex items-center gap-2">
-                <TestTube className="h-4 w-4" />
-                Demo Environment
-              </Link>
-            </Button>
-
-            {isProfessionalOrHigher && (
+            {mainNavItems.map((item) => item.show && (
               <Button
-                variant={isActive('/analytics') ? 'default' : 'ghost'}
+                key={item.path}
+                variant={isActive(item.path) ? 'default' : 'ghost'}
                 size="sm"
                 asChild
               >
-                <Link to="/dashboard" className="flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  Analytics
+                <Link to={item.path} className="flex items-center gap-2">
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
                 </Link>
               </Button>
-            )}
+            ))}
 
-            <Button
-              variant={isActive('/pricing') ? 'default' : 'ghost'}
-              size="sm"
-              asChild
-            >
-              <Link to="/pricing" className="flex items-center gap-2">
-                <CreditCard className="h-4 w-4" />
-                Pricing
-              </Link>
-            </Button>
-
-            {isEnterprise && (
+            {isSuperAdmin && superAdminItems.map((item) => (
               <Button
-                variant={isActive('/enterprise') ? 'default' : 'ghost'}
+                key={item.path}
+                variant={isActive(item.path) ? 'default' : 'ghost'}
                 size="sm"
                 asChild
               >
-                <Link to="/enterprise" className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4" />
-                  Enterprise
+                <Link to={item.path} className="flex items-center gap-2">
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
                 </Link>
               </Button>
-            )}
-
-            {isAdmin && (
-              <Button
-                variant={isActive('/admin') ? 'default' : 'ghost'}
-                size="sm"
-                asChild
-              >
-                <Link to="/admin" className="flex items-center gap-2">
-                  <Crown className="h-4 w-4" />
-                  Admin
-                </Link>
-              </Button>
-            )}
-
-            {isSuperAdmin && (
-              <>
-                <Button
-                  variant={isActive('/auth') ? 'default' : 'ghost'}
-                  size="sm"
-                  asChild
-                >
-                  <Link to="/auth" className="flex items-center gap-2">
-                    <Key className="h-4 w-4" />
-                    Auth
-                  </Link>
-                </Button>
-                
-                <Button
-                  variant={isActive('/reset-password') ? 'default' : 'ghost'}
-                  size="sm"
-                  asChild
-                >
-                  <Link to="/reset-password" className="flex items-center gap-2">
-                    <Lock className="h-4 w-4" />
-                    Reset Password
-                  </Link>
-                </Button>
-              </>
-            )}
+            ))}
           </div>
         </div>
 
@@ -188,78 +130,23 @@ const MainNavigation = () => {
                 <DropdownMenuLabel>Navigation</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem asChild>
-                    <Link to="/dashboard" className="flex items-center gap-2">
-                      <Home className="h-4 w-4" />
-                      Dashboard
-                    </Link>
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem asChild>
-                    <Link to="/features" className="flex items-center gap-2">
-                      <Star className="h-4 w-4" />
-                      Features
-                    </Link>
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem asChild>
-                    <Link to="/demo-environment" className="flex items-center gap-2">
-                      <TestTube className="h-4 w-4" />
-                      Demo Environment
-                    </Link>
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem asChild>
-                    <Link to="/pricing" className="flex items-center gap-2">
-                      <CreditCard className="h-4 w-4" />
-                      Pricing
-                    </Link>
-                  </DropdownMenuItem>
-                  
-                  {isProfessionalOrHigher && (
-                    <DropdownMenuItem asChild>
-                      <Link to="/dashboard" className="flex items-center gap-2">
-                        <BarChart3 className="h-4 w-4" />
-                        Analytics
+                  {mainNavItems.map((item) => item.show && (
+                    <DropdownMenuItem key={item.path} asChild>
+                      <Link to={item.path} className="flex items-center gap-2">
+                        <item.icon className="h-4 w-4" />
+                        {item.label}
                       </Link>
                     </DropdownMenuItem>
-                  )}
+                  ))}
 
-                  {isEnterprise && (
-                    <DropdownMenuItem asChild>
-                      <Link to="/enterprise" className="flex items-center gap-2">
-                        <Building2 className="h-4 w-4" />
-                        Enterprise
+                  {isSuperAdmin && superAdminItems.map((item) => (
+                    <DropdownMenuItem key={item.path} asChild>
+                      <Link to={item.path} className="flex items-center gap-2">
+                        <item.icon className="h-4 w-4" />
+                        {item.label}
                       </Link>
                     </DropdownMenuItem>
-                  )}
-
-                  {isAdmin && (
-                    <DropdownMenuItem asChild>
-                      <Link to="/admin" className="flex items-center gap-2">
-                        <Crown className="h-4 w-4" />
-                        Admin
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
-
-                  {isSuperAdmin && (
-                    <>
-                      <DropdownMenuItem asChild>
-                        <Link to="/auth" className="flex items-center gap-2">
-                          <Key className="h-4 w-4" />
-                          Auth
-                        </Link>
-                      </DropdownMenuItem>
-                      
-                      <DropdownMenuItem asChild>
-                        <Link to="/reset-password" className="flex items-center gap-2">
-                          <Lock className="h-4 w-4" />
-                          Reset Password
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  )}
+                  ))}
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -293,30 +180,14 @@ const MainNavigation = () => {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem asChild>
-                  <Link to="/profile" className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    Profile
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/settings" className="flex items-center gap-2">
-                    <Settings className="h-4 w-4" />
-                    Settings
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/onboarding" className="flex items-center gap-2">
-                    <BookOpen className="h-4 w-4" />
-                    Getting Started
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/support" className="flex items-center gap-2">
-                    <HelpCircle className="h-4 w-4" />
-                    Support
-                  </Link>
-                </DropdownMenuItem>
+                {userMenuItems.map((item) => (
+                  <DropdownMenuItem key={item.path} asChild>
+                    <Link to={item.path} className="flex items-center gap-2">
+                      <item.icon className="h-4 w-4" />
+                      {item.label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
