@@ -8,7 +8,6 @@ import Demo from '@/pages/Demo';
 import DemoEnvironment from '@/pages/DemoEnvironment';
 import Onboarding from '@/pages/Onboarding';
 import Pricing from '@/pages/Pricing';
-import Login from '@/pages/Login';
 import Auth from '@/pages/Auth';
 import ResetPassword from '@/pages/ResetPassword';
 import Dashboard from '@/pages/Dashboard';
@@ -44,10 +43,12 @@ function App() {
               <Route path="/demo-environment" element={<DemoEnvironment />} />
               <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/pricing" element={<Pricing />} />
-              <Route path="/login" element={<Login />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/patent-drawings" element={<PatentDrawingsPage />} />
+              
+              {/* Redirect /login to /auth for consistency */}
+              <Route path="/login" element={<Auth />} />
               
               {/* Protected routes */}
               <Route

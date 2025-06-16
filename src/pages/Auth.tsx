@@ -20,11 +20,11 @@ const AuthPage = () => {
     login, 
     register, 
     user, 
+    loading: authLoading,
     twoFactorRequired, 
     verifyTwoFactorCode, 
     sendTwoFactorCode,
     signInWithProvider,
-    loading: authLoading,
     resetPassword
   } = useAuth();
   
@@ -140,7 +140,6 @@ const AuthPage = () => {
       
       if (success) {
         setRegistrationSuccess(true);
-        // Don't automatically switch to login tab - let user confirm their email first
       }
     } finally {
       setRegisterLoading(false);

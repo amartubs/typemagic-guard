@@ -16,6 +16,7 @@ export const useAuthState = () => {
 
   useEffect(() => {
     let mounted = true;
+    let initializationComplete = false;
 
     const handleAuthStateChange = async (event: string, session: Session | null) => {
       console.log('Auth state changed:', event, session ? 'session exists' : 'no session');
@@ -50,8 +51,9 @@ export const useAuthState = () => {
       }
       
       // Set loading to false after processing
-      if (mounted) {
+      if (mounted && !initializationComplete) {
         setLoading(false);
+        initializationComplete = true;
       }
     };
 
@@ -67,6 +69,7 @@ export const useAuthState = () => {
           console.error('Error getting session:', error);
           if (mounted) {
             setLoading(false);
+            initializationComplete = true;
           }
           return;
         }
@@ -78,15 +81,26 @@ export const useAuthState = () => {
         console.error('Unexpected error during auth initialization:', error);
         if (mounted) {
           setLoading(false);
+          initializationComplete = true;
         }
       }
     };
 
     initializeAuth();
 
+    // Safety timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      if (!initializationComplete && mounted) {
+        console.warn('Auth initialization timeout reached, forcing loading to false');
+        setLoading(false);
+        initializationComplete = true;
+      }
+    }, 2000); // 2 second timeout
+
     // Cleanup
     return () => {
       mounted = false;
+      clearTimeout(timeout);
       subscription.unsubscribe();
     };
   }, []);
