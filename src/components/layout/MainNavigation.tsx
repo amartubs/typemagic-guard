@@ -1,0 +1,241 @@
+
+import React from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/auth';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Home,
+  BarChart3,
+  User,
+  Settings,
+  HelpCircle,
+  Building2,
+  Shield,
+  LogOut,
+  Menu,
+  Crown,
+  Key,
+  Database,
+  Monitor,
+  Star
+} from 'lucide-react';
+
+const MainNavigation = () => {
+  const { user, logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const isActive = (path: string) => location.pathname === path;
+
+  const isAdmin = user?.role === 'admin';
+  const isEnterprise = user?.subscription?.tier === 'enterprise';
+  const isProfessionalOrHigher = ['professional', 'enterprise'].includes(user?.subscription?.tier || '');
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
+  return (
+    <nav className="bg-background border-b border-border px-4 py-3">
+      <div className="flex items-center justify-between">
+        {/* Left side - Logo and main nav */}
+        <div className="flex items-center space-x-6">
+          <Link to="/" className="flex items-center space-x-2">
+            <Shield className="h-6 w-6 text-primary" />
+            <span className="font-bold text-lg">Shoale</span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-4">
+            <Button
+              variant={isActive('/dashboard') ? 'default' : 'ghost'}
+              size="sm"
+              asChild
+            >
+              <Link to="/dashboard" className="flex items-center gap-2">
+                <Home className="h-4 w-4" />
+                Dashboard
+              </Link>
+            </Button>
+
+            <Button
+              variant={isActive('/features') ? 'default' : 'ghost'}
+              size="sm"
+              asChild
+            >
+              <Link to="/features" className="flex items-center gap-2">
+                <Star className="h-4 w-4" />
+                Features
+              </Link>
+            </Button>
+
+            {isProfessionalOrHigher && (
+              <Button
+                variant={isActive('/analytics') ? 'default' : 'ghost'}
+                size="sm"
+                asChild
+              >
+                <Link to="/dashboard" className="flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  Analytics
+                </Link>
+              </Button>
+            )}
+
+            {isEnterprise && (
+              <Button
+                variant={isActive('/enterprise') ? 'default' : 'ghost'}
+                size="sm"
+                asChild
+              >
+                <Link to="/enterprise" className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4" />
+                  Enterprise
+                </Link>
+              </Button>
+            )}
+
+            {isAdmin && (
+              <Button
+                variant={isActive('/admin') ? 'default' : 'ghost'}
+                size="sm"
+                asChild
+              >
+                <Link to="/admin" className="flex items-center gap-2">
+                  <Crown className="h-4 w-4" />
+                  Admin
+                </Link>
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Right side - User menu */}
+        <div className="flex items-center space-x-4">
+          {/* Mobile menu */}
+          <div className="md:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end">
+                <DropdownMenuLabel>Navigation</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="flex items-center gap-2">
+                      <Home className="h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem asChild>
+                    <Link to="/features" className="flex items-center gap-2">
+                      <Star className="h-4 w-4" />
+                      Features
+                    </Link>
+                  </DropdownMenuItem>
+                  
+                  {isProfessionalOrHigher && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard" className="flex items-center gap-2">
+                        <BarChart3 className="h-4 w-4" />
+                        Analytics
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+
+                  {isEnterprise && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/enterprise" className="flex items-center gap-2">
+                        <Building2 className="h-4 w-4" />
+                        Enterprise
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+
+                  {isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="flex items-center gap-2">
+                        <Crown className="h-4 w-4" />
+                        Admin
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* User menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="h-4 w-4" />
+                </div>
+                <span className="hidden sm:inline">{user?.name || user?.email}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end">
+              <DropdownMenuLabel>
+                <div>
+                  <p className="font-medium">{user?.name || 'User'}</p>
+                  <p className="text-xs text-muted-foreground">{user?.email}</p>
+                  {isAdmin && (
+                    <p className="text-xs text-primary font-medium">Admin</p>
+                  )}
+                  {isEnterprise && (
+                    <p className="text-xs text-purple-600 font-medium">Enterprise</p>
+                  )}
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/settings" className="flex items-center gap-2">
+                    <Settings className="h-4 w-4" />
+                    Settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/support" className="flex items-center gap-2">
+                    <HelpCircle className="h-4 w-4" />
+                    Support
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={handleLogout}
+                className="text-destructive focus:text-destructive"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default MainNavigation;

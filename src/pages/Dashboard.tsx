@@ -1,240 +1,295 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useAuth } from '@/contexts/auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import KeystrokeAnalytics from '@/components/dashboard/KeystrokeAnalytics';
-import AdvancedAnalytics from '@/components/analytics/AdvancedAnalytics';
-import { SecurityLevelSlider } from '@/components/ui-custom/SecurityLevel';
-import PerformanceMonitor from '@/components/monitoring/PerformanceMonitor';
-import EnterpriseSettings from '@/components/enterprise/EnterpriseSettings';
-import { useSubscription } from '@/hooks/useSubscription';
-import { useSecurityMonitoring } from '@/hooks/useSecurityMonitoring';
-import { 
-  LayoutDashboard, 
-  BarChart3, 
-  Activity, 
-  Shield, 
-  Settings,
-  KeyRound,
+import { Badge } from '@/components/ui/badge';
+import { Link } from 'react-router-dom';
+import {
+  Shield,
   Users,
-  Clock,
-  AlertTriangle, 
+  BarChart3,
+  Key,
+  Settings,
+  Building2,
+  Crown,
+  Activity,
+  TrendingUp,
+  AlertTriangle,
   CheckCircle
 } from 'lucide-react';
+import KeystrokeAnalytics from '@/components/dashboard/KeystrokeAnalytics';
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { subscription, canAccessFeature } = useSubscription();
-  const { metrics } = useSecurityMonitoring();
-  const [activeTab, setActiveTab] = useState('overview');
   
-  const isEnterprise = subscription?.tier === 'enterprise';
-  const isProfessional = subscription?.tier === 'professional' || isEnterprise;
-  
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="mb-4">Please log in to access your dashboard.</p>
-          <Button asChild>
-            <a href="/login">Log In</a>
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const isAdmin = user?.role === 'admin';
+  const isEnterprise = user?.subscription?.tier === 'enterprise';
+  const isProfessionalOrHigher = ['professional', 'enterprise'].includes(user?.subscription?.tier || '');
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto py-8 px-4">
+      {/* Welcome Section */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Monitor your security status and system performance
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">
+              Welcome back, {user?.name || 'User'}!
+            </h1>
+            <p className="text-muted-foreground">
+              Here's your security overview and system status.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {isAdmin && (
+              <Badge variant="default" className="bg-yellow-500">
+                <Crown className="h-3 w-3 mr-1" />
+                Admin
+              </Badge>
+            )}
+            {isEnterprise && (
+              <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                <Building2 className="h-3 w-3 mr-1" />
+                Enterprise
+              </Badge>
+            )}
+            <Badge variant="outline">
+              {user?.subscription?.tier?.charAt(0).toUpperCase() + user?.subscription?.tier?.slice(1) || 'Free'}
+            </Badge>
+          </div>
+        </div>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center">
-              <Shield className={`h-8 w-8 ${
-                metrics.averageConfidence > 80 ? 'text-green-500' :
-                metrics.averageConfidence > 60 ? 'text-amber-500' : 
-                'text-red-500'
-              }`} />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Security Confidence</p>
-                <p className="text-2xl font-bold">{metrics.averageConfidence}%</p>
-              </div>
-            </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Security Score</CardTitle>
+            <Shield className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">98%</div>
+            <p className="text-xs text-muted-foreground">
+              +2% from last week
+            </p>
           </CardContent>
         </Card>
-        
+
         <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center">
-              <KeyRound className="h-8 w-8 text-blue-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Authentication Events</p>
-                <p className="text-2xl font-bold">
-                  {metrics.recentFailedAttempts > 0 ? (
-                    <span className="text-red-500">
-                      {metrics.recentFailedAttempts} failed
-                    </span>
-                  ) : (
-                    <span className="text-green-500">All secure</span>
-                  )}
-                </p>
-              </div>
-            </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Sessions</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">3</div>
+            <p className="text-xs text-muted-foreground">
+              Across 2 devices
+            </p>
           </CardContent>
         </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center">
-              <Users className="h-8 w-8 text-indigo-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Users Protected</p>
-                <p className="text-2xl font-bold">
-                  {(Math.floor(Math.random() * 10) + 1) * (
-                    isEnterprise ? 100 : 
-                    isProfessional ? 10 : 
-                    1
-                  )}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center">
-              <Clock className="h-8 w-8 text-purple-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Last Login</p>
-                <p className="text-2xl font-bold">
-                  {metrics.lastSuccessfulLogin ? 
-                    new Date(metrics.lastSuccessfulLogin).toLocaleDateString() : 
-                    "Never"}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+
+        {isProfessionalOrHigher && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Threat Detection</CardTitle>
+              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">0</div>
+              <p className="text-xs text-muted-foreground">
+                No threats detected
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {isEnterprise && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">API Calls</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">1,234</div>
+              <p className="text-xs text-muted-foreground">
+                +12% from yesterday
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
-      <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-2 md:grid-cols-5 gap-2">
-          <TabsTrigger value="overview" className="flex items-center gap-2">
-            <LayoutDashboard className="h-4 w-4" />
-            Overview
-          </TabsTrigger>
-          <TabsTrigger value="analytics" className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Analytics
-          </TabsTrigger>
-          <TabsTrigger value="performance" className="flex items-center gap-2">
-            <Activity className="h-4 w-4" />
-            Performance
-          </TabsTrigger>
-          <TabsTrigger value="security" className="flex items-center gap-2">
-            <Shield className="h-4 w-4" />
-            Security
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Enterprise
-          </TabsTrigger>
-        </TabsList>
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* Left Column - Main Analytics */}
+        <div className="lg:col-span-2">
+          <KeystrokeAnalytics />
+        </div>
 
-        <TabsContent value="overview" className="space-y-6">
-          {/* Security Status */}
+        {/* Right Column - Quick Actions */}
+        <div className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-primary" />
-                Security Status
+                <Settings className="h-5 w-5" />
+                Quick Actions
               </CardTitle>
               <CardDescription>
-                Current security level and recommendations
+                Manage your account and security settings
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="mb-6">
-                <SecurityLevelSlider
-                  value={metrics.averageConfidence || 75}
-                  showLabels={true}
-                  className="mb-2"
-                />
-                <p className="text-center text-sm text-muted-foreground">
-                  {metrics.averageConfidence > 80 
-                    ? "Your account is well protected" 
-                    : "Room for improvement"}
-                </p>
-              </div>
-              {metrics.recentFailedAttempts > 0 ? (
-                <Card className="bg-red-50 border-red-200">
-                  <CardContent className="pt-6">
-                    <div className="flex items-start gap-3">
-                      <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
-                      <div>
-                        <p className="font-medium text-red-800 mb-1">
-                          {metrics.recentFailedAttempts} Failed Authentication Attempts Detected
-                        </p>
-                        <p className="text-sm text-red-700">
-                          There have been unsuccessful login attempts to your account in the last 24 hours.
-                          Consider reviewing your security settings and changing your password.
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                <Card className="bg-green-50 border-green-200">
-                  <CardContent className="pt-6">
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
-                      <div>
-                        <p className="font-medium text-green-800 mb-1">
-                          No Security Issues Detected
-                        </p>
-                        <p className="text-sm text-green-700">
-                          Your account is secure with no failed authentication attempts or suspicious activities 
-                          detected in the last 24 hours.
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+            <CardContent className="space-y-3">
+              <Button asChild className="w-full justify-start">
+                <Link to="/profile" className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Manage Profile
+                </Link>
+              </Button>
+              
+              <Button asChild variant="outline" className="w-full justify-start">
+                <Link to="/settings" className="flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  Security Settings
+                </Link>
+              </Button>
+
+              {isEnterprise && (
+                <Button asChild variant="outline" className="w-full justify-start">
+                  <Link to="/enterprise" className="flex items-center gap-2">
+                    <Key className="h-4 w-4" />
+                    API Management
+                  </Link>
+                </Button>
+              )}
+
+              {isAdmin && (
+                <Button asChild variant="outline" className="w-full justify-start">
+                  <Link to="/admin" className="flex items-center gap-2">
+                    <Crown className="h-4 w-4" />
+                    Admin Panel
+                  </Link>
+                </Button>
               )}
             </CardContent>
           </Card>
 
-          {/* KeyStroke Analytics Sample */}
-          <KeystrokeAnalytics condensed />
-        </TabsContent>
+          {/* System Status */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5" />
+                System Status
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Biometric Engine</span>
+                <Badge variant="default" className="bg-green-100 text-green-800">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Online
+                </Badge>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Security Monitoring</span>
+                <Badge variant="default" className="bg-green-100 text-green-800">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Active
+                </Badge>
+              </div>
 
-        <TabsContent value="analytics" className="space-y-6">
-          <AdvancedAnalytics />
-        </TabsContent>
+              {isEnterprise && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">API Gateway</span>
+                  <Badge variant="default" className="bg-green-100 text-green-800">
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    Operational
+                  </Badge>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
-        <TabsContent value="performance" className="space-y-6">
-          <PerformanceMonitor />
-        </TabsContent>
+      {/* Feature Access Cards for Different Tiers */}
+      {isProfessionalOrHigher && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Advanced Analytics
+              </CardTitle>
+              <CardDescription>
+                Deep insights into user behavior patterns
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild className="w-full">
+                <Link to="/dashboard">View Analytics</Link>
+              </Button>
+            </CardContent>
+          </Card>
 
-        <TabsContent value="security" className="space-y-6">
-          <KeystrokeAnalytics />
-        </TabsContent>
+          {isEnterprise && (
+            <>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5" />
+                    Enterprise Portal
+                  </CardTitle>
+                  <CardDescription>
+                    API management, white-labeling, and more
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button asChild className="w-full">
+                    <Link to="/enterprise">Open Portal</Link>
+                  </Button>
+                </CardContent>
+              </Card>
 
-        <TabsContent value="settings" className="space-y-6">
-          <EnterpriseSettings isEnterprise={isEnterprise} />
-        </TabsContent>
-      </Tabs>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Key className="h-5 w-5" />
+                    API Keys
+                  </CardTitle>
+                  <CardDescription>
+                    Manage your API keys and integrations
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button asChild variant="outline" className="w-full">
+                    <Link to="/enterprise">Manage Keys</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </>
+          )}
+
+          {isAdmin && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Crown className="h-5 w-5" />
+                  Admin Panel
+                </CardTitle>
+                <CardDescription>
+                  System administration and user management
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild variant="outline" className="w-full">
+                  <Link to="/admin">Admin Dashboard</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
     </div>
   );
 };

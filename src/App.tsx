@@ -16,6 +16,7 @@ import Settings from '@/pages/Settings';
 import Support from '@/pages/Support';
 import EnterprisePortal from '@/pages/EnterprisePortal';
 import PatentDrawingsPage from '@/pages/PatentDrawingsPage';
+import FeatureShowcase from '@/pages/FeatureShowcase';
 import NotFound from '@/pages/NotFound';
 import Admin from '@/pages/Admin';
 import PrivateRoute from '@/components/auth/PrivateRoute';
@@ -88,6 +89,14 @@ function App() {
                 element={
                   <PrivateRoute>
                     <Support />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/features"
+                element={
+                  <PrivateRoute>
+                    <FeatureShowcase />
                   </PrivateRoute>
                 }
               />

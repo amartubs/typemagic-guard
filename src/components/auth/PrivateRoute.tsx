@@ -3,6 +3,7 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ProtectedLayout from '@/components/layout/ProtectedLayout';
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -27,8 +28,12 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // User is authenticated, render the protected content
-  return <>{children}</>;
+  // User is authenticated, render the protected content with layout
+  return (
+    <ProtectedLayout>
+      {children}
+    </ProtectedLayout>
+  );
 };
 
 export default PrivateRoute;
