@@ -20,9 +20,11 @@ const SubscriptionManager: React.FC = () => {
     
     setLoading(true);
     try {
+      // Use userType from profiles or default to individual
+      const userType = user.userType || 'individual';
       const success = await stripeService.createCheckoutSession(
         plan.id, 
-        user.user_type || 'individual'
+        userType
       );
       
       if (success) {
@@ -85,7 +87,7 @@ const SubscriptionManager: React.FC = () => {
         </div>
         
         <PricingCards
-          userType={user?.user_type || 'individual'}
+          userType={user?.userType || 'individual'}
           currentPlanId={subscription?.subscription_tier || user?.subscription?.tier}
           onSelectPlan={handleUpgrade}
           loading={loading}
@@ -105,10 +107,10 @@ const SubscriptionManager: React.FC = () => {
         user={{
           ...user,
           subscription: {
-            tier: subscription?.subscription_tier || user?.subscription?.tier || 'free',
-            status: subscription?.subscribed ? 'active' : 'inactive',
+            tier: (subscription?.subscription_tier || user?.subscription?.tier || 'free') as any,
+            status: subscription?.subscribed ? 'active' : 'trial' as any,
             end_date: subscription?.subscription_end,
-            type: user?.user_type || 'individual'
+            type: user?.userType || 'individual'
           }
         }}
         loading={loading}

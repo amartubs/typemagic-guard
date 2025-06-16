@@ -74,7 +74,7 @@ export const useAnalyticsData = (timeRange: '7d' | '30d' | '90d' = '30d') => {
         .eq('user_id', user.id)
         .gte('created_at', startDate.toISOString());
 
-      // Process device types from user agents
+      // Process device types from user agents with proper typing
       const deviceTypes = authAttempts?.reduce((acc: Record<string, number>, attempt) => {
         const userAgent = attempt.user_agent || 'Unknown';
         let deviceName = 'Unknown Device';
@@ -88,11 +88,11 @@ export const useAnalyticsData = (timeRange: '7d' | '30d' | '90d' = '30d') => {
         return acc;
       }, {}) || {};
 
-      // Convert to chart format
+      // Convert to chart format with proper risk typing
       const deviceData = Object.entries(deviceTypes).map(([name, value]) => ({
         name,
         value,
-        risk: value < 5 ? 'high' : value < 20 ? 'medium' : 'low'
+        risk: (value < 5 ? 'high' : value < 20 ? 'medium' : 'low') as 'low' | 'medium' | 'high'
       }));
 
       // Process login patterns by hour

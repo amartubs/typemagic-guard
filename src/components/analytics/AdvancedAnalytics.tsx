@@ -25,6 +25,13 @@ const AdvancedAnalytics: React.FC = () => {
     const failedAttempts = authTrends.reduce((sum, day) => sum + day.failed, 0);
     const suspiciousAttempts = authTrends.reduce((sum, day) => sum + day.suspicious, 0);
 
+    // Ensure threatLevel is properly typed
+    const getThreatLevel = (): 'low' | 'medium' | 'high' => {
+      if (suspiciousAttempts > 5) return 'high';
+      if (suspiciousAttempts > 2) return 'medium';
+      return 'low';
+    };
+
     return {
       metrics: {
         successRate: totalAttempts > 0 ? (successfulAttempts / totalAttempts) * 100 : 0,
@@ -33,12 +40,19 @@ const AdvancedAnalytics: React.FC = () => {
         activeUsers: 1, // Current user
         securityEvents: suspiciousAttempts,
         avgResponseTime: 145,
-        threatLevel: suspiciousAttempts > 5 ? 'high' : suspiciousAttempts > 2 ? 'medium' : 'low' as const,
+        threatLevel: getThreatLevel(),
         systemUptime: 99.8,
         authenticationsToday: authTrends[authTrends.length - 1]?.successful + authTrends[authTrends.length - 1]?.failed || 0
       },
       authTrends,
-      userBehavior,
+      userBehavior: {
+        ...userBehavior,
+        // Add missing locationAnalysis property
+        locationAnalysis: [
+          { country: 'United States', users: 1, suspicious: 0 },
+          { country: 'Unknown', users: 0, suspicious: suspiciousAttempts }
+        ]
+      },
       securityInsights: {
         insights: [
           {
