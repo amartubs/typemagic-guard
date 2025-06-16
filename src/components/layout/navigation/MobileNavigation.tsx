@@ -63,31 +63,56 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
     <div className="md:hidden">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm">
-            <Menu className="h-4 w-4" />
+          <Button 
+            variant="ghost" 
+            size="sm"
+            className="h-10 w-10 p-0 hover:bg-muted/50 active:bg-muted"
+          >
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Open navigation menu</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56" align="end">
-          <DropdownMenuLabel>Navigation</DropdownMenuLabel>
+        <DropdownMenuContent 
+          className="w-64 mr-4 bg-background/95 backdrop-blur-md border shadow-lg" 
+          align="end"
+          sideOffset={8}
+        >
+          <DropdownMenuLabel className="text-sm font-medium px-3 py-2">
+            Navigation
+          </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             {mainNavItems.map((item) => item.show && (
               <DropdownMenuItem key={item.path} asChild>
-                <Link to={item.path} className="flex items-center gap-2">
-                  <item.icon className="h-4 w-4" />
-                  {item.label}
+                <Link 
+                  to={item.path} 
+                  className="flex items-center gap-3 px-3 py-2.5 text-sm hover:bg-muted/50 active:bg-muted transition-colors"
+                >
+                  <item.icon className="h-4 w-4 text-muted-foreground" />
+                  <span>{item.label}</span>
                 </Link>
               </DropdownMenuItem>
             ))}
 
-            {isSuperAdmin && superAdminItems.map((item) => (
-              <DropdownMenuItem key={item.path} asChild>
-                <Link to={item.path} className="flex items-center gap-2">
-                  <item.icon className="h-4 w-4" />
-                  {item.label}
-                </Link>
-              </DropdownMenuItem>
-            ))}
+            {isSuperAdmin && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="text-xs font-medium px-3 py-1 text-muted-foreground">
+                  Super Admin
+                </DropdownMenuLabel>
+                {superAdminItems.map((item) => (
+                  <DropdownMenuItem key={item.path} asChild>
+                    <Link 
+                      to={item.path} 
+                      className="flex items-center gap-3 px-3 py-2.5 text-sm hover:bg-muted/50 active:bg-muted transition-colors"
+                    >
+                      <item.icon className="h-4 w-4 text-muted-foreground" />
+                      <span>{item.label}</span>
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </>
+            )}
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>

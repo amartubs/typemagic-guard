@@ -227,26 +227,26 @@ const WebhookManager = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h2 className="text-2xl font-bold">Webhook Configuration</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-xl sm:text-2xl font-bold">Webhook Configuration</h2>
+          <p className="text-sm text-muted-foreground">
             Configure webhooks to receive real-time notifications
           </p>
         </div>
         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
           <DialogTrigger asChild>
-            <Button>
+            <Button size="sm" className="w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Create Webhook
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-lg">
+          <DialogContent className="sm:max-w-lg mx-4 sm:mx-0">
             <DialogHeader>
               <DialogTitle>Create New Webhook</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-96 overflow-y-auto">
               <div>
                 <Label htmlFor="webhook-name">Webhook Name</Label>
                 <Input
@@ -254,6 +254,7 @@ const WebhookManager = () => {
                   value={newWebhook.name}
                   onChange={(e) => setNewWebhook(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="Production Webhook"
+                  className="mt-1"
                 />
               </div>
               
@@ -264,12 +265,13 @@ const WebhookManager = () => {
                   value={newWebhook.url}
                   onChange={(e) => setNewWebhook(prev => ({ ...prev, url: e.target.value }))}
                   placeholder="https://api.yourapp.com/webhooks/typemagic"
+                  className="mt-1"
                 />
               </div>
 
               <div>
                 <Label>Events to Subscribe</Label>
-                <div className="space-y-2 mt-2 max-h-40 overflow-y-auto">
+                <div className="space-y-2 mt-2 max-h-32 overflow-y-auto border rounded-md p-3">
                   {availableEvents.map((event) => (
                     <div key={event.id} className="flex items-start space-x-2">
                       <input
@@ -302,6 +304,7 @@ const WebhookManager = () => {
                     onChange={(e) => setNewWebhook(prev => ({ ...prev, timeout: parseInt(e.target.value) }))}
                     min="5"
                     max="60"
+                    className="mt-1"
                   />
                 </div>
                 <div>
@@ -313,11 +316,12 @@ const WebhookManager = () => {
                     onChange={(e) => setNewWebhook(prev => ({ ...prev, retry_count: parseInt(e.target.value) }))}
                     min="0"
                     max="5"
+                    className="mt-1"
                   />
                 </div>
               </div>
 
-              <div className="flex space-x-2 pt-4">
+              <div className="flex flex-col sm:flex-row gap-2 pt-4">
                 <Button onClick={createWebhook} className="flex-1">
                   Create Webhook
                 </Button>
@@ -333,12 +337,12 @@ const WebhookManager = () => {
       <div className="grid gap-4">
         {webhooks.map((webhook) => (
           <Card key={webhook.id} className={`${!webhook.is_active ? 'opacity-60' : ''}`}>
-            <CardContent className="pt-6">
-              <div className="flex justify-between items-start">
-                <div className="space-y-3 flex-1">
-                  <div className="flex items-center space-x-2">
-                    <Webhook className="h-4 w-4" />
-                    <span className="font-medium">{webhook.name}</span>
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+                <div className="space-y-3 flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Webhook className="h-4 w-4 flex-shrink-0" />
+                    <span className="font-medium truncate">{webhook.name}</span>
                     {webhook.is_active ? (
                       <Badge variant="default">Active</Badge>
                     ) : (
@@ -346,8 +350,8 @@ const WebhookManager = () => {
                     )}
                   </div>
                   
-                  <div className="text-sm text-muted-foreground">
-                    <p>URL: {webhook.url}</p>
+                  <div className="text-sm text-muted-foreground space-y-1">
+                    <p className="truncate">URL: {webhook.url}</p>
                     <p>Events: {webhook.events.length} subscribed</p>
                     <p>Success: {webhook.success_count} | Failures: {webhook.failure_count}</p>
                   </div>
@@ -361,12 +365,13 @@ const WebhookManager = () => {
                   </div>
                 </div>
                 
-                <div className="flex flex-col gap-2 ml-4">
+                <div className="flex flex-row sm:flex-col gap-2">
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => testWebhook(webhook.id)}
                     disabled={testing === webhook.id}
+                    className="flex-1 sm:flex-none"
                   >
                     <TestTube className="h-3 w-3 mr-1" />
                     {testing === webhook.id ? 'Testing...' : 'Test'}
@@ -375,6 +380,7 @@ const WebhookManager = () => {
                     size="sm"
                     variant="outline"
                     onClick={() => toggleWebhook(webhook.id, webhook.is_active)}
+                    className="flex-1 sm:flex-none"
                   >
                     {webhook.is_active ? 'Disable' : 'Enable'}
                   </Button>
@@ -382,7 +388,7 @@ const WebhookManager = () => {
                     size="sm"
                     variant="outline"
                     onClick={() => deleteWebhook(webhook.id)}
-                    className="text-destructive hover:text-destructive"
+                    className="text-destructive hover:text-destructive flex-1 sm:flex-none"
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
@@ -420,7 +426,7 @@ const WebhookManager = () => {
           <p className="text-sm text-muted-foreground">
             All webhook requests include a signature header for verification:
           </p>
-          <div className="bg-muted p-3 rounded font-mono text-sm">
+          <div className="bg-muted p-3 rounded font-mono text-sm break-all">
             X-TypeMagic-Signature: sha256=&lt;signature&gt;
           </div>
           <p className="text-sm text-muted-foreground">

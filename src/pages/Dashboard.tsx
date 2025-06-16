@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/contexts/auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -49,7 +50,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <ProtectedLayout>
-        <div className="container mx-auto py-8 px-4">
+        <div className="container mx-auto py-4 px-4 sm:py-8">
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
@@ -60,47 +61,47 @@ const Dashboard = () => {
 
   return (
     <ProtectedLayout>
-      <div className="container mx-auto py-8 px-4">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">
+      <div className="container mx-auto py-4 px-4 sm:py-8">
+        {/* Welcome Section - Mobile Optimized */}
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1">
+              <h1 className="text-2xl sm:text-3xl font-bold leading-tight">
                 Welcome back, {user?.name || 'User'}!
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-sm sm:text-base text-muted-foreground">
                 Here's your security overview and system status.
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {isAdmin && (
-                <Badge variant="default" className="bg-yellow-500">
+                <Badge variant="default" className="bg-yellow-500 text-xs sm:text-sm">
                   <Crown className="h-3 w-3 mr-1" />
                   Admin
                 </Badge>
               )}
               {isEnterprise && (
-                <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                <Badge variant="secondary" className="bg-purple-100 text-purple-800 text-xs sm:text-sm">
                   <Building2 className="h-3 w-3 mr-1" />
                   Enterprise
                 </Badge>
               )}
-              <Badge variant="outline">
+              <Badge variant="outline" className="text-xs sm:text-sm">
                 {user?.subscription?.tier?.charAt(0).toUpperCase() + user?.subscription?.tier?.slice(1) || 'Free'}
               </Badge>
             </div>
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Security Score</CardTitle>
-              <Shield className="h-4 w-4 text-muted-foreground" />
+        {/* Quick Stats - Mobile Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+          <Card className="p-3 sm:p-4">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-0">
+              <CardTitle className="text-xs sm:text-sm font-medium">Security Score</CardTitle>
+              <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
+            <CardContent className="p-0 pt-1">
+              <div className="text-lg sm:text-2xl font-bold text-green-600">
                 {realTimeMetrics?.securityScore.toFixed(1) || 0}%
               </div>
               <p className="text-xs text-muted-foreground">
@@ -109,13 +110,13 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Sessions</CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
+          <Card className="p-3 sm:p-4">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-0">
+              <CardTitle className="text-xs sm:text-sm font-medium">Active Sessions</CardTitle>
+              <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{realTimeMetrics?.activeSessions || 0}</div>
+            <CardContent className="p-0 pt-1">
+              <div className="text-lg sm:text-2xl font-bold">{realTimeMetrics?.activeSessions || 0}</div>
               <p className="text-xs text-muted-foreground">
                 Current device
               </p>
@@ -123,13 +124,13 @@ const Dashboard = () => {
           </Card>
 
           {isProfessionalOrHigher && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Threat Detection</CardTitle>
-                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            <Card className="p-3 sm:p-4">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-0">
+                <CardTitle className="text-xs sm:text-sm font-medium">Threat Detection</CardTitle>
+                <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
               </CardHeader>
-              <CardContent>
-                <div className={`text-2xl font-bold ${realTimeMetrics?.threatLevel === 'low' ? 'text-green-600' : realTimeMetrics?.threatLevel === 'medium' ? 'text-yellow-600' : 'text-red-600'}`}>
+              <CardContent className="p-0 pt-1">
+                <div className={`text-lg sm:text-2xl font-bold ${realTimeMetrics?.threatLevel === 'low' ? 'text-green-600' : realTimeMetrics?.threatLevel === 'medium' ? 'text-yellow-600' : 'text-red-600'}`}>
                   {realTimeMetrics?.fraudDetections || 0}
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -139,13 +140,13 @@ const Dashboard = () => {
             </Card>
           )}
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Authentications</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          <Card className="p-3 sm:p-4">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-0">
+              <CardTitle className="text-xs sm:text-sm font-medium">Authentications</CardTitle>
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{realTimeMetrics?.authenticationsToday || 0}</div>
+            <CardContent className="p-0 pt-1">
+              <div className="text-lg sm:text-2xl font-bold">{realTimeMetrics?.authenticationsToday || 0}</div>
               <p className="text-xs text-muted-foreground">
                 Today's attempts
               </p>
@@ -155,7 +156,7 @@ const Dashboard = () => {
 
         {/* Real-Time Metrics Card */}
         {isProfessionalOrHigher && (
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <RealTimeMetricsCard
               metrics={realTimeMetrics}
               isRealTime={isRealTime}
@@ -164,54 +165,54 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* Main Content - Mobile Stack */}
+        <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-6 mb-6 sm:mb-8">
           {/* Left Column - Main Analytics */}
           <div className="lg:col-span-2">
             <KeystrokeAnalytics />
           </div>
 
           {/* Right Column - Quick Actions & Export */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="h-5 w-5" />
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
                   Quick Actions
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm">
                   Manage your account and security settings
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <Button asChild className="w-full justify-start">
+              <CardContent className="space-y-2 sm:space-y-3">
+                <Button asChild size="sm" className="w-full justify-start h-9 sm:h-10">
                   <Link to="/profile" className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    Manage Profile
+                    <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="text-sm">Manage Profile</span>
                   </Link>
                 </Button>
                 
-                <Button asChild variant="outline" className="w-full justify-start">
+                <Button asChild variant="outline" size="sm" className="w-full justify-start h-9 sm:h-10">
                   <Link to="/settings" className="flex items-center gap-2">
-                    <Shield className="h-4 w-4" />
-                    Security Settings
+                    <Shield className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="text-sm">Security Settings</span>
                   </Link>
                 </Button>
 
                 {isEnterprise && (
-                  <Button asChild variant="outline" className="w-full justify-start">
+                  <Button asChild variant="outline" size="sm" className="w-full justify-start h-9 sm:h-10">
                     <Link to="/enterprise" className="flex items-center gap-2">
-                      <Key className="h-4 w-4" />
-                      API Management
+                      <Key className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="text-sm">API Management</span>
                     </Link>
                   </Button>
                 )}
 
                 {isAdmin && (
-                  <Button asChild variant="outline" className="w-full justify-start">
+                  <Button asChild variant="outline" size="sm" className="w-full justify-start h-9 sm:h-10">
                     <Link to="/admin" className="flex items-center gap-2">
-                      <Crown className="h-4 w-4" />
-                      Admin Panel
+                      <Crown className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="text-sm">Admin Panel</span>
                     </Link>
                   </Button>
                 )}
@@ -223,16 +224,16 @@ const Dashboard = () => {
 
             {/* System Status */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5" />
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <Activity className="h-4 w-4 sm:h-5 sm:w-5" />
                   System Status
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Biometric Engine</span>
-                  <Badge variant="default" className="bg-green-100 text-green-800">
+                  <Badge variant="default" className="bg-green-100 text-green-800 text-xs">
                     <CheckCircle className="h-3 w-3 mr-1" />
                     Online
                   </Badge>
@@ -240,7 +241,7 @@ const Dashboard = () => {
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Security Monitoring</span>
-                  <Badge variant="default" className="bg-green-100 text-green-800">
+                  <Badge variant="default" className="bg-green-100 text-green-800 text-xs">
                     <CheckCircle className="h-3 w-3 mr-1" />
                     Active
                   </Badge>
@@ -249,7 +250,7 @@ const Dashboard = () => {
                 {isEnterprise && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm">API Gateway</span>
-                    <Badge variant="default" className="bg-green-100 text-green-800">
+                    <Badge variant="default" className="bg-green-100 text-green-800 text-xs">
                       <CheckCircle className="h-3 w-3 mr-1" />
                       Operational
                     </Badge>
@@ -260,21 +261,21 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Feature Access Cards for Different Tiers */}
+        {/* Feature Access Cards for Different Tiers - Mobile Grid */}
         {isProfessionalOrHigher && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5" />
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" />
                   Advanced Analytics
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm">
                   Deep insights into user behavior patterns
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <Button asChild className="w-full">
+              <CardContent className="pt-0">
+                <Button asChild size="sm" className="w-full">
                   <Link to="/analytics">View Analytics</Link>
                 </Button>
               </CardContent>
@@ -283,34 +284,34 @@ const Dashboard = () => {
             {isEnterprise && (
               <>
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Building2 className="h-5 w-5" />
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Building2 className="h-4 w-4 sm:h-5 sm:w-5" />
                       Enterprise Portal
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-sm">
                       API management, white-labeling, and more
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <Button asChild className="w-full">
+                  <CardContent className="pt-0">
+                    <Button asChild size="sm" className="w-full">
                       <Link to="/enterprise">Open Portal</Link>
                     </Button>
                   </CardContent>
                 </Card>
 
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Key className="h-5 w-5" />
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Key className="h-4 w-4 sm:h-5 sm:w-5" />
                       API Keys
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-sm">
                       Manage your API keys and integrations
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <Button asChild variant="outline" className="w-full">
+                  <CardContent className="pt-0">
+                    <Button asChild variant="outline" size="sm" className="w-full">
                       <Link to="/enterprise">Manage Keys</Link>
                     </Button>
                   </CardContent>
@@ -320,17 +321,17 @@ const Dashboard = () => {
 
             {isAdmin && (
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Crown className="h-5 w-5" />
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Crown className="h-4 w-4 sm:h-5 sm:w-5" />
                     Admin Panel
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-sm">
                     System administration and user management
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <Button asChild variant="outline" className="w-full">
+                <CardContent className="pt-0">
+                  <Button asChild variant="outline" size="sm" className="w-full">
                     <Link to="/admin">Admin Dashboard</Link>
                   </Button>
                 </CardContent>

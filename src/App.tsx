@@ -20,6 +20,8 @@ import FeatureShowcase from '@/pages/FeatureShowcase';
 import NotFound from '@/pages/NotFound';
 import Admin from '@/pages/Admin';
 import PrivateRoute from '@/components/auth/PrivateRoute';
+import InstallPrompt from '@/components/pwa/InstallPrompt';
+import OfflineIndicator from '@/components/pwa/OfflineIndicator';
 import { Toaster } from '@/components/ui/toaster';
 
 const queryClient = new QueryClient({
@@ -27,6 +29,8 @@ const queryClient = new QueryClient({
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
     },
   },
 });
@@ -37,6 +41,10 @@ function App() {
       <Router>
         <AuthProvider>
           <div className="min-h-screen bg-background text-foreground">
+            {/* PWA Components */}
+            <OfflineIndicator />
+            <InstallPrompt />
+            
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<Index />} />
