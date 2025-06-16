@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { globalErrorHandler } from '@/lib/errorHandling/globalErrorHandler';
+import { AuditLogger } from './auditLogger';
 
 export class ProductionSecurityManager {
   private static readonly MAX_LOGIN_ATTEMPTS = 5;
@@ -25,6 +26,10 @@ export class ProductionSecurityManager {
         const now = Math.floor(Date.now() / 1000); // Convert to seconds
         if (now >= session.expires_at) {
           await this.logoutUser();
+          await AuditLogger.logSecurityEvent('session_expired', {
+            userId: session.user?.id,
+            expiresAt: session.expires_at
+          });
           return false;
         }
       }
@@ -42,14 +47,7 @@ export class ProductionSecurityManager {
     userId?: string
   ): Promise<void> {
     try {
-      await supabase.from('audit_logs').insert({
-        user_id: userId,
-        action: eventType,
-        resource_type: 'security',
-        details,
-        ip_address: await this.getClientIP(),
-        user_agent: navigator.userAgent
-      });
+      await AuditLogger.logSecurityEvent(eventType, details, userId);
     } catch (error) {
       globalErrorHandler.handleError(error as Error, 'Security event logging');
     }
@@ -66,7 +64,16 @@ export class ProductionSecurityManager {
         .eq('success', false)
         .gte('created_at', fifteenMinutesAgo);
 
-      return (attempts?.length || 0) >= this.MAX_LOGIN_ATTEMPTS;
+      const isLockedOut = (attempts?.length || 0) >= this.MAX_LOGIN_ATTEMPTS;
+      
+      if (isLockedOut) {
+        await this.logSecurityEvent('account_lockout_triggered', {
+          email,
+          attemptCount: attempts?.length || 0
+        });
+      }
+
+      return isLockedOut;
     } catch (error) {
       globalErrorHandler.handleError(error as Error, 'Account lockout check');
       return false;
@@ -88,6 +95,13 @@ export class ProductionSecurityManager {
         ip_address: await this.getClientIP(),
         user_agent: navigator.userAgent
       });
+
+      await this.logSecurityEvent('authentication_attempt', {
+        email,
+        success,
+        confidenceScore,
+        hasAnomalies: !!anomalyDetails
+      });
     } catch (error) {
       globalErrorHandler.handleError(error as Error, 'Authentication attempt recording');
     }
@@ -95,7 +109,12 @@ export class ProductionSecurityManager {
 
   static async logoutUser(): Promise<void> {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
       await supabase.auth.signOut();
+      
+      if (user) {
+        await this.logSecurityEvent('user_logout', {}, user.id);
+      }
     } catch (error) {
       globalErrorHandler.handleError(error as Error, 'User logout');
     }
@@ -108,6 +127,10 @@ export class ProductionSecurityManager {
       if (error) {
         globalErrorHandler.handleError(error, 'Session refresh');
         return false;
+      }
+
+      if (data.session?.user) {
+        await this.logSecurityEvent('session_refreshed', {}, data.session.user.id);
       }
 
       return !!data.session;
@@ -155,5 +178,44 @@ export class ProductionSecurityManager {
       score,
       feedback
     };
+  }
+
+  static async getSecurityMetrics(userId: string): Promise<{
+    failedAttemptsToday: number;
+    lastSuccessfulLogin: Date | null;
+    accountLockoutStatus: boolean;
+  }> {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const { data: attempts } = await supabase
+        .from('authentication_attempts')
+        .select('*')
+        .eq('user_id', userId)
+        .gte('created_at', today.toISOString());
+
+      const failedAttempts = attempts?.filter(a => !a.success) || [];
+      const successfulAttempts = attempts?.filter(a => a.success) || [];
+      
+      const lastSuccessful = successfulAttempts.length > 0 
+        ? new Date(successfulAttempts[0].created_at)
+        : null;
+
+      const isLockedOut = await this.checkAccountLockout(userId);
+
+      return {
+        failedAttemptsToday: failedAttempts.length,
+        lastSuccessfulLogin: lastSuccessful,
+        accountLockoutStatus: isLockedOut
+      };
+    } catch (error) {
+      globalErrorHandler.handleError(error as Error, 'Security metrics retrieval');
+      return {
+        failedAttemptsToday: 0,
+        lastSuccessfulLogin: null,
+        accountLockoutStatus: false
+      };
+    }
   }
 }

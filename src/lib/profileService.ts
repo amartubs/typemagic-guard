@@ -10,26 +10,48 @@ type DbProfileUpdate = Database['public']['Tables']['profiles']['Update'];
 export class ProfileService {
   static async getProfile(userId: string): Promise<User | null> {
     try {
-      const { data, error } = await supabase
+      // First get the profile
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select(`
-          *,
-          security_settings(*),
-          subscriptions(
-            *,
-            plan:subscription_plans(*)
-          ),
-          biometric_profiles(*)
-        `)
+        .select('*')
         .eq('id', userId)
         .single();
 
-      if (error) {
-        console.error('Error fetching profile:', error);
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
         return null;
       }
 
-      return this.mapDbProfileToUser(data);
+      // Get security settings separately
+      const { data: securityData } = await supabase
+        .from('security_settings')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      // Get subscriptions separately
+      const { data: subscriptionData } = await supabase
+        .from('subscriptions')
+        .select(`
+          *,
+          plan:subscription_plans(*)
+        `)
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      // Get biometric profile separately
+      const { data: biometricData } = await supabase
+        .from('biometric_profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      return this.mapDbProfileToUser({
+        ...profileData,
+        security_settings: securityData,
+        subscriptions: subscriptionData,
+        biometric_profiles: biometricData
+      });
     } catch (error) {
       console.error('Error in getProfile:', error);
       return null;
