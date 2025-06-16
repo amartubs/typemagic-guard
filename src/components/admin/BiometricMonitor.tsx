@@ -1,13 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Brain, TrendingUp, Shield, Activity } from 'lucide-react';
+import React, { useState } from 'react';
 import { SystemMetricsCards } from './biometric-monitor/SystemMetricsCards';
 import { ConfidenceDistributionChart } from './biometric-monitor/ConfidenceDistributionChart';
 import { UserSelectionPanel } from './biometric-monitor/UserSelectionPanel';
-import { UserProfileAnalysis } from './biometric-monitor/UserProfileAnalysis';
+import { UserProfileAnalysisCard } from './biometric-monitor/UserProfileAnalysis';
 import { LearningProgressChart } from './biometric-monitor/LearningProgressChart';
 import { RiskAssessmentList } from './biometric-monitor/RiskAssessmentList';
 import { useBiometricMonitorData } from './biometric-monitor/useBiometricMonitorData';
@@ -51,7 +47,7 @@ const BiometricMonitor: React.FC = () => {
         />
 
         {selectedUserAnalysis && (
-          <UserProfileAnalysis analysis={selectedUserAnalysis} />
+          <UserProfileAnalysisCard analysis={selectedUserAnalysis} />
         )}
       </div>
 

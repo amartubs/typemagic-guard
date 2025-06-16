@@ -5,11 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { AlertTriangle } from 'lucide-react';
 import { UserProfileAnalysis } from './useBiometricMonitorData';
 
-interface UserProfileAnalysisProps {
+interface UserProfileAnalysisCardProps {
   analysis: UserProfileAnalysis;
 }
 
-export const UserProfileAnalysis: React.FC<UserProfileAnalysisProps> = ({ analysis }) => {
+export const UserProfileAnalysisCard: React.FC<UserProfileAnalysisCardProps> = ({ analysis }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'bg-green-500';
