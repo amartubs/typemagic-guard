@@ -8,19 +8,19 @@ export const generateDemoKeystrokePattern = (userId: string, context: string = '
   
   let currentTime = 0;
   for (let i = 0; i < phrase.length; i++) {
-    const dwellTime = 80 + Math.random() * 40; // 80-120ms
+    const pressTime = currentTime;
+    const duration = 80 + Math.random() * 40; // 80-120ms
+    const releaseTime = pressTime + duration;
     const flightTime = 50 + Math.random() * 30; // 50-80ms
     
     timings.push({
       key: phrase[i],
-      keyCode: phrase.charCodeAt(i),
-      dwellTime,
-      flightTime,
-      timestamp: currentTime,
-      pressure: 0.5 + Math.random() * 0.3 // 0.5-0.8
+      pressTime,
+      releaseTime,
+      duration
     });
     
-    currentTime += dwellTime + flightTime;
+    currentTime += duration + flightTime;
   }
   
   return {
@@ -33,14 +33,18 @@ export const generateDemoKeystrokePattern = (userId: string, context: string = '
 };
 
 // Generate demo authentication results for testing
-export const generateDemoAuthResult = (success: boolean = true): AuthenticationResult => {
+export const generateDemoAuthResult = (userId: string, success: boolean = true): AuthenticationResult => {
   return {
     success,
     confidenceScore: success ? 75 + Math.random() * 20 : 30 + Math.random() * 30,
-    patterns: [],
-    anomalies: success ? [] : ['Unusual typing rhythm detected'],
-    riskFactors: success ? [] : ['Timing deviation above threshold'],
-    timestamp: Date.now()
+    timestamp: Date.now(),
+    userId,
+    patternId: success ? `${userId}-pattern-${Date.now()}` : null,
+    anomalyDetails: success ? undefined : {
+      fields: ['timing', 'rhythm'],
+      severity: 'medium',
+      description: 'Unusual typing rhythm detected'
+    }
   };
 };
 
@@ -63,23 +67,24 @@ export const generateRealisticTimings = (text: string): KeyTiming[] => {
     const isCommon = 'etaoinshrdlu'.includes(char.toLowerCase());
     
     // Adjust timing based on character type
-    let baseDwell = isSpace ? 60 : isCommon ? 85 : 95;
+    let baseDuration = isSpace ? 60 : isCommon ? 85 : 95;
     let baseFlight = isSpace ? 40 : isCommon ? 55 : 65;
     
     // Add some natural variation
-    const dwellTime = baseDwell + (Math.random() - 0.5) * 20;
-    const flightTime = baseFlight + (Math.random() - 0.5) * 15;
+    const duration = Math.max(20, baseDuration + (Math.random() - 0.5) * 20);
+    const flightTime = Math.max(10, baseFlight + (Math.random() - 0.5) * 15);
+    
+    const pressTime = currentTime;
+    const releaseTime = pressTime + duration;
     
     timings.push({
       key: char,
-      keyCode: char.charCodeAt(0),
-      dwellTime: Math.max(20, dwellTime),
-      flightTime: Math.max(10, flightTime),
-      timestamp: currentTime,
-      pressure: 0.4 + Math.random() * 0.4
+      pressTime,
+      releaseTime,
+      duration
     });
     
-    currentTime += dwellTime + flightTime;
+    currentTime += duration + flightTime;
   }
   
   return timings;
