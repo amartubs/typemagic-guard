@@ -1,40 +1,47 @@
 
 import { Session } from '@supabase/supabase-js';
-import { User, SecuritySettings, SubscriptionDetails } from '@/lib/types';
+import { User } from '@/lib/types';
 
 export const createUserFromSession = (session: Session): User => {
-  const { user: authUser } = session;
+  const user = session.user;
   
-  // Create a user object that matches our database schema
-  const user: User = {
-    id: authUser.id,
-    email: authUser.email || '',
-    name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'Unknown User',
-    role: authUser.user_metadata?.role || 'user',
+  return {
+    id: user.id,
+    email: user.email || '',
+    name: user.user_metadata?.name || user.email?.split('@')[0] || '',
+    role: user.user_metadata?.role || 'user',
     status: 'active',
     lastLogin: Date.now(),
-    securitySettings: getDefaultSecuritySettings(),
-    // These will be populated from the database in a real implementation
-    subscription: getDefaultSubscription(),
+    securitySettings: {
+      minConfidenceThreshold: 65,
+      learningPeriod: 5,
+      anomalyDetectionSensitivity: 70,
+      securityLevel: 'medium',
+      enforceTwoFactor: false,
+      maxFailedAttempts: 5,
+    },
+    subscription: {
+      type: user.user_metadata?.userType || 'individual',
+      tier: 'free',
+      startDate: Date.now(),
+      endDate: null,
+      autoRenew: true,
+      status: 'trial',
+    }
   };
-
-  return user;
 };
 
-const getDefaultSecuritySettings = (): SecuritySettings => ({
-  minConfidenceThreshold: 65,
-  learningPeriod: 5,
-  anomalyDetectionSensitivity: 70,
-  securityLevel: 'medium',
-  enforceTwoFactor: false,
-  maxFailedAttempts: 5,
-});
-
-const getDefaultSubscription = (): SubscriptionDetails => ({
-  type: 'individual',
-  tier: 'free',
-  startDate: Date.now(),
-  endDate: null,
-  autoRenew: true,
-  status: 'trial',
-});
+export const getUserFromMetadata = (metadata: any): Partial<User> => {
+  return {
+    name: metadata?.name,
+    role: metadata?.role || 'user',
+    subscription: metadata?.subscription ? {
+      type: metadata.subscription.type || 'individual',
+      tier: metadata.subscription.tier || 'free',
+      startDate: metadata.subscription.startDate || Date.now(),
+      endDate: metadata.subscription.endDate,
+      autoRenew: metadata.subscription.autoRenew || true,
+      status: metadata.subscription.status || 'trial',
+    } : undefined
+  };
+};

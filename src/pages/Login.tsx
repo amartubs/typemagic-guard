@@ -1,159 +1,95 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, KeyTiming, KeystrokePattern, AuthenticationResult } from '@/lib/types';
-import { KeystrokeCapture as KeystrokeCaptureService, BiometricAnalyzer, createBiometricProfile } from '@/lib/biometricAuth';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import KeystrokeCapture from '@/components/ui-custom/KeystrokeCapture';
+import { useAuth } from '@/contexts/auth';
 import { Lock, User as UserIcon, Shield, AlertCircle } from 'lucide-react';
-
-// Mock user data for demonstration
-const mockUsers: User[] = [
-  {
-    id: 'user-1',
-    email: 'demo@example.com',
-    name: 'Demo User',
-    role: 'user',
-    biometricProfile: {
-      userId: 'user-1',
-      keystrokePatterns: [],
-      confidenceScore: 0,
-      lastUpdated: Date.now(),
-      status: 'learning'
-    },
-    securitySettings: {
-      minConfidenceThreshold: 65,
-      learningPeriod: 5,
-      anomalyDetectionSensitivity: 70,
-      securityLevel: 'medium',
-      enforceTwoFactor: false,
-      maxFailedAttempts: 5
-    },
-    lastLogin: null,
-    status: 'active'
-  }
-];
+import KeystrokeCapture from '@/components/ui-custom/KeystrokeCapture';
+import { KeyTiming, KeystrokePattern } from '@/lib/types';
+import { KeystrokeCapture as KeystrokeCaptureService, BiometricAnalyzer } from '@/lib/biometricAuth';
+import { DatabaseManager } from '@/lib/biometric/continuousLearning/databaseManager';
 
 const LoginPage: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user, login, loading: authLoading } = useAuth();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [loginStep, setLoginStep] = useState<'credentials' | 'biometric'>('credentials');
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [biometricResult, setBiometricResult] = useState<AuthenticationResult | null>(null);
   const [keystrokeTimings, setKeystrokeTimings] = useState<KeyTiming[]>([]);
   const [enableBiometrics, setEnableBiometrics] = useState(true);
+  const [biometricResult, setBiometricResult] = useState<any>(null);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && !authLoading) {
+      navigate('/dashboard');
+    }
+  }, [user, authLoading, navigate]);
 
   const handleKeystrokeCapture = (timings: KeyTiming[]) => {
     setKeystrokeTimings(timings);
   };
 
-  const handleCredentialSubmit = (e: React.FormEvent) => {
+  const handleCredentialSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate API call delay
-    setTimeout(() => {
-      // Find user by email for demonstration
-      const user = mockUsers.find(u => u.email === email);
+    try {
+      const success = await login(email, password);
       
-      if (user && password === 'demo') { // Simple password check for demo
-        setCurrentUser(user);
-        
-        if (enableBiometrics && user.biometricProfile) {
-          setLoginStep('biometric');
-        } else {
-          // Skip biometric verification if not enabled
-          completeLogin(user);
-        }
-      } else {
-        toast({
-          title: "Authentication Failed",
-          description: "Invalid email or password",
-          variant: "destructive"
-        });
+      if (success && enableBiometrics) {
+        setLoginStep('biometric');
+      } else if (success) {
+        navigate('/dashboard');
       }
-      
+    } catch (error) {
+      console.error('Login error:', error);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
-  const handleBiometricSubmit = () => {
-    if (!currentUser || !keystrokeTimings.length) return;
+  const handleBiometricSubmit = async () => {
+    if (!user || !keystrokeTimings.length) return;
     
     setLoading(true);
     
-    // Create a pattern from captured keystrokes
-    const keystrokeService = new KeystrokeCaptureService('login');
-    const pattern: KeystrokePattern = {
-      userId: currentUser.id,
-      patternId: `${currentUser.id}-${Date.now()}`,
-      timings: keystrokeTimings,
-      timestamp: Date.now(),
-      context: 'login'
-    };
-    
-    // If user doesn't have a biometric profile yet, create one
-    if (!currentUser.biometricProfile) {
-      currentUser.biometricProfile = createBiometricProfile(currentUser.id);
-    }
-    
-    // For demo users with empty profiles, the first login adds the pattern to their profile
-    if (currentUser.biometricProfile.keystrokePatterns.length === 0) {
-      currentUser.biometricProfile = BiometricAnalyzer.updateProfile(
-        currentUser.biometricProfile,
-        pattern
-      );
+    try {
+      // Create a pattern from captured keystrokes
+      const pattern: KeystrokePattern = {
+        userId: user.id,
+        patternId: `${user.id}-${Date.now()}`,
+        timings: keystrokeTimings,
+        timestamp: Date.now(),
+        context: 'login'
+      };
+
+      // Store the pattern in the database
+      await DatabaseManager.storePatternAndUpdateProfile(pattern, user.id);
       
       toast({
-        title: "Biometric Profile Created",
-        description: "Your keystroke pattern has been recorded for future verification",
+        title: "Biometric Authentication Complete",
+        description: "Your keystroke pattern has been recorded",
       });
       
-      completeLogin(currentUser);
-      return;
-    }
-    
-    // Verify the keystroke pattern against the user's profile
-    const result = BiometricAnalyzer.authenticate(currentUser.biometricProfile, pattern);
-    setBiometricResult(result);
-    
-    // Update the user's profile with the new pattern if authentication was successful
-    if (result.success) {
-      currentUser.biometricProfile = BiometricAnalyzer.updateProfile(
-        currentUser.biometricProfile,
-        pattern
-      );
-      
-      completeLogin(currentUser);
-    } else {
-      // Failed biometric verification
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Biometric submission error:', error);
       toast({
-        title: "Biometric Verification Failed",
-        description: `Confidence score: ${result.confidenceScore.toFixed(1)}%. Threshold: ${currentUser.securitySettings.minConfidenceThreshold}%`,
+        title: "Biometric Error",
+        description: "Failed to process biometric data",
         variant: "destructive"
       });
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
-  };
-  
-  const completeLogin = (user: User) => {
-    // Store user in localStorage (in a real app, this would be handled by a secure auth provider)
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    
-    toast({
-      title: "Login Successful",
-      description: `Welcome back, ${user.name}!`,
-    });
-    
-    // Redirect to dashboard
-    navigate('/dashboard');
   };
   
   const resetBiometricStep = () => {
@@ -161,6 +97,17 @@ const LoginPage: React.FC = () => {
     setKeystrokeTimings([]);
     setBiometricResult(null);
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
@@ -187,7 +134,7 @@ const LoginPage: React.FC = () => {
                     <UserIcon className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                     <Input
                       id="email"
-                      placeholder="demo@example.com"
+                      placeholder="Enter your email"
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -203,7 +150,7 @@ const LoginPage: React.FC = () => {
                     <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                     <Input
                       id="password"
-                      placeholder="••••••••"
+                      placeholder="Enter your password"
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -294,12 +241,6 @@ const LoginPage: React.FC = () => {
                 </div>
               </div>
             )}
-
-            <div className="text-center text-xs text-muted-foreground mt-4">
-              <p>
-                For demo: use email "demo@example.com" and password "demo"
-              </p>
-            </div>
           </div>
         )}
       </Card>

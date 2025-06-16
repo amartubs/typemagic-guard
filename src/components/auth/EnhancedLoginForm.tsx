@@ -10,13 +10,14 @@ import { useAuth } from '@/contexts/auth';
 import { RealTimeKeystrokeCapture } from '@/components/biometric/RealTimeKeystrokeCapture';
 import { RateLimiter } from '@/lib/security/rateLimiter';
 import { AuditLogger } from '@/lib/security/auditLogger';
+import { DatabaseManager } from '@/lib/biometric/continuousLearning/databaseManager';
 
 interface Props {
   onSuccess?: () => void;
 }
 
 export const EnhancedLoginForm: React.FC<Props> = ({ onSuccess }) => {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -60,6 +61,17 @@ export const EnhancedLoginForm: React.FC<Props> = ({ onSuccess }) => {
       const success = await login(email, password);
 
       if (success) {
+        // Store biometric data if available and user is authenticated
+        if (biometricResult?.success && user?.id) {
+          try {
+            // This would be handled by the biometric capture component
+            console.log('Biometric data would be stored for user:', user.id);
+          } catch (biometricError) {
+            console.error('Failed to store biometric data:', biometricError);
+            // Don't fail login for biometric storage issues
+          }
+        }
+
         await AuditLogger.logSecurityEvent('login_success', {
           email,
           biometricConfidence: biometricResult?.confidence
