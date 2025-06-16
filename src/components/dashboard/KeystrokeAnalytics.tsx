@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Card,
@@ -20,6 +21,9 @@ import {
 } from "recharts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useAuth } from "@/contexts/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 interface KeystrokeAnalyticsProps {
   condensed?: boolean;
@@ -27,60 +31,61 @@ interface KeystrokeAnalyticsProps {
 
 const KeystrokeAnalytics: React.FC<KeystrokeAnalyticsProps> = ({ condensed = false }) => {
   const { canAccessFeature } = useSubscription();
-  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 500);
-  }, []);
+  const { data: biometricData, isLoading } = useQuery({
+    queryKey: ['keystroke-analytics', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
 
-  // Mock data for demonstration
-  const [mockData, setMockData] = useState({
-    confidenceHistory: [
-      { date: "May 24", confidence: 85 },
-      { date: "May 25", confidence: 88 },
-      { date: "May 26", confidence: 90 },
-      { date: "May 27", confidence: 91 },
-      { date: "May 28", confidence: 89 },
-      { date: "May 29", confidence: 92 },
-      { date: "May 30", confidence: 94 },
-    ],
-    typingPatterns: [
-      {
-        key: "KeyA",
-        pressTime: 98,
-        releaseTime: 65,
-        similarity: 92,
-      },
-      {
-        key: "KeyS",
-        pressTime: 105,
-        releaseTime: 72,
-        similarity: 88,
-      },
-      {
-        key: "KeyD",
-        pressTime: 95,
-        releaseTime: 68,
-        similarity: 95,
-      },
-      {
-        key: "KeyF",
-        pressTime: 102,
-        releaseTime: 70,
-        similarity: 91,
-      },
-      {
-        key: "Space",
-        pressTime: 110,
-        releaseTime: 75,
-        similarity: 86,
-      },
-    ],
+      // Fetch biometric profile
+      const { data: profile } = await supabase
+        .from('biometric_profiles')
+        .select('confidence_score, status, last_updated')
+        .eq('user_id', user.id)
+        .single();
+
+      // Fetch recent authentication attempts for confidence history
+      const { data: attempts } = await supabase
+        .from('authentication_attempts')
+        .select('confidence_score, created_at, success')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      // Generate confidence history from attempts
+      const confidenceHistory = attempts?.map((attempt, index) => ({
+        date: new Date(attempt.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        confidence: attempt.confidence_score || 0
+      })).reverse() || [];
+
+      // Add current confidence if we have a profile
+      if (profile && confidenceHistory.length > 0) {
+        confidenceHistory[confidenceHistory.length - 1].confidence = profile.confidence_score;
+      }
+
+      // Mock typing patterns data (would come from actual keystroke analysis)
+      const typingPatterns = [
+        { key: "KeyA", pressTime: 98, releaseTime: 65, similarity: profile?.confidence_score || 92 },
+        { key: "KeyS", pressTime: 105, releaseTime: 72, similarity: Math.max(0, (profile?.confidence_score || 88) - 4) },
+        { key: "KeyD", pressTime: 95, releaseTime: 68, similarity: Math.min(100, (profile?.confidence_score || 95) + 3) },
+        { key: "KeyF", pressTime: 102, releaseTime: 70, similarity: profile?.confidence_score || 91 },
+        { key: "Space", pressTime: 110, releaseTime: 75, similarity: Math.max(0, (profile?.confidence_score || 86) - 6) },
+      ];
+
+      return {
+        confidenceHistory: confidenceHistory.length > 0 ? confidenceHistory : [
+          { date: "Today", confidence: profile?.confidence_score || 0 }
+        ],
+        typingPatterns,
+        currentConfidence: profile?.confidence_score || 0,
+        status: profile?.status || 'learning'
+      };
+    },
+    enabled: !!user,
   });
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Card>
         <CardContent className="pt-6">
@@ -104,7 +109,7 @@ const KeystrokeAnalytics: React.FC<KeystrokeAnalyticsProps> = ({ condensed = fal
         <CardContent>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart
-              data={mockData.confidenceHistory}
+              data={biometricData?.confidenceHistory || []}
               margin={{
                 top: 5,
                 right: 20,
@@ -125,9 +130,12 @@ const KeystrokeAnalytics: React.FC<KeystrokeAnalyticsProps> = ({ condensed = fal
             </LineChart>
           </ResponsiveContainer>
           <div className="mt-4 text-center">
-            <div className="text-3xl font-bold text-primary">94%</div>
+            <div className="text-3xl font-bold text-primary">{biometricData?.currentConfidence || 0}%</div>
             <div className="text-sm text-muted-foreground">
               Current authentication confidence
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              Status: {biometricData?.status || 'learning'}
             </div>
           </div>
         </CardContent>
@@ -141,7 +149,7 @@ const KeystrokeAnalytics: React.FC<KeystrokeAnalyticsProps> = ({ condensed = fal
         <TabsList>
           <TabsTrigger value="confidence">Confidence History</TabsTrigger>
           <TabsTrigger value="patterns">Typing Patterns</TabsTrigger>
-          <TabsTrigger value="anomalies">Anomaly Detection</TabsTrigger>
+          <TabsTrigger value="anomalies">Pattern Analysis</TabsTrigger>
         </TabsList>
         <TabsContent value="confidence">
           <Card>
@@ -155,7 +163,7 @@ const KeystrokeAnalytics: React.FC<KeystrokeAnalyticsProps> = ({ condensed = fal
               <div className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
-                    data={mockData.confidenceHistory}
+                    data={biometricData?.confidenceHistory || []}
                     margin={{
                       top: 20,
                       right: 30,
@@ -192,7 +200,7 @@ const KeystrokeAnalytics: React.FC<KeystrokeAnalyticsProps> = ({ condensed = fal
               <div className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
-                    data={mockData.typingPatterns}
+                    data={biometricData?.typingPatterns || []}
                     margin={{
                       top: 20,
                       right: 30,
@@ -232,7 +240,7 @@ const KeystrokeAnalytics: React.FC<KeystrokeAnalyticsProps> = ({ condensed = fal
               <div className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
-                    data={mockData.typingPatterns}
+                    data={biometricData?.typingPatterns || []}
                     margin={{
                       top: 20,
                       right: 30,
@@ -245,7 +253,7 @@ const KeystrokeAnalytics: React.FC<KeystrokeAnalyticsProps> = ({ condensed = fal
                     <YAxis domain={[0, 100]} />
                     <Tooltip />
                     <Bar dataKey="similarity" name="Similarity (%)">
-                      {mockData.typingPatterns.map((entry, index) => (
+                      {(biometricData?.typingPatterns || []).map((entry, index) => (
                         <Cell
                           key={`cell-${index}`}
                           fill={
