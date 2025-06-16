@@ -7,6 +7,7 @@ import EnhancedApiKeyManager from "@/components/enterprise/EnhancedApiKeyManager
 import ApiDocumentation from "@/components/enterprise/ApiDocumentation";
 import IntegrationTutorials from "@/components/enterprise/IntegrationTutorials";
 import WhiteLabelManager from "@/components/enterprise/WhiteLabelManager";
+import WebhookManager from "@/components/enterprise/WebhookManager";
 import EnterpriseSettings from "@/components/enterprise/EnterpriseSettings";
 import AdvancedAnalytics from "@/components/analytics/AdvancedAnalytics";
 import PerformanceMonitor from "@/components/monitoring/PerformanceMonitor";
@@ -122,15 +123,19 @@ const EnterprisePortal = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Enterprise Portal</h1>
         <p className="text-muted-foreground">
-          Advanced configuration, API management, security monitoring, and analytics for enterprise users
+          Advanced configuration, API management, webhook setup, security monitoring, and analytics for enterprise users
         </p>
       </div>
 
       <Tabs defaultValue="api-keys" className="space-y-8">
-        <TabsList className="grid grid-cols-2 md:grid-cols-8 gap-2">
+        <TabsList className="grid grid-cols-2 md:grid-cols-9 gap-2">
           <TabsTrigger value="api-keys" className="flex items-center gap-2">
             <Key className="h-4 w-4" />
             <span className="hidden sm:inline">API Keys</span>
+          </TabsTrigger>
+          <TabsTrigger value="webhooks" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            <span className="hidden sm:inline">Webhooks</span>
           </TabsTrigger>
           <TabsTrigger value="api-docs" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
@@ -164,6 +169,10 @@ const EnterprisePortal = () => {
 
         <TabsContent value="api-keys">
           <EnhancedApiKeyManager />
+        </TabsContent>
+
+        <TabsContent value="webhooks">
+          <WebhookManager />
         </TabsContent>
 
         <TabsContent value="api-docs">
