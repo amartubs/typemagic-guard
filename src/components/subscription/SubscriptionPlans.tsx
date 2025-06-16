@@ -4,7 +4,7 @@ import { SubscriptionPlan, UserType } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Check, Loader2, RefreshCw } from 'lucide-react';
-import { SubscriptionService } from '@/lib/subscriptionService';
+import { SubscriptionService } from '@/lib/subscription/subscriptionService';
 import { toast } from '@/hooks/use-toast';
 
 interface SubscriptionPlansProps {
