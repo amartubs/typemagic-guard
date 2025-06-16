@@ -10,6 +10,8 @@ type DbProfileUpdate = Database['public']['Tables']['profiles']['Update'];
 export class ProfileService {
   static async getProfile(userId: string): Promise<User | null> {
     try {
+      console.log('Fetching profile for user:', userId);
+      
       // First get the profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -65,6 +67,8 @@ export class ProfileService {
     organizationSize?: number;
   }): Promise<User | null> {
     try {
+      console.log('Creating profile for user:', userId, userData);
+      
       const { data, error } = await supabase
         .from('profiles')
         .insert({
@@ -99,6 +103,8 @@ export class ProfileService {
 
   static async updateProfile(userId: string, updates: Partial<DbProfileUpdate>): Promise<void> {
     try {
+      console.log('Updating profile for user:', userId, updates);
+      
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -131,6 +137,8 @@ export class ProfileService {
 
   static async updateLastLogin(userId: string): Promise<void> {
     try {
+      console.log('Updating last login for user:', userId);
+      
       const { error } = await supabase
         .from('profiles')
         .update({ 
@@ -149,6 +157,8 @@ export class ProfileService {
 
   private static async createDefaultSecuritySettings(userId: string): Promise<void> {
     try {
+      console.log('Creating default security settings for user:', userId);
+      
       const { error } = await supabase
         .from('security_settings')
         .insert({
@@ -171,6 +181,8 @@ export class ProfileService {
 
   private static async createBiometricProfile(userId: string): Promise<void> {
     try {
+      console.log('Creating biometric profile for user:', userId);
+      
       const { error } = await supabase
         .from('biometric_profiles')
         .insert({
@@ -194,6 +206,8 @@ export class ProfileService {
       subscriptions: any;
       biometric_profiles: any;
     };
+
+    console.log('Mapping profile data:', profile);
 
     return {
       id: profile.id,
@@ -241,6 +255,8 @@ export class ProfileService {
 
   static async deleteProfile(userId: string): Promise<void> {
     try {
+      console.log('Deleting profile for user:', userId);
+      
       // Delete related data first (cascading should handle this, but being explicit)
       await Promise.all([
         supabase.from('security_settings').delete().eq('user_id', userId),
