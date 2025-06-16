@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { globalErrorHandler } from '@/lib/errorHandling/globalErrorHandler';
 import { AuditLogger } from './auditLogger';
@@ -43,11 +42,10 @@ export class ProductionSecurityManager {
 
   static async logSecurityEvent(
     eventType: string,
-    details: Record<string, any>,
-    userId?: string
+    details: Record<string, any>
   ): Promise<void> {
     try {
-      await AuditLogger.logSecurityEvent(eventType, details, userId);
+      await AuditLogger.logSecurityEvent(eventType, details);
     } catch (error) {
       globalErrorHandler.handleError(error as Error, 'Security event logging');
     }
@@ -113,7 +111,7 @@ export class ProductionSecurityManager {
       await supabase.auth.signOut();
       
       if (user) {
-        await this.logSecurityEvent('user_logout', {}, user.id);
+        await this.logSecurityEvent('user_logout', { userId: user.id });
       }
     } catch (error) {
       globalErrorHandler.handleError(error as Error, 'User logout');
@@ -130,7 +128,7 @@ export class ProductionSecurityManager {
       }
 
       if (data.session?.user) {
-        await this.logSecurityEvent('session_refreshed', {}, data.session.user.id);
+        await this.logSecurityEvent('session_refreshed', { userId: data.session.user.id });
       }
 
       return !!data.session;
