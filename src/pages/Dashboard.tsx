@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,16 +18,33 @@ import {
   CheckCircle
 } from 'lucide-react';
 import KeystrokeAnalytics from '@/components/dashboard/KeystrokeAnalytics';
+import RealTimeMetricsCard from '@/components/dashboard/RealTimeMetricsCard';
+import ExportManager from '@/components/dashboard/ExportManager';
 import ProtectedLayout from '@/components/layout/ProtectedLayout';
 import { useDashboardData } from '@/hooks/useDashboardData';
+import { useRealTimeMetrics } from '@/hooks/useRealTimeMetrics';
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { metrics, loading } = useDashboardData();
+  const { metrics, recentActivity, loading } = useDashboardData();
+  const { 
+    metrics: realTimeMetrics, 
+    isRealTime, 
+    startRealTimeUpdates, 
+    stopRealTimeUpdates 
+  } = useRealTimeMetrics(metrics);
   
   const isAdmin = user?.role === 'admin';
   const isEnterprise = user?.subscription?.tier === 'enterprise';
   const isProfessionalOrHigher = ['professional', 'enterprise'].includes(user?.subscription?.tier || '');
+
+  const handleToggleRealTime = () => {
+    if (isRealTime) {
+      stopRealTimeUpdates();
+    } else {
+      startRealTimeUpdates();
+    }
+  };
 
   if (loading) {
     return (
@@ -84,7 +100,9 @@ const Dashboard = () => {
               <Shield className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{metrics?.securityScore || 0}%</div>
+              <div className="text-2xl font-bold text-green-600">
+                {realTimeMetrics?.securityScore.toFixed(1) || 0}%
+              </div>
               <p className="text-xs text-muted-foreground">
                 Based on recent activity
               </p>
@@ -97,7 +115,7 @@ const Dashboard = () => {
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{metrics?.activeSessions || 0}</div>
+              <div className="text-2xl font-bold">{realTimeMetrics?.activeSessions || 0}</div>
               <p className="text-xs text-muted-foreground">
                 Current device
               </p>
@@ -111,11 +129,11 @@ const Dashboard = () => {
                 <AlertTriangle className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className={`text-2xl font-bold ${metrics?.threatLevel === 'low' ? 'text-green-600' : metrics?.threatLevel === 'medium' ? 'text-yellow-600' : 'text-red-600'}`}>
-                  {metrics?.fraudDetections || 0}
+                <div className={`text-2xl font-bold ${realTimeMetrics?.threatLevel === 'low' ? 'text-green-600' : realTimeMetrics?.threatLevel === 'medium' ? 'text-yellow-600' : 'text-red-600'}`}>
+                  {realTimeMetrics?.fraudDetections || 0}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {metrics?.threatLevel || 'low'} threat level
+                  {realTimeMetrics?.threatLevel || 'low'} threat level
                 </p>
               </CardContent>
             </Card>
@@ -127,13 +145,24 @@ const Dashboard = () => {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{metrics?.authenticationsToday || 0}</div>
+              <div className="text-2xl font-bold">{realTimeMetrics?.authenticationsToday || 0}</div>
               <p className="text-xs text-muted-foreground">
                 Today's attempts
               </p>
             </CardContent>
           </Card>
         </div>
+
+        {/* Real-Time Metrics Card */}
+        {isProfessionalOrHigher && (
+          <div className="mb-8">
+            <RealTimeMetricsCard
+              metrics={realTimeMetrics}
+              isRealTime={isRealTime}
+              onToggleRealTime={handleToggleRealTime}
+            />
+          </div>
+        )}
 
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -142,7 +171,7 @@ const Dashboard = () => {
             <KeystrokeAnalytics />
           </div>
 
-          {/* Right Column - Quick Actions */}
+          {/* Right Column - Quick Actions & Export */}
           <div className="space-y-6">
             <Card>
               <CardHeader>
@@ -188,6 +217,9 @@ const Dashboard = () => {
                 )}
               </CardContent>
             </Card>
+
+            {/* Export Manager for Enterprise Users */}
+            <ExportManager metrics={realTimeMetrics} recentActivity={recentActivity || []} />
 
             {/* System Status */}
             <Card>

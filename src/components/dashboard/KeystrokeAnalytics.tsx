@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Card,
@@ -7,23 +6,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  Cell,
-} from "recharts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/contexts/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import EnhancedKeystrokeChart from "./EnhancedKeystrokeChart";
 
 interface KeystrokeAnalyticsProps {
   condensed?: boolean;
@@ -85,6 +73,8 @@ const KeystrokeAnalytics: React.FC<KeystrokeAnalyticsProps> = ({ condensed = fal
     enabled: !!user,
   });
 
+  const isEnterprise = user?.subscription?.tier === 'enterprise';
+
   if (isLoading) {
     return (
       <Card>
@@ -107,28 +97,11 @@ const KeystrokeAnalytics: React.FC<KeystrokeAnalyticsProps> = ({ condensed = fal
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart
-              data={biometricData?.confidenceHistory || []}
-              margin={{
-                top: 5,
-                right: 20,
-                left: 0,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis domain={[0, 100]} />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="confidence"
-                stroke="#8884d8"
-                activeDot={{ r: 8 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <EnhancedKeystrokeChart
+            data={biometricData?.confidenceHistory || []}
+            currentConfidence={biometricData?.currentConfidence || 0}
+            canExport={isEnterprise}
+          />
           <div className="mt-4 text-center">
             <div className="text-3xl font-bold text-primary">{biometricData?.currentConfidence || 0}%</div>
             <div className="text-sm text-muted-foreground">
@@ -147,44 +120,24 @@ const KeystrokeAnalytics: React.FC<KeystrokeAnalyticsProps> = ({ condensed = fal
     <div className="space-y-6">
       <Tabs defaultValue="confidence" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="confidence">Confidence History</TabsTrigger>
+          <TabsTrigger value="confidence">Enhanced Analytics</TabsTrigger>
           <TabsTrigger value="patterns">Typing Patterns</TabsTrigger>
           <TabsTrigger value="anomalies">Pattern Analysis</TabsTrigger>
         </TabsList>
         <TabsContent value="confidence">
           <Card>
             <CardHeader>
-              <CardTitle>Confidence Score History</CardTitle>
+              <CardTitle>Enhanced Confidence Analysis</CardTitle>
               <CardDescription>
-                Your pattern recognition confidence over time
+                Advanced visualization of your pattern recognition confidence
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={biometricData?.confidenceHistory || []}
-                    margin={{
-                      top: 20,
-                      right: 30,
-                      left: 20,
-                      bottom: 10,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis domain={[0, 100]} />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="confidence"
-                      stroke="#8884d8"
-                      strokeWidth={2}
-                      activeDot={{ r: 8 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
+              <EnhancedKeystrokeChart
+                data={biometricData?.confidenceHistory || []}
+                currentConfidence={biometricData?.currentConfidence || 0}
+                canExport={isEnterprise}
+              />
             </CardContent>
           </Card>
         </TabsContent>
