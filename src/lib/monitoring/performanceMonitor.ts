@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 export class PerformanceMonitor {
@@ -7,6 +8,8 @@ export class PerformanceMonitor {
     timestamp: number;
     userId?: string;
   }> = [];
+
+  private static observers: Map<string, PerformanceObserver> = new Map();
 
   static recordMetric(name: string, value: number, userId?: string) {
     this.metrics.push({
@@ -23,11 +26,11 @@ export class PerformanceMonitor {
 
     // Log slow operations
     if (this.isSlowOperation(name, value)) {
-      console.warn(`Slow operation detected: ${name} took ${value}ms`);
+      console.warn(`🐌 Slow operation detected: ${name} took ${value}ms`);
     }
   }
 
-  static startTimer(name: string): () => void {
+  static startTimer(name: string): () => number {
     const startTime = performance.now();
     return () => {
       const duration = performance.now() - startTime;
@@ -57,7 +60,9 @@ export class PerformanceMonitor {
       'auth.login': 3000,
       'biometric.analysis': 2000,
       'database.query': 1000,
-      'api.request': 5000
+      'api.request': 5000,
+      'component.render': 16, // 60fps threshold
+      'route.change': 1000
     };
 
     return value > (thresholds[name] || 2000);
@@ -92,6 +97,85 @@ export class PerformanceMonitor {
       throw error;
     }
   }
+
+  static initializeWebVitals() {
+    if (typeof window === 'undefined' || !('PerformanceObserver' in window)) {
+      return;
+    }
+
+    try {
+      // Largest Contentful Paint
+      const lcpObserver = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          this.recordMetric('web-vitals.lcp', entry.startTime);
+        }
+      });
+      lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
+      this.observers.set('lcp', lcpObserver);
+
+      // First Input Delay
+      const fidObserver = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          const fid = (entry as any).processingStart - entry.startTime;
+          this.recordMetric('web-vitals.fid', fid);
+        }
+      });
+      fidObserver.observe({ entryTypes: ['first-input'] });
+      this.observers.set('fid', fidObserver);
+
+      // Cumulative Layout Shift
+      let clsValue = 0;
+      const clsObserver = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (!(entry as any).hadRecentInput) {
+            clsValue += (entry as any).value;
+            this.recordMetric('web-vitals.cls', clsValue);
+          }
+        }
+      });
+      clsObserver.observe({ entryTypes: ['layout-shift'] });
+      this.observers.set('cls', clsObserver);
+
+    } catch (error) {
+      console.warn('Failed to initialize Web Vitals monitoring:', error);
+    }
+  }
+
+  static cleanup() {
+    this.observers.forEach(observer => observer.disconnect());
+    this.observers.clear();
+    this.metrics = [];
+  }
+
+  static getPerformanceReport() {
+    const report = {
+      metrics: this.getMetrics(),
+      averages: {
+        componentRender: this.getAverageMetric('component.render'),
+        apiRequest: this.getAverageMetric('api.request'),
+        databaseQuery: this.getAverageMetric('database.query'),
+        routeChange: this.getAverageMetric('route.change')
+      },
+      webVitals: {
+        lcp: this.getAverageMetric('web-vitals.lcp'),
+        fid: this.getAverageMetric('web-vitals.fid'),
+        cls: this.getAverageMetric('web-vitals.cls')
+      },
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      viewport: {
+        width: window.innerWidth,
+        height: window.innerHeight
+      }
+    };
+
+    console.group('📊 Performance Report');
+    console.table(report.averages);
+    console.table(report.webVitals);
+    console.groupEnd();
+
+    return report;
+  }
 }
 
 // Performance monitoring HOC
@@ -105,4 +189,9 @@ export function withPerformanceMonitoring<P extends object>(
       () => React.createElement(WrappedComponent, props)
     );
   };
+}
+
+// Initialize Web Vitals monitoring when module loads
+if (typeof window !== 'undefined') {
+  PerformanceMonitor.initializeWebVitals();
 }
