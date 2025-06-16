@@ -26,7 +26,10 @@ import {
   Key,
   Database,
   Monitor,
-  Star
+  Star,
+  CreditCard,
+  BookOpen,
+  Users
 } from 'lucide-react';
 
 const MainNavigation = () => {
@@ -91,6 +94,17 @@ const MainNavigation = () => {
               </Button>
             )}
 
+            <Button
+              variant={isActive('/pricing') ? 'default' : 'ghost'}
+              size="sm"
+              asChild
+            >
+              <Link to="/pricing" className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4" />
+                Pricing
+              </Link>
+            </Button>
+
             {isEnterprise && (
               <Button
                 variant={isActive('/enterprise') ? 'default' : 'ghost'}
@@ -144,6 +158,13 @@ const MainNavigation = () => {
                     <Link to="/features" className="flex items-center gap-2">
                       <Star className="h-4 w-4" />
                       Features
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem asChild>
+                    <Link to="/pricing" className="flex items-center gap-2">
+                      <CreditCard className="h-4 w-4" />
+                      Pricing
                     </Link>
                   </DropdownMenuItem>
                   
@@ -213,6 +234,12 @@ const MainNavigation = () => {
                   <Link to="/settings" className="flex items-center gap-2">
                     <Settings className="h-4 w-4" />
                     Settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/onboarding" className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4" />
+                    Getting Started
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
