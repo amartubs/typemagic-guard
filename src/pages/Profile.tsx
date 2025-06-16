@@ -2,8 +2,8 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/auth';
-import ProfileManagement from '@/components/profile/ProfileManagement';
-import SubscriptionManager from '@/components/subscription/SubscriptionManager';
+import ProductionProfileManager from '@/components/profile/ProductionProfileManager';
+import ProductionSubscriptionManager from '@/components/subscription/ProductionSubscriptionManager';
 import GDPRManagement from '@/components/gdpr/GDPRManagement';
 import TwoFactorSetup from '@/components/security/TwoFactorSetup';
 import ApiKeyManager from '@/components/enterprise/ApiKeyManager';
@@ -69,11 +69,11 @@ const Profile = () => {
           </TabsList>
 
           <TabsContent value="profile">
-            <ProfileManagement />
+            <ProductionProfileManager />
           </TabsContent>
 
           <TabsContent value="subscription">
-            <SubscriptionManager />
+            <ProductionSubscriptionManager />
           </TabsContent>
 
           <TabsContent value="security">
