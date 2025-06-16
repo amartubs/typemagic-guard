@@ -67,7 +67,7 @@ const BiometricVerification: React.FC<BiometricVerificationProps> = ({
               className="w-full"
             >
               {authenticationResult?.success ? 
-                `Proceed with ${authenticationResult.confidence}% Confidence` : 
+                `Proceed with ${authenticationResult.confidence.toFixed(1)}% Confidence` : 
                 'Complete Verification Above'
               }
             </Button>

@@ -7,11 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth';
-import { Lock, User as UserIcon, Shield, AlertCircle } from 'lucide-react';
-import KeystrokeCapture from '@/components/ui-custom/KeystrokeCapture';
-import { KeyTiming, KeystrokePattern } from '@/lib/types';
-import { KeystrokeCapture as KeystrokeCaptureService, BiometricAnalyzer } from '@/lib/biometricAuth';
-import { DatabaseManager } from '@/lib/biometric/continuousLearning/databaseManager';
+import { Lock, User as UserIcon, Shield, AlertCircle, CheckCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import EnhancedBiometricAuth from '@/components/biometric/EnhancedBiometricAuth';
 
 const LoginPage: React.FC = () => {
   const { toast } = useToast();
@@ -22,9 +20,9 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [loginStep, setLoginStep] = useState<'credentials' | 'biometric'>('credentials');
-  const [keystrokeTimings, setKeystrokeTimings] = useState<KeyTiming[]>([]);
   const [enableBiometrics, setEnableBiometrics] = useState(true);
-  const [biometricResult, setBiometricResult] = useState<any>(null);
+  const [biometricResult, setBiometricResult] = useState<{success: boolean, confidence: number} | null>(null);
+  const [credentialsValid, setCredentialsValid] = useState(false);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -33,10 +31,6 @@ const LoginPage: React.FC = () => {
     }
   }, [user, authLoading, navigate]);
 
-  const handleKeystrokeCapture = (timings: KeyTiming[]) => {
-    setKeystrokeTimings(timings);
-  };
-
   const handleCredentialSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -44,10 +38,18 @@ const LoginPage: React.FC = () => {
     try {
       const success = await login(email, password);
       
-      if (success && enableBiometrics) {
-        setLoginStep('biometric');
-      } else if (success) {
-        navigate('/dashboard');
+      if (success) {
+        setCredentialsValid(true);
+        
+        if (enableBiometrics) {
+          setLoginStep('biometric');
+          toast({
+            title: "Credentials Verified",
+            description: "Please complete biometric verification",
+          });
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -56,46 +58,39 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  const handleBiometricSubmit = async () => {
-    if (!user || !keystrokeTimings.length) return;
+  const handleBiometricResult = (success: boolean, confidence: number) => {
+    setBiometricResult({ success, confidence });
     
-    setLoading(true);
-    
-    try {
-      // Create a pattern from captured keystrokes
-      const pattern: KeystrokePattern = {
-        userId: user.id,
-        patternId: `${user.id}-${Date.now()}`,
-        timings: keystrokeTimings,
-        timestamp: Date.now(),
-        context: 'login'
-      };
-
-      // Store the pattern in the database
-      await DatabaseManager.storePatternAndUpdateProfile(pattern, user.id);
-      
+    if (success && confidence >= 70) {
       toast({
         title: "Biometric Authentication Complete",
-        description: "Your keystroke pattern has been recorded",
+        description: `Identity verified with ${confidence.toFixed(1)}% confidence`,
       });
       
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Biometric submission error:', error);
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1500);
+    } else {
       toast({
-        title: "Biometric Error",
-        description: "Failed to process biometric data",
+        title: "Biometric Verification Failed",
+        description: "Please try again or proceed without biometrics",
         variant: "destructive"
       });
-    } finally {
-      setLoading(false);
     }
   };
   
-  const resetBiometricStep = () => {
+  const proceedWithoutBiometrics = () => {
+    if (credentialsValid) {
+      navigate('/dashboard');
+    } else {
+      setLoginStep('credentials');
+    }
+  };
+
+  const resetToCredentials = () => {
     setLoginStep('credentials');
-    setKeystrokeTimings([]);
     setBiometricResult(null);
+    setCredentialsValid(false);
   };
 
   if (authLoading) {
@@ -169,7 +164,7 @@ const LoginPage: React.FC = () => {
                     onChange={(e) => setEnableBiometrics(e.target.checked)}
                   />
                   <Label htmlFor="biometrics" className="text-sm cursor-pointer">
-                    Enable keystroke biometric verification
+                    Enable enhanced biometric verification
                   </Label>
                 </div>
 
@@ -189,57 +184,50 @@ const LoginPage: React.FC = () => {
             </div>
           </>
         ) : (
-          <div className="space-y-4">
-            <div className="p-4 bg-muted rounded-md">
-              <div className="flex items-start space-x-3">
-                <AlertCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium">Type the following sentence:</p>
-                  <p className="text-sm mt-1">
-                    "My voice is my passport, verify me."
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div className="space-y-6">
+            {credentialsValid && (
+              <Alert>
+                <CheckCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Credentials verified successfully. Complete biometric verification to continue.
+                </AlertDescription>
+              </Alert>
+            )}
 
-            <div className="space-y-2">
-              <Label htmlFor="biometric-input">Keystroke Verification</Label>
-              <KeystrokeCapture
-                captureContext="login"
-                onCapture={handleKeystrokeCapture}
-                autoStart={true}
-                inputProps={{
-                  placeholder: "Type the verification phrase here...",
-                  id: "biometric-input"
-                }}
-              />
-            </div>
+            <EnhancedBiometricAuth
+              mode="verification"
+              onAuthentication={handleBiometricResult}
+            />
 
             <div className="flex flex-col space-y-2">
               <Button 
-                onClick={handleBiometricSubmit} 
-                disabled={loading || keystrokeTimings.length < 5}
+                onClick={() => credentialsValid && navigate('/dashboard')} 
+                disabled={!credentialsValid}
+                variant="outline"
                 className="w-full"
               >
-                {loading ? "Verifying..." : "Verify Biometrics"}
+                Proceed Without Biometrics
               </Button>
               
               <Button 
-                variant="outline"
-                onClick={resetBiometricStep}
+                variant="ghost"
+                onClick={resetToCredentials}
                 disabled={loading}
+                className="w-full"
               >
                 Back to Credentials
               </Button>
             </div>
 
             {biometricResult && !biometricResult.success && (
-              <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">
-                Biometric verification failed. Try typing naturally as you normally would.
-                <div className="mt-1 text-xs">
-                  Confidence: {biometricResult.confidenceScore.toFixed(1)}%
-                </div>
-              </div>
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Biometric verification failed. Confidence: {biometricResult.confidence.toFixed(1)}%
+                  <br />
+                  <span className="text-xs">Try typing naturally as you normally would.</span>
+                </AlertDescription>
+              </Alert>
             )}
           </div>
         )}
