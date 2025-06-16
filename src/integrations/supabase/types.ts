@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          setting_key: string
+          setting_value: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       api_keys: {
         Row: {
           created_at: string | null
@@ -20,6 +47,7 @@ export type Database = {
           last_used: string | null
           name: string
           permissions: Json | null
+          rate_limit: number | null
           updated_at: string | null
           user_id: string | null
         }
@@ -33,6 +61,7 @@ export type Database = {
           last_used?: string | null
           name: string
           permissions?: Json | null
+          rate_limit?: number | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -46,6 +75,7 @@ export type Database = {
           last_used?: string | null
           name?: string
           permissions?: Json | null
+          rate_limit?: number | null
           updated_at?: string | null
           user_id?: string | null
         }

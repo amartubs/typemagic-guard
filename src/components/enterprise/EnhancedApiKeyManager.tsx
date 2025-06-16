@@ -1,386 +1,453 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
-import { 
-  Key, 
-  Plus, 
-  Copy, 
-  Eye, 
-  EyeOff, 
-  Trash2, 
-  Settings, 
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  Shield,
-  BarChart3
-} from 'lucide-react';
+import { useAuth } from '@/contexts/auth';
+import { supabase } from '@/integrations/supabase/client';
+import { Key, Copy, Trash2, Plus, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 
 interface ApiKey {
   id: string;
   name: string;
-  key: string;
+  key_prefix: string;
   permissions: string[];
-  status: 'active' | 'revoked' | 'expired';
-  lastUsed: string | null;
-  usageCount: number;
-  rateLimit: number;
-  expiresAt: string | null;
-  createdAt: string;
+  rate_limit: number;
+  is_active: boolean;
+  created_at: string;
+  last_used?: string;
+  expires_at?: string;
+  key_hash: string;
+  user_id: string;
 }
 
-const EnhancedApiKeyManager: React.FC = () => {
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>([
-    {
-      id: '1',
-      name: 'Production API',
-      key: 'sk_live_abc123...xyz789',
-      permissions: ['read', 'write', 'admin'],
-      status: 'active',
-      lastUsed: '2024-01-15T10:30:00Z',
-      usageCount: 15420,
-      rateLimit: 1000,
-      expiresAt: null,
-      createdAt: '2024-01-01T00:00:00Z'
-    },
-    {
-      id: '2',
-      name: 'Testing Environment',
-      key: 'sk_test_def456...uvw012',
-      permissions: ['read', 'write'],
-      status: 'active',
-      lastUsed: '2024-01-14T15:45:00Z',
-      usageCount: 892,
-      rateLimit: 500,
-      expiresAt: '2024-12-31T23:59:59Z',
-      createdAt: '2024-01-10T00:00:00Z'
-    }
-  ]);
+interface NewApiKey extends ApiKey {
+  full_key?: string; // Only present when newly created
+}
 
-  const [showCreateForm, setShowCreateForm] = useState(false);
+const EnhancedApiKeyManager = () => {
+  const { user } = useAuth();
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newKeyName, setNewKeyName] = useState('');
-  const [newKeyPermissions, setNewKeyPermissions] = useState<string[]>([]);
-  const [newKeyRateLimit, setNewKeyRateLimit] = useState('1000');
-  const [newKeyExpiration, setNewKeyExpiration] = useState('');
-  const [visibleKeys, setVisibleKeys] = useState<Set<string>>(new Set());
+  const [newKeyPermissions, setNewKeyPermissions] = useState<string[]>(['biometric_auth']);
+  const [newKeyRateLimit, setNewKeyRateLimit] = useState(1000);
+  const [newKeyExpiry, setNewKeyExpiry] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
 
-  const handleCreateKey = () => {
-    if (!newKeyName.trim()) {
+  const permissions = [
+    { id: 'biometric_auth', label: 'Biometric Authentication', description: 'Access to authentication endpoints' },
+    { id: 'user_management', label: 'User Management', description: 'Create and manage users' },
+    { id: 'analytics', label: 'Analytics & Reporting', description: 'Access to analytics data' },
+    { id: 'security_settings', label: 'Security Settings', description: 'Modify security configurations' },
+    { id: 'admin', label: 'Admin Access', description: 'Full administrative access' },
+  ];
+
+  useEffect(() => {
+    if (user) {
+      fetchApiKeys();
+    }
+  }, [user]);
+
+  const fetchApiKeys = async () => {
+    if (!user) return;
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('api_keys')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setApiKeys(data || []);
+    } catch (error) {
+      console.error('Error fetching API keys:', error);
       toast({
         title: "Error",
-        description: "Please enter a name for the API key.",
+        description: "Failed to load API keys",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generateApiKey = () => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = 'sk_';
+    for (let i = 0; i < 48; i++) {
+      result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+  };
+
+  const hashApiKey = async (key: string) => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(key);
+    const hash = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hash))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+  };
+
+  const createApiKey = async () => {
+    if (!user || !newKeyName.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a name for the API key",
         variant: "destructive",
       });
       return;
     }
 
-    const newKey: ApiKey = {
-      id: (apiKeys.length + 1).toString(),
-      name: newKeyName,
-      key: `sk_live_${Math.random().toString(36).substring(2, 15)}...${Math.random().toString(36).substring(2, 8)}`,
-      permissions: newKeyPermissions,
-      status: 'active',
-      lastUsed: null,
-      usageCount: 0,
-      rateLimit: parseInt(newKeyRateLimit),
-      expiresAt: newKeyExpiration || null,
-      createdAt: new Date().toISOString()
-    };
+    setCreating(true);
+    try {
+      const fullKey = generateApiKey();
+      const keyPrefix = fullKey.substring(0, 12) + '...';
+      const keyHash = await hashApiKey(fullKey);
+      
+      const newKeyData = {
+        user_id: user.id,
+        name: newKeyName,
+        key_prefix: keyPrefix,
+        key_hash: keyHash,
+        permissions: newKeyPermissions,
+        rate_limit: newKeyRateLimit,
+        expires_at: newKeyExpiry ? new Date(newKeyExpiry).toISOString() : null,
+        is_active: true
+      };
 
-    setApiKeys([...apiKeys, newKey]);
-    setShowCreateForm(false);
-    setNewKeyName('');
-    setNewKeyPermissions([]);
-    setNewKeyRateLimit('1000');
-    setNewKeyExpiration('');
+      const { data, error } = await supabase
+        .from('api_keys')
+        .insert(newKeyData)
+        .select()
+        .single();
 
-    toast({
-      title: "API Key Created",
-      description: "Your new API key has been generated successfully.",
-    });
+      if (error) throw error;
+
+      // Add the full key for display (only shown once)
+      const newApiKey: NewApiKey = { ...data, full_key: fullKey };
+      setApiKeys(prev => [newApiKey, ...prev]);
+
+      // Copy to clipboard
+      navigator.clipboard.writeText(fullKey);
+      
+      toast({
+        title: "API Key Created",
+        description: "Your new API key has been created and copied to clipboard. Store it safely!",
+      });
+
+      // Reset form
+      setNewKeyName('');
+      setNewKeyPermissions(['biometric_auth']);
+      setNewKeyRateLimit(1000);
+      setNewKeyExpiry('');
+      setShowCreateDialog(false);
+
+    } catch (error) {
+      console.error('Error creating API key:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create API key",
+        variant: "destructive",
+      });
+    } finally {
+      setCreating(false);
+    }
   };
 
-  const handleRevokeKey = (keyId: string) => {
-    setApiKeys(apiKeys.map(key => 
-      key.id === keyId ? { ...key, status: 'revoked' as const } : key
-    ));
-    
-    toast({
-      title: "API Key Revoked",
-      description: "The API key has been revoked and is no longer valid.",
-    });
+  const toggleApiKey = async (keyId: string, isActive: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('api_keys')
+        .update({ is_active: !isActive })
+        .eq('id', keyId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      setApiKeys(prev => prev.map(key => 
+        key.id === keyId ? { ...key, is_active: !isActive } : key
+      ));
+
+      toast({
+        title: "Success",
+        description: `API key ${!isActive ? 'activated' : 'deactivated'}`,
+      });
+    } catch (error) {
+      console.error('Error toggling API key:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update API key status",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const deleteApiKey = async (keyId: string) => {
+    try {
+      const { error } = await supabase
+        .from('api_keys')
+        .delete()
+        .eq('id', keyId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      setApiKeys(prev => prev.filter(key => key.id !== keyId));
+      toast({
+        title: "API Key Deleted",
+        description: "The API key has been deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting API key:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete API key",
+        variant: "destructive",
+      });
+    }
   };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
       title: "Copied",
-      description: "API key copied to clipboard.",
+      description: "API key copied to clipboard",
     });
   };
 
-  const toggleKeyVisibility = (keyId: string) => {
-    const newVisibleKeys = new Set(visibleKeys);
-    if (newVisibleKeys.has(keyId)) {
-      newVisibleKeys.delete(keyId);
-    } else {
-      newVisibleKeys.add(keyId);
-    }
-    setVisibleKeys(newVisibleKeys);
+  const isExpired = (expiresAt: string | null) => {
+    if (!expiresAt) return false;
+    return new Date(expiresAt) < new Date();
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'active':
-        return <Badge className="bg-green-100 text-green-800">Active</Badge>;
-      case 'revoked':
-        return <Badge variant="destructive">Revoked</Badge>;
-      case 'expired':
-        return <Badge variant="secondary">Expired</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
-    }
-  };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Key className="h-5 w-5 text-primary" />
-                Enhanced API Key Management
-              </CardTitle>
-              <CardDescription>
-                Create and manage API keys with advanced permissions and monitoring
-              </CardDescription>
-            </div>
-            <Button onClick={() => setShowCreateForm(true)} className="gap-2">
-              <Plus className="h-4 w-4" />
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold">API Key Management</h2>
+          <p className="text-muted-foreground">
+            Manage API keys for enterprise integrations
+          </p>
+        </div>
+        <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
               Create API Key
             </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Create API Key Form */}
-          {showCreateForm && (
-            <Card className="border-dashed">
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="keyName">API Key Name</Label>
-                    <Input
-                      id="keyName"
-                      placeholder="Enter a descriptive name"
-                      value={newKeyName}
-                      onChange={(e) => setNewKeyName(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Permissions</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {['read', 'write', 'admin', 'analytics'].map(permission => (
-                        <label key={permission} className="flex items-center space-x-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={newKeyPermissions.includes(permission)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setNewKeyPermissions([...newKeyPermissions, permission]);
-                              } else {
-                                setNewKeyPermissions(newKeyPermissions.filter(p => p !== permission));
-                              }
-                            }}
-                            className="rounded border-gray-300"
-                          />
-                          <span className="text-sm capitalize">{permission}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="rateLimit">Rate Limit (requests/hour)</Label>
-                      <Select value={newKeyRateLimit} onValueChange={setNewKeyRateLimit}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="100">100</SelectItem>
-                          <SelectItem value="500">500</SelectItem>
-                          <SelectItem value="1000">1,000</SelectItem>
-                          <SelectItem value="5000">5,000</SelectItem>
-                          <SelectItem value="10000">10,000</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="expiration">Expiration Date (Optional)</Label>
-                      <Input
-                        id="expiration"
-                        type="date"
-                        value={newKeyExpiration}
-                        onChange={(e) => setNewKeyExpiration(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button onClick={handleCreateKey} className="gap-2">
-                      <Key className="h-4 w-4" />
-                      Generate API Key
-                    </Button>
-                    <Button variant="outline" onClick={() => setShowCreateForm(false)}>
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* API Keys List */}
-          <div className="space-y-4">
-            {apiKeys.map((apiKey) => (
-              <Card key={apiKey.id} className={apiKey.status === 'revoked' ? 'opacity-60' : ''}>
-                <CardContent className="pt-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div>
-                          <h4 className="font-medium">{apiKey.name}</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Created {new Date(apiKey.createdAt).toLocaleDateString()}
-                          </p>
-                        </div>
-                        {getStatusBadge(apiKey.status)}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleKeyVisibility(apiKey.id)}
-                        >
-                          {visibleKeys.has(apiKey.id) ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => copyToClipboard(apiKey.key)}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRevokeKey(apiKey.id)}
-                          disabled={apiKey.status === 'revoked'}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>API Key</Label>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          value={visibleKeys.has(apiKey.id) ? apiKey.key : apiKey.key.replace(/./g, '•')}
-                          readOnly
-                          className="font-mono text-sm"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-muted-foreground" />
-                        <span>Permissions: {apiKey.permissions.join(', ')}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                        <span>Usage: {apiKey.usageCount.toLocaleString()}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Settings className="h-4 w-4 text-muted-foreground" />
-                        <span>Rate Limit: {apiKey.rateLimit}/hr</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span>
-                          Last Used: {apiKey.lastUsed ? 
-                            new Date(apiKey.lastUsed).toLocaleDateString() : 
-                            'Never'
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Create New API Key</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="keyName">API Key Name</Label>
+                <Input
+                  id="keyName"
+                  value={newKeyName}
+                  onChange={(e) => setNewKeyName(e.target.value)}
+                  placeholder="Production API Key"
+                />
+              </div>
+              
+              <div>
+                <Label>Permissions</Label>
+                <div className="space-y-2 mt-2 max-h-40 overflow-y-auto">
+                  {permissions.map((permission) => (
+                    <div key={permission.id} className="flex items-start space-x-2">
+                      <Checkbox
+                        id={permission.id}
+                        checked={newKeyPermissions.includes(permission.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setNewKeyPermissions([...newKeyPermissions, permission.id]);
+                          } else {
+                            setNewKeyPermissions(newKeyPermissions.filter(p => p !== permission.id));
                           }
-                        </span>
+                        }}
+                      />
+                      <div className="grid gap-1.5 leading-none">
+                        <Label htmlFor={permission.id} className="text-sm font-medium">
+                          {permission.label}
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          {permission.description}
+                        </p>
                       </div>
                     </div>
+                  ))}
+                </div>
+              </div>
 
-                    {apiKey.expiresAt && (
-                      <Alert>
-                        <AlertTriangle className="h-4 w-4" />
-                        <AlertDescription>
-                          This key expires on {new Date(apiKey.expiresAt).toLocaleDateString()}
-                        </AlertDescription>
-                      </Alert>
+              <div>
+                <Label htmlFor="rateLimit">Rate Limit (requests per hour)</Label>
+                <Select value={newKeyRateLimit.toString()} onValueChange={(value) => setNewKeyRateLimit(parseInt(value))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="100">100 requests/hour</SelectItem>
+                    <SelectItem value="500">500 requests/hour</SelectItem>
+                    <SelectItem value="1000">1,000 requests/hour</SelectItem>
+                    <SelectItem value="5000">5,000 requests/hour</SelectItem>
+                    <SelectItem value="10000">10,000 requests/hour</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="expiry">Expiry Date (Optional)</Label>
+                <Input
+                  id="expiry"
+                  type="date"
+                  value={newKeyExpiry}
+                  onChange={(e) => setNewKeyExpiry(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+
+              <div className="flex space-x-2 pt-4">
+                <Button onClick={createApiKey} disabled={creating} className="flex-1">
+                  {creating ? 'Creating...' : 'Create API Key'}
+                </Button>
+                <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="grid gap-4">
+        {apiKeys.map((apiKey) => (
+          <Card key={apiKey.id} className={`${!apiKey.is_active ? 'opacity-60' : ''}`}>
+            <CardContent className="pt-6">
+              <div className="flex justify-between items-start">
+                <div className="space-y-3 flex-1">
+                  <div className="flex items-center space-x-2">
+                    <Key className="h-4 w-4" />
+                    <span className="font-medium">{apiKey.name}</span>
+                    {apiKey.is_active ? (
+                      <Badge variant="default">Active</Badge>
+                    ) : (
+                      <Badge variant="secondary">Inactive</Badge>
+                    )}
+                    {isExpired(apiKey.expires_at) && (
+                      <Badge variant="destructive">Expired</Badge>
                     )}
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  
+                  <div className="flex flex-wrap gap-1">
+                    {apiKey.permissions.map((permission) => (
+                      <Badge key={permission} variant="outline" className="text-xs">
+                        {permissions.find(p => p.id === permission)?.label || permission}
+                      </Badge>
+                    ))}
+                  </div>
+                  
+                  <div className="text-sm text-muted-foreground space-y-1">
+                    <p>Rate limit: {apiKey.rate_limit.toLocaleString()} requests/hour</p>
+                    <p>Created: {new Date(apiKey.created_at).toLocaleDateString()}</p>
+                    {apiKey.expires_at && (
+                      <p>Expires: {new Date(apiKey.expires_at).toLocaleDateString()}</p>
+                    )}
+                    {apiKey.last_used && (
+                      <p>Last used: {new Date(apiKey.last_used).toLocaleDateString()}</p>
+                    )}
+                  </div>
 
-          {/* Usage Statistics */}
-          <Separator />
-          
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-primary" />
-                API Usage Overview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-primary">
-                    {apiKeys.filter(k => k.status === 'active').length}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Active Keys</div>
+                  {((apiKey as NewApiKey).full_key || showKeys[apiKey.id]) && (
+                    <div className="flex items-center space-x-2 mt-2 p-2 bg-muted rounded">
+                      <code className="text-sm font-mono flex-1">
+                        {(apiKey as NewApiKey).full_key || apiKey.key_prefix}
+                      </code>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => copyToClipboard((apiKey as NewApiKey).full_key || apiKey.key_prefix)}
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  )}
+
+                  {(apiKey as NewApiKey).full_key && (
+                    <div className="flex items-center gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                      <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                      <span className="text-sm text-yellow-800">
+                        This is the only time you'll see this key. Store it safely!
+                      </span>
+                    </div>
+                  )}
                 </div>
-                <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-primary">
-                    {apiKeys.reduce((sum, key) => sum + key.usageCount, 0).toLocaleString()}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Total Requests</div>
-                </div>
-                <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-primary">
-                    {Math.round(apiKeys.reduce((sum, key) => sum + key.usageCount, 0) / apiKeys.length).toLocaleString()}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Avg. per Key</div>
+                
+                <div className="flex flex-col gap-2 ml-4">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setShowKeys(prev => ({ ...prev, [apiKey.id]: !prev[apiKey.id] }))}
+                  >
+                    {showKeys[apiKey.id] ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => toggleApiKey(apiKey.id, apiKey.is_active)}
+                  >
+                    {apiKey.is_active ? 'Disable' : 'Enable'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => deleteApiKey(apiKey.id)}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
                 </div>
               </div>
             </CardContent>
           </Card>
-        </CardContent>
-      </Card>
+        ))}
+      </div>
+
+      {apiKeys.length === 0 && (
+        <Card>
+          <CardContent className="pt-6 text-center">
+            <Key className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium mb-2">No API Keys</h3>
+            <p className="text-muted-foreground mb-4">
+              Create your first API key to start integrating with the TypeMagic Guard API
+            </p>
+            <Button onClick={() => setShowCreateDialog(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Create API Key
+            </Button>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

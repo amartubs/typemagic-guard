@@ -31,8 +31,13 @@ import {
   Key, 
   ChevronLeft,
   AlertTriangle,
-  Smartphone
+  Smartphone,
+  Palette,
+  Database
 } from 'lucide-react';
+import EnhancedWhiteLabelManager from '@/components/enterprise/EnhancedWhiteLabelManager';
+import EnhancedApiKeyManager from '@/components/enterprise/EnhancedApiKeyManager';
+import AdminSettingsManager from '@/components/admin/AdminSettingsManager';
 
 const SettingsPage: React.FC = () => {
   const { toast } = useToast();
@@ -164,7 +169,7 @@ const SettingsPage: React.FC = () => {
         </div>
         
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full max-w-3xl grid-cols-4 mb-8">
+          <TabsList className="grid w-full max-w-4xl grid-cols-7 mb-8">
             <TabsTrigger value="profile" className="flex items-center gap-2">
               <UserIcon className="h-4 w-4" />
               <span className="hidden sm:inline">Profile</span>
@@ -181,9 +186,21 @@ const SettingsPage: React.FC = () => {
               <Smartphone className="h-4 w-4" />
               <span className="hidden sm:inline">Devices</span>
             </TabsTrigger>
+            <TabsTrigger value="whitelabel" className="flex items-center gap-2">
+              <Palette className="h-4 w-4" />
+              <span className="hidden sm:inline">Branding</span>
+            </TabsTrigger>
+            <TabsTrigger value="apikeys" className="flex items-center gap-2">
+              <Key className="h-4 w-4" />
+              <span className="hidden sm:inline">API Keys</span>
+            </TabsTrigger>
+            <TabsTrigger value="admin" className="flex items-center gap-2">
+              <Database className="h-4 w-4" />
+              <span className="hidden sm:inline">Admin</span>
+            </TabsTrigger>
           </TabsList>
           
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             {/* Profile Settings */}
             <TabsContent value="profile">
               <Card>
@@ -509,6 +526,21 @@ const SettingsPage: React.FC = () => {
                   </Button>
                 </CardFooter>
               </Card>
+            </TabsContent>
+
+            {/* White Label Settings */}
+            <TabsContent value="whitelabel">
+              <EnhancedWhiteLabelManager />
+            </TabsContent>
+
+            {/* API Key Management */}
+            <TabsContent value="apikeys">
+              <EnhancedApiKeyManager />
+            </TabsContent>
+
+            {/* Admin Settings */}
+            <TabsContent value="admin">
+              <AdminSettingsManager />
             </TabsContent>
           </div>
         </Tabs>
