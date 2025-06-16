@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -52,25 +51,26 @@ const AuthPage = () => {
   useEffect(() => {
     if (user && !twoFactorRequired && !authLoading) {
       const from = location.state?.from?.pathname || '/dashboard';
-      console.log('User is authenticated, redirecting to:', from);
+      console.log('User authenticated, redirecting to:', from);
       navigate(from, { replace: true });
     }
   }, [user, navigate, location, twoFactorRequired, authLoading]);
 
   const handleLoginSubmit = async (email: string, password: string) => {
+    console.log('Login form submitted');
     setLoginLoading(true);
     
     try {
-      console.log('Submitting login form');
       const success = await login(email, password);
+      console.log('Login result:', success);
       
-      if (success) {
-        console.log('Login successful, should redirect soon');
-        // Don't manually navigate here, let the useEffect handle it
+      if (!success) {
+        console.log('Login failed, keeping loading state false');
       }
     } catch (error) {
       console.error('Login submission error:', error);
     } finally {
+      console.log('Resetting login loading state');
       setLoginLoading(false);
     }
   };
@@ -162,8 +162,8 @@ const AuthPage = () => {
   if (biometricStep) {
     return (
       <BiometricVerification 
-        onVerify={handleBiometricVerify}
-        onSkip={resetBiometricStep}
+        onVerify={() => navigate('/dashboard')}
+        onSkip={() => setBiometricStep(false)}
       />
     );
   }

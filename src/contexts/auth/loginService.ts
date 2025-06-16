@@ -4,53 +4,43 @@ import { toast } from '@/hooks/use-toast';
 
 export const loginOperations = {
   async login(email: string, password: string): Promise<boolean> {
-    try {
-      console.log('Attempting login for:', email);
+    console.log('Starting login process for:', email);
+    
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+    
+    if (error) {
+      console.error('Login error:', error);
       
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-      
-      if (error) {
-        console.error('Login error:', error);
-        
-        // Handle specific error types
-        let errorMessage = 'Login failed. Please try again.';
-        if (error.message.includes('Invalid login credentials')) {
-          errorMessage = 'Invalid email or password. Please check your credentials.';
-        } else if (error.message.includes('Email not confirmed')) {
-          errorMessage = 'Please check your email and confirm your account before logging in.';
-        } else if (error.message.includes('Too many requests')) {
-          errorMessage = 'Too many login attempts. Please wait a few minutes before trying again.';
-        }
-        
-        toast({
-          title: "Login Failed",
-          description: errorMessage,
-          variant: "destructive",
-        });
-        return false;
+      let errorMessage = 'Login failed. Please try again.';
+      if (error.message.includes('Invalid login credentials')) {
+        errorMessage = 'Invalid email or password. Please check your credentials.';
+      } else if (error.message.includes('Email not confirmed')) {
+        errorMessage = 'Please check your email and confirm your account before logging in.';
+      } else if (error.message.includes('Too many requests')) {
+        errorMessage = 'Too many login attempts. Please wait a few minutes before trying again.';
       }
       
-      if (data.user) {
-        console.log('Login successful for user:', data.user.email);
-        toast({
-          title: "Welcome back!",
-          description: "You have been successfully logged in.",
-        });
-        return true;
-      }
-      
-      return false;
-    } catch (error) {
-      console.error('Unexpected login error:', error);
       toast({
-        title: "Connection Error",
-        description: "Unable to connect to authentication service. Please check your internet connection and try again.",
+        title: "Login Failed",
+        description: errorMessage,
         variant: "destructive",
       });
       return false;
     }
+    
+    if (data.user && data.session) {
+      console.log('Login successful for user:', data.user.email);
+      toast({
+        title: "Welcome back!",
+        description: "You have been successfully logged in.",
+      });
+      return true;
+    }
+    
+    console.error('Login failed: No user or session returned');
+    return false;
   }
 };

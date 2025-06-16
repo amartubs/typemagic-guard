@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/auth';
 import Index from '@/pages/Index';
@@ -47,8 +47,8 @@ function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/patent-drawings" element={<PatentDrawingsPage />} />
               
-              {/* Redirect /login to /auth for consistency */}
-              <Route path="/login" element={<Auth />} />
+              {/* Redirect /login to /auth */}
+              <Route path="/login" element={<Navigate to="/auth" replace />} />
               
               {/* Protected routes */}
               <Route

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
@@ -26,21 +25,17 @@ export const useAuthState = () => {
       
       if (session?.user) {
         try {
-          // Try to get full profile from database
           const fullProfile = await ProfileService.getProfile(session.user.id);
           if (fullProfile && mounted) {
             setUser(fullProfile);
-            // Update last login
             await ProfileService.updateLastLogin(session.user.id);
           } else if (mounted) {
-            // Fallback to session-based user if profile not found
             const userData = createUserFromSession(session);
             setUser(userData);
           }
         } catch (error) {
           console.error('Error loading user profile:', error);
           if (mounted) {
-            // Fallback to session-based user
             const userData = createUserFromSession(session);
             setUser(userData);
           }
@@ -49,7 +44,6 @@ export const useAuthState = () => {
         setUser(null);
       }
       
-      // Always set loading to false after processing auth state
       if (mounted) {
         setLoading(false);
       }
@@ -65,10 +59,6 @@ export const useAuthState = () => {
         
         if (error) {
           console.error('Error getting session:', error);
-          if (mounted) {
-            setLoading(false);
-          }
-          return;
         }
 
         if (mounted) {
@@ -84,15 +74,14 @@ export const useAuthState = () => {
 
     initializeAuth();
 
-    // Safety timeout to prevent infinite loading
+    // Safety timeout
     const timeout = setTimeout(() => {
-      if (mounted) {
-        console.warn('Auth initialization timeout reached, forcing loading to false');
+      if (mounted && loading) {
+        console.warn('Auth initialization timeout reached');
         setLoading(false);
       }
-    }, 1500); // 1.5 second timeout
+    }, 3000);
 
-    // Cleanup
     return () => {
       mounted = false;
       clearTimeout(timeout);
