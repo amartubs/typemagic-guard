@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { KeystrokeCapture } from '@/lib/biometricAuth';
@@ -10,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { toast } from '@/hooks/use-toast';
-import { Shield, Key, Fingerprint, AlertTriangle, CheckCircle2, X, Info } from 'lucide-react';
+import { Shield, Key, Fingerprint, AlertTriangle, CheckCircle2, X, Info, Clock, ArrowRight } from 'lucide-react';
 
 export default function Demo() {
   const [demoStep, setDemoStep] = useState<'intro' | 'create' | 'test' | 'result'>('intro');
@@ -25,6 +24,8 @@ export default function Demo() {
   const [enrollmentProgress, setEnrollmentProgress] = useState(0);
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [testIndex, setTestIndex] = useState(0);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [hasTypedEnoughForTest, setHasTypedEnoughForTest] = useState(false);
 
   const demoTexts = [
     "The quick brown fox jumps over the lazy dog.",
@@ -36,7 +37,6 @@ export default function Demo() {
   const [currentTestText, setCurrentTestText] = useState(demoTexts[0]);
 
   useEffect(() => {
-    // Reset the demo when the component mounts
     createNewProfile();
   }, []);
 
@@ -48,6 +48,7 @@ export default function Demo() {
     setAuthResult(null);
     setEnrollmentProgress(0);
     setTestIndex(0);
+    setHasTypedEnoughForTest(false);
   };
 
   const handleEnrollmentCapture = (timings: KeyTiming[]) => {
@@ -55,13 +56,15 @@ export default function Demo() {
 
     setEnrollmentKeystrokes(prev => [...prev, ...timings]);
     
-    // Update enrollment progress
     const newProgress = Math.min(100, Math.round((enrollmentKeystrokes.length + timings.length) / 50 * 100));
     setEnrollmentProgress(newProgress);
     
-    // Complete enrollment if we have enough keystrokes
     if (newProgress >= 100) {
-      completeEnrollment();
+      setIsAnalyzing(true);
+      setTimeout(() => {
+        completeEnrollment();
+        setIsAnalyzing(false);
+      }, 2000);
     }
   };
 
@@ -76,17 +79,18 @@ export default function Demo() {
       context: 'enrollment'
     };
 
-    // Update the biometric profile with the new pattern
     const updatedProfile = BiometricAnalyzer.updateProfile(biometricProfile, pattern);
     setBiometricProfile(updatedProfile);
     
     toast({
-      title: "Enrollment Complete",
-      description: "Your keystroke biometric profile has been created. Now you can test authentication.",
+      title: "Profile Created Successfully!",
+      description: "Your unique biometric profile is ready. Now let's test the authentication.",
     });
     
     setIsEnrolling(false);
-    setDemoStep('test');
+    setTimeout(() => {
+      setDemoStep('test');
+    }, 1000);
   };
 
   const startEnrollment = () => {
@@ -99,35 +103,45 @@ export default function Demo() {
 
   const handleTestCapture = (timings: KeyTiming[]) => {
     setTestKeystrokes(timings);
+    
+    if (timings.length >= 10) {
+      setHasTypedEnoughForTest(true);
+    }
+  };
 
-    if (timings.length > 10 && biometricProfile) {
-      // Create a test pattern from the captured keystrokes
+  const runAuthentication = () => {
+    if (!biometricProfile || testKeystrokes.length === 0) return;
+
+    setIsAnalyzing(true);
+
+    setTimeout(() => {
       const testPattern: KeystrokePattern = {
         userId: 'demo-user',
         patternId: `demo-test-${Date.now()}`,
-        timings: timings,
+        timings: testKeystrokes,
         timestamp: Date.now(),
         context: 'test'
       };
 
-      // Authenticate against the biometric profile
       const result = BiometricAnalyzer.authenticate(biometricProfile, testPattern);
       
       setAuthResult({
         success: result.success,
         confidenceScore: result.confidenceScore,
         message: result.success 
-          ? "Authenticated successfully! Your typing pattern matches your profile."
+          ? "Authentication successful! Your typing pattern matches your profile."
           : "Authentication failed. The typing pattern doesn't match the enrolled profile."
       });
       
+      setIsAnalyzing(false);
       setDemoStep('result');
-    }
+    }, 2000);
   };
 
   const startTest = () => {
     setTestKeystrokes([]);
     setAuthResult(null);
+    setHasTypedEnoughForTest(false);
     setCurrentTestText(demoTexts[testIndex % demoTexts.length]);
     setTestIndex(prev => prev + 1);
     setDemoStep('test');
@@ -258,7 +272,7 @@ export default function Demo() {
                   Create Your Biometric Profile
                 </CardTitle>
                 <CardDescription>
-                  Type the text below to create your unique keystroke biometric profile
+                  Type the text below naturally. The system will automatically analyze your keystroke pattern.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -267,7 +281,7 @@ export default function Demo() {
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Type the text above</label>
+                  <label className="text-sm font-medium">Type the text above (just start typing - no need to press Enter)</label>
                   <KeystrokeCaptureComponent 
                     onCapture={handleEnrollmentCapture}
                     captureContext="enrollment"
@@ -283,21 +297,37 @@ export default function Demo() {
                   <Progress value={enrollmentProgress} className="h-2" />
                 </div>
                 
-                {enrollmentProgress < 100 && (
-                  <p className="text-sm text-muted-foreground mt-4">
-                    Keep typing until the enrollment is complete. You can repeat the text multiple times.
-                  </p>
-                )}
+                {isAnalyzing ? (
+                  <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Clock className="h-5 w-5 text-blue-500 animate-spin" />
+                      <div>
+                        <h3 className="font-medium text-blue-700">Analyzing Your Typing Pattern</h3>
+                        <p className="text-sm text-blue-600 mt-1">
+                          Creating your unique biometric profile...
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : enrollmentProgress < 100 ? (
+                  <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <Info className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <h3 className="font-medium text-green-700">Keep Typing!</h3>
+                        <p className="text-sm text-green-600 mt-1">
+                          Repeat the text multiple times until the progress bar reaches 100%. 
+                          The more you type, the more accurate your profile becomes.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
               </CardContent>
               <CardFooter className="flex justify-between">
                 <Button variant="outline" onClick={resetDemo}>
                   Start Over
                 </Button>
-                {enrollmentProgress >= 100 && (
-                  <Button onClick={completeEnrollment}>
-                    Continue to Testing
-                  </Button>
-                )}
               </CardFooter>
             </Card>
           )}
@@ -310,7 +340,7 @@ export default function Demo() {
                   Test Authentication
                 </CardTitle>
                 <CardDescription>
-                  Let's test if we can correctly verify your identity
+                  Now type the text below to test if we can correctly verify your identity
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -319,7 +349,7 @@ export default function Demo() {
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Type the text above</label>
+                  <label className="text-sm font-medium">Type the text above naturally</label>
                   <KeystrokeCaptureComponent 
                     onCapture={handleTestCapture}
                     captureContext="test"
@@ -327,9 +357,49 @@ export default function Demo() {
                   />
                 </div>
                 
-                <p className="text-sm text-muted-foreground mt-4">
-                  Type naturally as you would normally. We'll analyze your typing pattern to verify your identity.
-                </p>
+                {hasTypedEnoughForTest && !isAnalyzing ? (
+                  <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-start gap-3">
+                        <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <h3 className="font-medium text-green-700">Ready for Authentication</h3>
+                          <p className="text-sm text-green-600 mt-1">
+                            We've captured enough of your typing pattern. Click the button to run authentication.
+                          </p>
+                        </div>
+                      </div>
+                      <Button onClick={runAuthentication} className="ml-4">
+                        <ArrowRight className="h-4 w-4 mr-2" />
+                        Authenticate
+                      </Button>
+                    </div>
+                  </div>
+                ) : isAnalyzing ? (
+                  <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Clock className="h-5 w-5 text-blue-500 animate-spin" />
+                      <div>
+                        <h3 className="font-medium text-blue-700">Authenticating...</h3>
+                        <p className="text-sm text-blue-600 mt-1">
+                          Comparing your typing pattern with your enrolled profile...
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <Info className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <h3 className="font-medium text-yellow-700">Keep Typing</h3>
+                        <p className="text-sm text-yellow-600 mt-1">
+                          Type at least 10 characters to capture enough data for authentication.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </CardContent>
               <CardFooter className="flex justify-between">
                 <Button variant="outline" onClick={resetDemo}>
