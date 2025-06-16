@@ -30,13 +30,16 @@ export const useAuthHandlers = () => {
       console.log('📝 Login result:', success);
       
       if (success) {
-        console.log('✅ Login successful, auth context should handle redirect');
+        console.log('✅ Login successful, navigating to dashboard');
+        // Navigate directly since auth state will be updated
+        const from = location.state?.from?.pathname || '/dashboard';
+        navigate(from, { replace: true });
       } else {
         console.log('❌ Login failed');
-        setLoginLoading(false);
       }
     } catch (error) {
       console.error('📝 Login submission error:', error);
+    } finally {
       setLoginLoading(false);
     }
   };

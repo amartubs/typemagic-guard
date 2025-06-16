@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
@@ -26,24 +25,25 @@ export const useAuthState = () => {
       
       if (session?.user) {
         console.log('👤 Processing user session for:', session.user.email);
-        try {
-          const fullProfile = await ProfileService.getProfile(session.user.id);
-          if (fullProfile && mounted) {
-            console.log('👤 Full profile loaded for user');
-            setUser(fullProfile);
-            await ProfileService.updateLastLogin(session.user.id);
-          } else if (mounted) {
-            console.log('👤 Creating user from session');
-            const userData = createUserFromSession(session);
-            setUser(userData);
+        
+        // Create user from session immediately to avoid loading issues
+        const userData = createUserFromSession(session);
+        setUser(userData);
+        
+        // Try to load full profile but don't block on it
+        setTimeout(async () => {
+          try {
+            const fullProfile = await ProfileService.getProfile(session.user.id);
+            if (fullProfile && mounted) {
+              console.log('👤 Full profile loaded for user');
+              setUser(fullProfile);
+              await ProfileService.updateLastLogin(session.user.id);
+            }
+          } catch (error) {
+            console.error('👤 Error loading user profile:', error);
+            // Keep the basic user data from session
           }
-        } catch (error) {
-          console.error('👤 Error loading user profile:', error);
-          if (mounted) {
-            const userData = createUserFromSession(session);
-            setUser(userData);
-          }
-        }
+        }, 0);
       } else if (mounted) {
         console.log('👤 No user session, clearing user state');
         setUser(null);
@@ -84,13 +84,13 @@ export const useAuthState = () => {
 
     initializeAuth();
 
-    // Safety timeout - shorter timeout for better UX
+    // Reduced timeout for better UX
     const timeout = setTimeout(() => {
       if (mounted && loading) {
-        console.warn('⏰ Auth initialization timeout reached');
+        console.warn('⏰ Auth initialization timeout reached, setting loading to false');
         setLoading(false);
       }
-    }, 2000);
+    }, 1000);
 
     return () => {
       console.log('🧹 Cleaning up auth state listener');
