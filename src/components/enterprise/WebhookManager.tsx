@@ -12,22 +12,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth';
 import { supabase } from '@/integrations/supabase/client';
-import { Webhook, Plus, Test, Trash2, Settings, AlertCircle } from 'lucide-react';
+import { Webhook, Plus, TestTube, Trash2, Settings, AlertCircle } from 'lucide-react';
+import type { Tables } from '@/integrations/supabase/types';
 
-interface WebhookConfig {
-  id: string;
-  name: string;
-  url: string;
-  events: string[];
-  is_active: boolean;
-  secret: string;
-  timeout: number;
-  retry_count: number;
-  created_at: string;
-  last_triggered?: string;
-  success_count: number;
-  failure_count: number;
-}
+type WebhookConfig = Tables<'webhook_configs'>;
 
 const WebhookManager = () => {
   const { user } = useAuth();
@@ -380,7 +368,7 @@ const WebhookManager = () => {
                     onClick={() => testWebhook(webhook.id)}
                     disabled={testing === webhook.id}
                   >
-                    <Test className="h-3 w-3 mr-1" />
+                    <TestTube className="h-3 w-3 mr-1" />
                     {testing === webhook.id ? 'Testing...' : 'Test'}
                   </Button>
                   <Button

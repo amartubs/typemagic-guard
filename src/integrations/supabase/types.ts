@@ -789,6 +789,57 @@ export type Database = {
           },
         ]
       }
+      webhook_configs: {
+        Row: {
+          created_at: string
+          events: string[]
+          failure_count: number
+          id: string
+          is_active: boolean
+          last_triggered: string | null
+          name: string
+          retry_count: number
+          secret: string
+          success_count: number
+          timeout: number
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          events?: string[]
+          failure_count?: number
+          id?: string
+          is_active?: boolean
+          last_triggered?: string | null
+          name: string
+          retry_count?: number
+          secret: string
+          success_count?: number
+          timeout?: number
+          updated_at?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          events?: string[]
+          failure_count?: number
+          id?: string
+          is_active?: boolean
+          last_triggered?: string | null
+          name?: string
+          retry_count?: number
+          secret?: string
+          success_count?: number
+          timeout?: number
+          updated_at?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       white_label_configs: {
         Row: {
           accent_color: string | null
