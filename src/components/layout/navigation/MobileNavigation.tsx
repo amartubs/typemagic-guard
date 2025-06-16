@@ -55,8 +55,8 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
   ];
 
   const superAdminItems: NavigationItem[] = [
-    { path: '/auth', label: 'Auth', icon: Key },
-    { path: '/reset-password', label: 'Reset Password', icon: Lock },
+    { path: '/auth', label: 'Auth', icon: Key, show: true },
+    { path: '/reset-password', label: 'Reset Password', icon: Lock, show: true },
   ];
 
   return (
