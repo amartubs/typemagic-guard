@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -31,16 +32,10 @@ const AuthPage = () => {
   const [showEmailLogin, setShowEmailLogin] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   
-  // Login state
+  // Individual loading states for different operations
   const [loginLoading, setLoginLoading] = useState(false);
-  
-  // Forgot password state
   const [forgotLoading, setForgotLoading] = useState(false);
-  
-  // Two-factor authentication state
   const [verifyingCode, setVerifyingCode] = useState(false);
-  
-  // Registration state
   const [registerLoading, setRegisterLoading] = useState(false);
   
   // Biometric state
@@ -49,28 +44,37 @@ const AuthPage = () => {
 
   // Redirect if user is already logged in
   useEffect(() => {
+    console.log('🔍 Auth page - checking user state:', {
+      hasUser: !!user,
+      twoFactorRequired,
+      authLoading,
+      userEmail: user?.email
+    });
+
     if (user && !twoFactorRequired && !authLoading) {
       const from = location.state?.from?.pathname || '/dashboard';
-      console.log('User authenticated, redirecting to:', from);
+      console.log('✅ User authenticated, redirecting to:', from);
       navigate(from, { replace: true });
     }
   }, [user, navigate, location, twoFactorRequired, authLoading]);
 
   const handleLoginSubmit = async (email: string, password: string) => {
-    console.log('Login form submitted');
+    console.log('📝 Login form submitted for:', email);
     setLoginLoading(true);
     
     try {
       const success = await login(email, password);
-      console.log('Login result:', success);
+      console.log('📝 Login result:', success);
       
-      if (!success) {
-        console.log('Login failed, keeping loading state false');
+      if (success) {
+        console.log('✅ Login successful, auth context should handle redirect');
+        // Don't manually set loading to false here - let the auth state change handle it
+      } else {
+        console.log('❌ Login failed');
+        setLoginLoading(false);
       }
     } catch (error) {
-      console.error('Login submission error:', error);
-    } finally {
-      console.log('Resetting login loading state');
+      console.error('📝 Login submission error:', error);
       setLoginLoading(false);
     }
   };
@@ -80,6 +84,7 @@ const AuthPage = () => {
       return;
     }
 
+    console.log('🔄 Forgot password submitted for:', email);
     setForgotLoading(true);
     
     try {
@@ -94,6 +99,7 @@ const AuthPage = () => {
   };
 
   const handleSocialLogin = async (provider: SocialProvider) => {
+    console.log('🔗 Social login attempted with:', provider);
     const success = await signInWithProvider(provider);
     
     if (success) {
@@ -103,6 +109,7 @@ const AuthPage = () => {
   };
 
   const handleTwoFactorSubmit = async (code: string) => {
+    console.log('🔐 Two factor code submitted');
     setVerifyingCode(true);
     
     try {
@@ -118,6 +125,7 @@ const AuthPage = () => {
   };
 
   const handleResendCode = async () => {
+    console.log('📨 Resending two factor code');
     await sendTwoFactorCode();
   };
 
@@ -129,6 +137,7 @@ const AuthPage = () => {
     organizationName?: string,
     organizationSize?: number
   ) => {
+    console.log('📝 Registration form submitted for:', email);
     setRegisterLoading(true);
     
     try {
@@ -158,6 +167,19 @@ const AuthPage = () => {
     setBiometricStep(false);
   };
 
+  // Show loading spinner while auth is initializing
+  if (authLoading) {
+    console.log('⏳ Showing auth loading spinner');
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   // Show biometric verification if needed
   if (biometricStep) {
     return (
@@ -179,6 +201,14 @@ const AuthPage = () => {
     );
   }
 
+  console.log('🎨 Rendering auth page with state:', {
+    activeTab,
+    showEmailLogin,
+    registrationSuccess,
+    loginLoading,
+    hasUser: !!user
+  });
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
       <Card className="w-full max-w-md shadow-lg">
@@ -193,6 +223,7 @@ const AuthPage = () => {
         </div>
 
         <Tabs defaultValue="login" value={activeTab} onValueChange={(value) => {
+          console.log('📑 Tab changed to:', value);
           setActiveTab(value as 'login' | 'register' | 'forgot');
           setShowEmailLogin(false);
           setRegistrationSuccess(false);
@@ -228,7 +259,10 @@ const AuthPage = () => {
                   <Button 
                     variant="outline" 
                     className="w-full flex items-center gap-2"
-                    onClick={() => setShowEmailLogin(true)}
+                    onClick={() => {
+                      console.log('📧 Switching to email login form');
+                      setShowEmailLogin(true);
+                    }}
                   >
                     <Mail className="h-4 w-4" />
                     Sign in with Email
@@ -237,8 +271,12 @@ const AuthPage = () => {
               ) : (
                 <LoginForm 
                   onSubmit={handleLoginSubmit}
-                  onBackToOptions={() => setShowEmailLogin(false)}
+                  onBackToOptions={() => {
+                    console.log('⬅️ Going back to login options');
+                    setShowEmailLogin(false);
+                  }}
                   onForgotPassword={() => {
+                    console.log('🔄 Switching to forgot password');
                     setActiveTab('forgot');
                     setShowEmailLogin(false);
                   }}
