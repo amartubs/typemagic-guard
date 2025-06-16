@@ -110,7 +110,9 @@ const SubscriptionManager: React.FC = () => {
             tier: (subscription?.subscription_tier || user?.subscription?.tier || 'free') as any,
             status: subscription?.subscribed ? 'active' : 'trial' as any,
             endDate: subscription?.subscription_end ? new Date(subscription.subscription_end).getTime() : null,
-            type: user?.subscription?.type || 'individual'
+            type: user?.subscription?.type || 'individual',
+            startDate: user?.subscription?.startDate || Date.now(),
+            autoRenew: user?.subscription?.autoRenew || true
           }
         }}
         loading={loading}
