@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { AuthProvider, useAuth } from './auth';
 import type { Provider as SocialProvider } from './auth/types';
 
