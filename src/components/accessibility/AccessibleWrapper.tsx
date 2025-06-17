@@ -1,9 +1,9 @@
 
-import * as React from 'react';
 import { cn } from '@/lib/utils';
 
-interface AccessibleWrapperProps extends React.HTMLAttributes<HTMLDivElement> {
+interface AccessibleWrapperProps {
   children: React.ReactNode;
+  className?: string;
   announcement?: string;
   focusOnMount?: boolean;
   trapFocus?: boolean;
@@ -12,21 +12,19 @@ interface AccessibleWrapperProps extends React.HTMLAttributes<HTMLDivElement> {
   ariaLabel?: string;
   ariaLabelledBy?: string;
   ariaDescribedBy?: string;
+  [key: string]: any;
 }
 
-export const AccessibleWrapper = React.forwardRef<HTMLDivElement, AccessibleWrapperProps>(({
+export const AccessibleWrapper = ({
   children,
   className,
-  announcement,
-  focusOnMount = false,
-  trapFocus = false,
   skipLinks = [],
   landmarkRole,
   ariaLabel,
   ariaLabelledBy,
   ariaDescribedBy,
   ...props
-}, ref) => {
+}: AccessibleWrapperProps) => {
   return (
     <>
       {/* Skip Links */}
@@ -47,7 +45,6 @@ export const AccessibleWrapper = React.forwardRef<HTMLDivElement, AccessibleWrap
       )}
 
       <div
-        ref={ref}
         className={cn(className)}
         role={landmarkRole}
         aria-label={ariaLabel}
@@ -59,21 +56,23 @@ export const AccessibleWrapper = React.forwardRef<HTMLDivElement, AccessibleWrap
       </div>
     </>
   );
-});
-
-AccessibleWrapper.displayName = 'AccessibleWrapper';
+};
 
 // Screen reader only text component
-export const ScreenReaderOnly: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+export const ScreenReaderOnly = ({ children }: { children: React.ReactNode }) => (
   <span className="sr-only">{children}</span>
 );
 
 // Live region for announcements
-export const LiveRegion: React.FC<{
+export const LiveRegion = ({
+  children,
+  priority = 'polite',
+  atomic = true,
+}: {
   children: React.ReactNode;
   priority?: 'polite' | 'assertive';
   atomic?: boolean;
-}> = ({ children, priority = 'polite', atomic = true }) => (
+}) => (
   <div
     className="sr-only"
     aria-live={priority}
