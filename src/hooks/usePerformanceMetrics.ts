@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 
 interface PerformanceMetrics {
@@ -205,6 +206,6 @@ export function withPerformanceMonitoring<P extends object>(
       return endMeasurement;
     });
 
-    return <WrappedComponent {...props} />;
+    return React.createElement(WrappedComponent, props);
   };
 }
