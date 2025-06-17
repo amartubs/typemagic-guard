@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -8,7 +8,7 @@ interface BeforeInstallPromptEvent extends Event {
 
 export const usePWA = () => {
   // Add defensive checks for React hooks
-  if (!React || !useState || !useEffect) {
+  if (!React || !React.useState || !React.useEffect) {
     console.error('React hooks not available in usePWA');
     return {
       isInstallable: false,
@@ -17,11 +17,11 @@ export const usePWA = () => {
     };
   }
 
-  const [isInstallable, setIsInstallable] = useState(false);
-  const [isOffline, setIsOffline] = useState(!navigator.onLine);
-  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isInstallable, setIsInstallable] = React.useState(false);
+  const [isOffline, setIsOffline] = React.useState(!navigator.onLine);
+  const [installPrompt, setInstallPrompt] = React.useState<BeforeInstallPromptEvent | null>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Register service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js')
