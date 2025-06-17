@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React from 'react';
 
 interface PerformanceMetrics {
   pageLoadTime: number;
@@ -17,14 +17,14 @@ interface ComponentMetrics {
 }
 
 export const usePerformanceMetrics = () => {
-  const [metrics, setMetrics] = useState<Partial<PerformanceMetrics>>({});
-  const [componentMetrics, setComponentMetrics] = useState<ComponentMetrics>({
+  const [metrics, setMetrics] = React.useState<Partial<PerformanceMetrics>>({});
+  const [componentMetrics, setComponentMetrics] = React.useState<ComponentMetrics>({
     renderTime: 0,
     rerenderCount: 0,
     lastRenderTime: 0
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     const measurePerformance = () => {
       // Page Load Time
       const navigationTiming = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
@@ -106,7 +106,7 @@ export const usePerformanceMetrics = () => {
     }
   }, []);
 
-  const measureComponentRender = useCallback((componentName: string) => {
+  const measureComponentRender = React.useCallback((componentName: string) => {
     const startTime = performance.now();
     
     return () => {
@@ -126,7 +126,7 @@ export const usePerformanceMetrics = () => {
     };
   }, []);
 
-  const logMetrics = useCallback(() => {
+  const logMetrics = React.useCallback(() => {
     const performanceData = {
       ...metrics,
       ...componentMetrics,
@@ -159,7 +159,7 @@ export const usePerformanceMetrics = () => {
     localStorage.setItem('performance_metrics', JSON.stringify(storedMetrics));
   }, [metrics, componentMetrics]);
 
-  const getPerformanceScore = useCallback(() => {
+  const getPerformanceScore = React.useCallback(() => {
     const { firstContentfulPaint = 0, largestContentfulPaint = 0, cumulativeLayoutShift = 0, firstInputDelay = 0 } = metrics;
     
     // Simple scoring based on Google's Core Web Vitals thresholds
@@ -201,7 +201,7 @@ export function withPerformanceMonitoring<P extends object>(
   return function PerformanceMonitoredComponent(props: P) {
     const { measureComponentRender } = usePerformanceMetrics();
     
-    useEffect(() => {
+    React.useEffect(() => {
       const endMeasurement = measureComponentRender(componentName);
       return endMeasurement;
     });
