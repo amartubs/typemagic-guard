@@ -2,6 +2,16 @@
 import * as React from 'react';
 
 export const useAccessibility = () => {
+  // Add defensive check for React hooks
+  if (!React || !React.useState || !React.useEffect || !React.useCallback) {
+    console.error('React hooks not available in useAccessibility');
+    return {
+      isKeyboardUser: false,
+      announce: () => {},
+      announcements: []
+    };
+  }
+
   const [isKeyboardUser, setIsKeyboardUser] = React.useState(false);
   const [announcements, setAnnouncements] = React.useState<string[]>([]);
 
@@ -44,6 +54,16 @@ export const useAccessibility = () => {
 };
 
 export const useFocusManagement = () => {
+  // Add defensive check for React hooks
+  if (!React || !React.useRef || !React.useCallback) {
+    console.error('React hooks not available in useFocusManagement');
+    return {
+      saveFocus: () => {},
+      restoreFocus: () => {},
+      trapFocus: () => () => {}
+    };
+  }
+
   const lastFocusedElement = React.useRef<HTMLElement | null>(null);
 
   const saveFocus = React.useCallback(() => {
@@ -96,6 +116,12 @@ export const useFocusManagement = () => {
 };
 
 export const useReducedMotion = () => {
+  // Add defensive check for React hooks
+  if (!React || !React.useState || !React.useEffect) {
+    console.error('React hooks not available in useReducedMotion');
+    return false;
+  }
+
   const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
 
   React.useEffect(() => {

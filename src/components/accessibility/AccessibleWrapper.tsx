@@ -28,6 +28,16 @@ export const AccessibleWrapper = React.forwardRef<HTMLDivElement, AccessibleWrap
   ariaDescribedBy,
   ...props
 }, ref) => {
+  // Add defensive check for React hooks
+  if (!React || !React.useRef || !React.useEffect) {
+    console.error('React hooks not available in AccessibleWrapper');
+    return (
+      <div className={cn(className)} {...props}>
+        {children}
+      </div>
+    );
+  }
+
   const containerRef = React.useRef<HTMLDivElement>(null);
   const { announce } = useAccessibility();
   const { trapFocus: enableFocusTrap } = useFocusManagement();
