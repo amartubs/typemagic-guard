@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
 import { User, SubscriptionDetails } from '@/lib/types';
@@ -9,12 +9,12 @@ import { createUserFromSession } from './userUtils';
 import { ProfileService } from '@/lib/profileService';
 
 export const useAuthState = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [twoFactorRequired, setTwoFactorRequired] = useState(false);
+  const [user, setUser] = React.useState<User | null>(null);
+  const [session, setSession] = React.useState<Session | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [twoFactorRequired, setTwoFactorRequired] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     let mounted = true;
 
     const handleAuthStateChange = async (event: string, session: Session | null) => {
