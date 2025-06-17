@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import React from 'react';
 
 interface SEOHeadProps {
   title?: string;
@@ -18,7 +18,7 @@ const SEOHead = ({
   canonical,
   schema
 }: SEOHeadProps) => {
-  useEffect(() => {
+  React.useEffect(() => {
     // Update document title
     document.title = title;
 
