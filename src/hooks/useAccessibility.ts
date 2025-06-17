@@ -2,6 +2,10 @@
 import React from 'react';
 
 export const useAccessibility = () => {
+  // Add debugging to check if React is available
+  console.log('useAccessibility - React object:', React);
+  console.log('useAccessibility - React.useState:', React?.useState);
+  
   const [isKeyboardUser, setIsKeyboardUser] = React.useState(false);
   const [announcements, setAnnouncements] = React.useState<string[]>([]);
 
@@ -44,6 +48,9 @@ export const useAccessibility = () => {
 };
 
 export const useFocusManagement = () => {
+  console.log('useFocusManagement - React object:', React);
+  console.log('useFocusManagement - React.useRef:', React?.useRef);
+  
   const lastFocusedElement = React.useRef<HTMLElement | null>(null);
 
   const saveFocus = React.useCallback(() => {
@@ -96,6 +103,8 @@ export const useFocusManagement = () => {
 };
 
 export const useReducedMotion = () => {
+  console.log('useReducedMotion - React object:', React);
+  
   const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
 
   React.useEffect(() => {

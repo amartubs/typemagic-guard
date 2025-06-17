@@ -28,6 +28,10 @@ export const AccessibleWrapper = React.forwardRef<HTMLDivElement, AccessibleWrap
   ariaDescribedBy,
   ...props
 }, ref) => {
+  // Add debugging to check if React is available
+  console.log('React object:', React);
+  console.log('React.useRef:', React?.useRef);
+  
   const containerRef = React.useRef<HTMLDivElement>(null);
   const { announce } = useAccessibility();
   const { trapFocus: enableFocusTrap } = useFocusManagement();
