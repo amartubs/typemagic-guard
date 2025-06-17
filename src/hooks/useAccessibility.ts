@@ -1,15 +1,11 @@
 
-import React from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 export const useAccessibility = () => {
-  // Add debugging to check if React is available
-  console.log('useAccessibility - React object:', React);
-  console.log('useAccessibility - React.useState:', React?.useState);
-  
-  const [isKeyboardUser, setIsKeyboardUser] = React.useState(false);
-  const [announcements, setAnnouncements] = React.useState<string[]>([]);
+  const [isKeyboardUser, setIsKeyboardUser] = useState(false);
+  const [announcements, setAnnouncements] = useState<string[]>([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleKeyDown = () => setIsKeyboardUser(true);
     const handleMouseDown = () => setIsKeyboardUser(false);
 
@@ -22,7 +18,7 @@ export const useAccessibility = () => {
     };
   }, []);
 
-  const announce = React.useCallback((message: string, priority: 'polite' | 'assertive' = 'polite') => {
+  const announce = useCallback((message: string, priority: 'polite' | 'assertive' = 'polite') => {
     setAnnouncements(prev => [...prev, message]);
     
     // Create a temporary element for screen reader announcement
@@ -48,23 +44,20 @@ export const useAccessibility = () => {
 };
 
 export const useFocusManagement = () => {
-  console.log('useFocusManagement - React object:', React);
-  console.log('useFocusManagement - React.useRef:', React?.useRef);
-  
-  const lastFocusedElement = React.useRef<HTMLElement | null>(null);
+  const lastFocusedElement = useRef<HTMLElement | null>(null);
 
-  const saveFocus = React.useCallback(() => {
+  const saveFocus = useCallback(() => {
     lastFocusedElement.current = document.activeElement as HTMLElement;
   }, []);
 
-  const restoreFocus = React.useCallback(() => {
+  const restoreFocus = useCallback(() => {
     if (lastFocusedElement.current) {
       lastFocusedElement.current.focus();
       lastFocusedElement.current = null;
     }
   }, []);
 
-  const trapFocus = React.useCallback((container: HTMLElement) => {
+  const trapFocus = useCallback((container: HTMLElement) => {
     const focusableElements = container.querySelectorAll(
       'a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select, [tabindex]:not([tabindex="-1"])'
     );
@@ -103,11 +96,9 @@ export const useFocusManagement = () => {
 };
 
 export const useReducedMotion = () => {
-  console.log('useReducedMotion - React object:', React);
-  
-  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(mediaQuery.matches);
 

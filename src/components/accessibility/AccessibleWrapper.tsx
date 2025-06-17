@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useRef, useEffect, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useFocusManagement, useAccessibility } from '@/hooks/useAccessibility';
 
@@ -15,7 +15,7 @@ interface AccessibleWrapperProps extends React.HTMLAttributes<HTMLDivElement> {
   ariaDescribedBy?: string;
 }
 
-export const AccessibleWrapper = React.forwardRef<HTMLDivElement, AccessibleWrapperProps>(({
+export const AccessibleWrapper = forwardRef<HTMLDivElement, AccessibleWrapperProps>(({
   children,
   className,
   announcement,
@@ -28,21 +28,17 @@ export const AccessibleWrapper = React.forwardRef<HTMLDivElement, AccessibleWrap
   ariaDescribedBy,
   ...props
 }, ref) => {
-  // Add debugging to check if React is available
-  console.log('React object:', React);
-  console.log('React.useRef:', React?.useRef);
-  
-  const containerRef = React.useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const { announce } = useAccessibility();
   const { trapFocus: enableFocusTrap } = useFocusManagement();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (announcement) {
       announce(announcement);
     }
   }, [announcement, announce]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
