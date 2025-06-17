@@ -1,5 +1,4 @@
-
-import { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 
 export const useAccessibility = () => {
   const [isKeyboardUser, setIsKeyboardUser] = useState(false);
