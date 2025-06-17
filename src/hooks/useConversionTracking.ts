@@ -1,5 +1,5 @@
 
-import { useCallback } from 'react';
+import React from 'react';
 
 export interface ConversionEvent {
   funnel_step: string;
@@ -9,7 +9,7 @@ export interface ConversionEvent {
 }
 
 export const useConversionTracking = () => {
-  const trackConversion = useCallback((event: ConversionEvent) => {
+  const trackConversion = React.useCallback((event: ConversionEvent) => {
     const conversionData = {
       ...event,
       timestamp: new Date().toISOString(),
@@ -27,14 +27,14 @@ export const useConversionTracking = () => {
     console.log('Conversion tracked:', conversionData);
   }, []);
 
-  const trackPageView = useCallback((page: string) => {
+  const trackPageView = React.useCallback((page: string) => {
     trackConversion({
       funnel_step: page,
       event_type: 'view'
     });
   }, [trackConversion]);
 
-  const trackClick = useCallback((element: string, metadata?: Record<string, any>) => {
+  const trackClick = React.useCallback((element: string, metadata?: Record<string, any>) => {
     trackConversion({
       funnel_step: element,
       event_type: 'click',
@@ -42,7 +42,7 @@ export const useConversionTracking = () => {
     });
   }, [trackConversion]);
 
-  const trackGoalConversion = useCallback((goal: string, value?: number) => {
+  const trackGoalConversion = React.useCallback((goal: string, value?: number) => {
     trackConversion({
       funnel_step: goal,
       event_type: 'conversion',
