@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 
 interface PerformanceMetrics {
   pageLoadTime: number;
@@ -205,6 +205,6 @@ export function withPerformanceMonitoring<P extends object>(
       return endMeasurement;
     });
 
-    return React.createElement(WrappedComponent, props);
+    return <WrappedComponent {...props} />;
   };
 }
