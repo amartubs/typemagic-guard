@@ -1,11 +1,11 @@
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import * as React from 'react';
 
 export const useAccessibility = () => {
-  const [isKeyboardUser, setIsKeyboardUser] = useState(false);
-  const [announcements, setAnnouncements] = useState<string[]>([]);
+  const [isKeyboardUser, setIsKeyboardUser] = React.useState(false);
+  const [announcements, setAnnouncements] = React.useState<string[]>([]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const handleKeyDown = () => setIsKeyboardUser(true);
     const handleMouseDown = () => setIsKeyboardUser(false);
 
@@ -18,7 +18,7 @@ export const useAccessibility = () => {
     };
   }, []);
 
-  const announce = useCallback((message: string, priority: 'polite' | 'assertive' = 'polite') => {
+  const announce = React.useCallback((message: string, priority: 'polite' | 'assertive' = 'polite') => {
     setAnnouncements(prev => [...prev, message]);
     
     // Create a temporary element for screen reader announcement
@@ -44,20 +44,20 @@ export const useAccessibility = () => {
 };
 
 export const useFocusManagement = () => {
-  const lastFocusedElement = useRef<HTMLElement | null>(null);
+  const lastFocusedElement = React.useRef<HTMLElement | null>(null);
 
-  const saveFocus = useCallback(() => {
+  const saveFocus = React.useCallback(() => {
     lastFocusedElement.current = document.activeElement as HTMLElement;
   }, []);
 
-  const restoreFocus = useCallback(() => {
+  const restoreFocus = React.useCallback(() => {
     if (lastFocusedElement.current) {
       lastFocusedElement.current.focus();
       lastFocusedElement.current = null;
     }
   }, []);
 
-  const trapFocus = useCallback((container: HTMLElement) => {
+  const trapFocus = React.useCallback((container: HTMLElement) => {
     const focusableElements = container.querySelectorAll(
       'a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select, [tabindex]:not([tabindex="-1"])'
     );
@@ -96,9 +96,9 @@ export const useFocusManagement = () => {
 };
 
 export const useReducedMotion = () => {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(mediaQuery.matches);
 
