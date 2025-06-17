@@ -1,11 +1,11 @@
 
-import React, { ReactNode } from 'react';
+import * as React from 'react';
 import { authOperations } from './authService';
 import { useAuthState, useAuthActions } from './authHooks';
 import AuthContext from './AuthContext';
 
 interface AuthProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
