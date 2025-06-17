@@ -1,7 +1,6 @@
-
 import React from 'react';
 
-export class PerformanceMonitor {
+class PerformanceMonitor {
   private static metrics: Array<{
     name: string;
     value: number;
@@ -178,7 +177,7 @@ export class PerformanceMonitor {
   }
 }
 
-// Performance monitoring HOC
+// Performance monitoring HOC using React directly to avoid destructuring issues
 export function withPerformanceMonitoring<P extends object>(
   WrappedComponent: React.ComponentType<P>,
   componentName: string
@@ -195,3 +194,5 @@ export function withPerformanceMonitoring<P extends object>(
 if (typeof window !== 'undefined') {
   PerformanceMonitor.initializeWebVitals();
 }
+
+export { PerformanceMonitor };
