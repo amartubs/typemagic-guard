@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -7,6 +7,16 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export const usePWA = () => {
+  // Add defensive checks for React hooks
+  if (!React || !useState || !useEffect) {
+    console.error('React hooks not available in usePWA');
+    return {
+      isInstallable: false,
+      isOffline: false,
+      promptInstall: async () => false
+    };
+  }
+
   const [isInstallable, setIsInstallable] = useState(false);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);

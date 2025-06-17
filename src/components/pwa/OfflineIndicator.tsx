@@ -6,6 +6,12 @@ import { WifiOff, Wifi } from 'lucide-react';
 import { usePWA } from '@/hooks/usePWA';
 
 const OfflineIndicator = () => {
+  // Add defensive check for React
+  if (!React || !React.useState || !React.useEffect) {
+    console.error('React not available in OfflineIndicator');
+    return null;
+  }
+
   const { isOffline } = usePWA();
   const [showReconnected, setShowReconnected] = React.useState(false);
 
