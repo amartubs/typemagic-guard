@@ -17,6 +17,7 @@ interface State {
   error?: Error;
   errorInfo?: ErrorInfo;
   errorId?: string;
+  isReactError?: boolean;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -29,10 +30,16 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   static getDerivedStateFromError(error: Error): State {
+    const isReactError = error.message.includes('useState') || 
+                        error.message.includes('useEffect') || 
+                        error.message.includes('useRef') ||
+                        error.message.includes('Cannot read properties of null');
+    
     return {
       hasError: true,
       error,
-      errorId: Math.random().toString(36).substr(2, 9)
+      errorId: Math.random().toString(36).substr(2, 9),
+      isReactError
     };
   }
 
@@ -40,7 +47,11 @@ export class ErrorBoundary extends Component<Props, State> {
     this.setState({
       error,
       errorInfo,
-      errorId: Math.random().toString(36).substr(2, 9)
+      errorId: Math.random().toString(36).substr(2, 9),
+      isReactError: error.message.includes('useState') || 
+                   error.message.includes('useEffect') || 
+                   error.message.includes('useRef') ||
+                   error.message.includes('Cannot read properties of null')
     });
 
     // Call custom error handler if provided
@@ -60,13 +71,13 @@ export class ErrorBoundary extends Component<Props, State> {
   handleRetry = () => {
     if (this.retryCount < this.maxRetries) {
       this.retryCount++;
-      this.setState({ hasError: false, error: undefined, errorInfo: undefined });
+      this.setState({ hasError: false, error: undefined, errorInfo: undefined, isReactError: false });
     }
   };
 
   handleReset = () => {
     this.retryCount = 0;
-    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
+    this.setState({ hasError: false, error: undefined, errorInfo: undefined, isReactError: false });
   };
 
   handleReportError = () => {
@@ -78,7 +89,8 @@ export class ErrorBoundary extends Component<Props, State> {
         componentStack: this.state.errorInfo?.componentStack,
         timestamp: new Date().toISOString(),
         userAgent: navigator.userAgent,
-        url: window.location.href
+        url: window.location.href,
+        isReactError: this.state.isReactError
       };
       
       console.log('Error Report:', errorReport);
@@ -99,13 +111,16 @@ export class ErrorBoundary extends Component<Props, State> {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-destructive">
               <AlertTriangle className="h-5 w-5" />
-              Something went wrong
+              {this.state.isReactError ? 'React Initialization Error' : 'Something went wrong'}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-sm space-y-2">
               <p className="text-muted-foreground">
-                We've encountered an unexpected error. Our team has been notified.
+                {this.state.isReactError 
+                  ? 'There was an issue initializing React components. This usually resolves with a page refresh.'
+                  : "We've encountered an unexpected error. Our team has been notified."
+                }
               </p>
               {this.state.errorId && (
                 <p className="font-mono text-xs bg-muted p-2 rounded">

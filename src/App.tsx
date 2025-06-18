@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/auth';
+import ReactReadyWrapper from '@/components/ReactReadyWrapper';
 import Index from '@/pages/Index';
 import Demo from '@/pages/Demo';
 import DemoEnvironment from '@/pages/DemoEnvironment';
@@ -40,128 +41,130 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <Router>
-          <AuthProvider>
-            <AccessibleWrapper
-              className="min-h-screen bg-background text-foreground"
-              landmarkRole="main"
-              skipLinks={[
-                { href: '#main-content', label: 'Skip to main content' },
-                { href: '#navigation', label: 'Skip to navigation' }
-              ]}
-            >
-              {/* PWA Components */}
-              <OfflineIndicator />
-              <InstallPrompt />
-              
-              <div id="main-content">
-                <ErrorBoundary>
-                  <Routes>
-                    {/* Public routes */}
-                    <Route path="/" element={<Index />} />
-                    <Route path="/demo" element={<Demo />} />
-                    <Route path="/demo-environment" element={<DemoEnvironment />} />
-                    <Route path="/onboarding" element={<Onboarding />} />
-                    <Route path="/pricing" element={<Pricing />} />
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/reset-password" element={<ResetPassword />} />
-                    <Route path="/patent-drawings" element={<PatentDrawingsPage />} />
-                    
-                    {/* Legacy redirects */}
-                    <Route path="/login" element={<Navigate to="/auth" replace />} />
-                    <Route path="/register" element={<Navigate to="/auth" replace />} />
-                    <Route path="/signup" element={<Navigate to="/auth" replace />} />
-                    
-                    {/* Protected routes */}
-                    <Route
-                      path="/dashboard"
-                      element={
-                        <ErrorBoundary>
-                          <PrivateRoute>
-                            <Dashboard />
-                          </PrivateRoute>
-                        </ErrorBoundary>
-                      }
-                    />
-                    <Route
-                      path="/profile"
-                      element={
-                        <ErrorBoundary>
-                          <PrivateRoute>
-                            <Profile />
-                          </PrivateRoute>
-                        </ErrorBoundary>
-                      }
-                    />
-                    <Route
-                      path="/settings"
-                      element={
-                        <ErrorBoundary>
-                          <PrivateRoute>
-                            <Settings />
-                          </PrivateRoute>
-                        </ErrorBoundary>
-                      }
-                    />
-                    <Route
-                      path="/enterprise"
-                      element={
-                        <ErrorBoundary>
-                          <PrivateRoute>
-                            <EnterprisePortal />
-                          </PrivateRoute>
-                        </ErrorBoundary>
-                      }
-                    />
-                    <Route
-                      path="/support"
-                      element={
-                        <ErrorBoundary>
-                          <PrivateRoute>
-                            <Support />
-                          </PrivateRoute>
-                        </ErrorBoundary>
-                      }
-                    />
-                    <Route
-                      path="/features"
-                      element={
-                        <ErrorBoundary>
-                          <PrivateRoute>
-                            <FeatureShowcase />
-                          </PrivateRoute>
-                        </ErrorBoundary>
-                      }
-                    />
-                    <Route
-                      path="/admin"
-                      element={
-                        <ErrorBoundary>
-                          <PrivateRoute>
-                            <Admin />
-                          </PrivateRoute>
-                        </ErrorBoundary>
-                      }
-                    />
-                    
-                    {/* Analytics route redirect */}
-                    <Route 
-                      path="/analytics" 
-                      element={<Navigate to="/dashboard" replace />} 
-                    />
-                    
-                    {/* 404 fallback */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </ErrorBoundary>
-              </div>
-              
-              <Toaster />
-            </AccessibleWrapper>
-          </AuthProvider>
-        </Router>
-      </QueryClientProvider>
+      <ReactReadyWrapper>
+        <QueryClientProvider client={queryClient}>
+          <Router>
+            <AuthProvider>
+              <AccessibleWrapper
+                className="min-h-screen bg-background text-foreground"
+                landmarkRole="main"
+                skipLinks={[
+                  { href: '#main-content', label: 'Skip to main content' },
+                  { href: '#navigation', label: 'Skip to navigation' }
+                ]}
+              >
+                {/* PWA Components */}
+                <OfflineIndicator />
+                <InstallPrompt />
+                
+                <div id="main-content">
+                  <ErrorBoundary>
+                    <Routes>
+                      {/* Public routes */}
+                      <Route path="/" element={<Index />} />
+                      <Route path="/demo" element={<Demo />} />
+                      <Route path="/demo-environment" element={<DemoEnvironment />} />
+                      <Route path="/onboarding" element={<Onboarding />} />
+                      <Route path="/pricing" element={<Pricing />} />
+                      <Route path="/auth" element={<Auth />} />
+                      <Route path="/reset-password" element={<ResetPassword />} />
+                      <Route path="/patent-drawings" element={<PatentDrawingsPage />} />
+                      
+                      {/* Legacy redirects */}
+                      <Route path="/login" element={<Navigate to="/auth" replace />} />
+                      <Route path="/register" element={<Navigate to="/auth" replace />} />
+                      <Route path="/signup" element={<Navigate to="/auth" replace />} />
+                      
+                      {/* Protected routes */}
+                      <Route
+                        path="/dashboard"
+                        element={
+                          <ErrorBoundary>
+                            <PrivateRoute>
+                              <Dashboard />
+                            </PrivateRoute>
+                          </ErrorBoundary>
+                        }
+                      />
+                      <Route
+                        path="/profile"
+                        element={
+                          <ErrorBoundary>
+                            <PrivateRoute>
+                              <Profile />
+                            </PrivateRoute>
+                          </ErrorBoundary>
+                        }
+                      />
+                      <Route
+                        path="/settings"
+                        element={
+                          <ErrorBoundary>
+                            <PrivateRoute>
+                              <Settings />
+                            </PrivateRoute>
+                          </ErrorBoundary>
+                        }
+                      />
+                      <Route
+                        path="/enterprise"
+                        element={
+                          <ErrorBoundary>
+                            <PrivateRoute>
+                              <EnterprisePortal />
+                            </PrivateRoute>
+                          </ErrorBoundary>
+                        }
+                      />
+                      <Route
+                        path="/support"
+                        element={
+                          <ErrorBoundary>
+                            <PrivateRoute>
+                              <Support />
+                            </PrivateRoute>
+                          </ErrorBoundary>
+                        }
+                      />
+                      <Route
+                        path="/features"
+                        element={
+                          <ErrorBoundary>
+                            <PrivateRoute>
+                              <FeatureShowcase />
+                            </PrivateRoute>
+                          </ErrorBoundary>
+                        }
+                      />
+                      <Route
+                        path="/admin"
+                        element={
+                          <ErrorBoundary>
+                            <PrivateRoute>
+                              <Admin />
+                            </PrivateRoute>
+                          </ErrorBoundary>
+                        }
+                      />
+                      
+                      {/* Analytics route redirect */}
+                      <Route 
+                        path="/analytics" 
+                        element={<Navigate to="/dashboard" replace />} 
+                      />
+                      
+                      {/* 404 fallback */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </ErrorBoundary>
+                </div>
+                
+                <Toaster />
+              </AccessibleWrapper>
+            </AuthProvider>
+          </Router>
+        </QueryClientProvider>
+      </ReactReadyWrapper>
     </ErrorBoundary>
   );
 }

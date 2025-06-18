@@ -1,3 +1,4 @@
+
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth';
 import { routeConfig, isProtectedRoute } from '@/utils/routeValidation';
@@ -61,4 +62,3 @@ export const useNavigation = () => {
     isAuthenticated: !!user
   };
 };
-
