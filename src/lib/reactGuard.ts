@@ -1,4 +1,6 @@
 
+import React from 'react';
+
 let reactReady = false;
 let readyPromise: Promise<void> | null = null;
 
