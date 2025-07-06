@@ -79,3 +79,6 @@ verify_jwt = false
 
 [functions.api-key-management]
 verify_jwt = true
+
+[functions.biometric-api]
+verify_jwt = false

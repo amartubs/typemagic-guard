@@ -33,18 +33,35 @@ serve(async (req) => {
   try {
     const { action, email, keystrokeData }: BiometricRequest = await req.json();
     
-    // Get user profile
-    const { data: profile } = await supabase
+    // Get or create user profile
+    let { data: profile } = await supabase
       .from('profiles')
       .select('id')
       .eq('email', email)
-      .single();
+      .maybeSingle();
 
     if (!profile) {
-      return new Response(
-        JSON.stringify({ error: 'User not found' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      console.log(`Creating profile for new user: ${email}`);
+      // Create new user profile
+      const { data: newProfile, error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          email,
+          name: email.split('@')[0],
+          user_type: 'individual',
+          status: 'active'
+        })
+        .select('id')
+        .single();
+
+      if (profileError) {
+        console.error('Failed to create profile:', profileError);
+        return new Response(
+          JSON.stringify({ error: 'Failed to create user profile', details: profileError.message }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      profile = newProfile;
     }
 
     switch (action) {
@@ -56,31 +73,65 @@ serve(async (req) => {
           );
         }
 
-        // Store training pattern
-        const { data: biometricProfile } = await supabase
+        // Get or create biometric profile
+        let { data: biometricProfile } = await supabase
           .from('biometric_profiles')
           .select('id')
           .eq('user_id', profile.id)
-          .single();
+          .maybeSingle();
 
-        if (biometricProfile) {
-          await supabase
-            .from('keystroke_patterns')
+        if (!biometricProfile) {
+          console.log(`Creating biometric profile for user: ${profile.id}`);
+          const { data: newBiometricProfile, error: biometricError } = await supabase
+            .from('biometric_profiles')
             .insert({
               user_id: profile.id,
-              biometric_profile_id: biometricProfile.id,
-              pattern_data: { timings: keystrokeData.timings },
-              context: keystrokeData.context || 'training'
-            });
-
-          // Update pattern count
-          await supabase
-            .from('biometric_profiles')
-            .update({ 
-              pattern_count: supabase.sql`pattern_count + 1`,
-              last_updated: new Date().toISOString()
+              confidence_score: 0,
+              status: 'learning',
+              pattern_count: 0
             })
-            .eq('user_id', profile.id);
+            .select('id')
+            .single();
+
+          if (biometricError) {
+            console.error('Failed to create biometric profile:', biometricError);
+            return new Response(
+              JSON.stringify({ error: 'Failed to create biometric profile', details: biometricError.message }),
+              { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+          biometricProfile = newBiometricProfile;
+        }
+
+        // Store training pattern
+        const { error: patternError } = await supabase
+          .from('keystroke_patterns')
+          .insert({
+            user_id: profile.id,
+            biometric_profile_id: biometricProfile.id,
+            pattern_data: { timings: keystrokeData.timings },
+            context: keystrokeData.context || 'training'
+          });
+
+        if (patternError) {
+          console.error('Failed to store keystroke pattern:', patternError);
+          return new Response(
+            JSON.stringify({ error: 'Failed to store training data', details: patternError.message }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        // Update pattern count
+        const { error: updateError } = await supabase
+          .from('biometric_profiles')
+          .update({ 
+            pattern_count: supabase.sql`pattern_count + 1`,
+            last_updated: new Date().toISOString()
+          })
+          .eq('user_id', profile.id);
+
+        if (updateError) {
+          console.error('Failed to update pattern count:', updateError);
         }
 
         return new Response(
@@ -104,14 +155,27 @@ serve(async (req) => {
             keystroke_patterns(*)
           `)
           .eq('user_id', profile.id)
-          .single();
+          .maybeSingle();
 
-        if (!userProfile || userProfile.keystroke_patterns.length < 3) {
+        if (!userProfile) {
           return new Response(
             JSON.stringify({ 
               success: false, 
               confidence: 0, 
-              message: 'Insufficient training data' 
+              message: 'No biometric profile found. Please complete training first.' 
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        if (userProfile.keystroke_patterns.length < 3) {
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              confidence: 0, 
+              message: `Insufficient training data. Need ${3 - userProfile.keystroke_patterns.length} more training samples.`,
+              pattern_count: userProfile.keystroke_patterns.length,
+              required_count: 3
             }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
@@ -144,13 +208,14 @@ serve(async (req) => {
           .from('biometric_profiles')
           .select('confidence_score, status, pattern_count')
           .eq('user_id', profile.id)
-          .single();
+          .maybeSingle();
 
         return new Response(
           JSON.stringify(profileData || { 
             confidence_score: 0, 
             status: 'learning', 
-            pattern_count: 0 
+            pattern_count: 0,
+            message: 'No biometric profile found. Training required.'
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
