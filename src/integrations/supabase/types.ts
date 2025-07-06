@@ -410,7 +410,7 @@ export type Database = {
         Insert: {
           created_at?: string
           email: string
-          id: string
+          id?: string
           last_login?: string | null
           name: string
           organization_name?: string | null
