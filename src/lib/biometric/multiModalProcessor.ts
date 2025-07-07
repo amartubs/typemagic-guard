@@ -116,12 +116,14 @@ export class MultiModalBiometricProcessor {
 
   private async analyzeTouchPatterns(userId: string, patterns: TouchPattern[], deviceFingerprint: string): Promise<number> {
     // Store patterns and calculate confidence
+    const biometricProfileId = await this.getBiometricProfileId(userId);
+    
     for (const pattern of patterns) {
       await supabase.from('touch_patterns').insert({
         user_id: userId,
-        biometric_profile_id: await this.getBiometricProfileId(userId),
+        biometric_profile_id: biometricProfileId,
         pattern_type: pattern.type,
-        pattern_data: pattern,
+        pattern_data: pattern as any, // Cast to Json type
         device_fingerprint: deviceFingerprint,
         context: pattern.context
       });
@@ -133,12 +135,14 @@ export class MultiModalBiometricProcessor {
 
   private async analyzeMousePatterns(userId: string, patterns: MousePattern[], deviceFingerprint: string): Promise<number> {
     // Store patterns and calculate confidence
+    const biometricProfileId = await this.getBiometricProfileId(userId);
+    
     for (const pattern of patterns) {
       await supabase.from('mouse_patterns').insert({
         user_id: userId,
-        biometric_profile_id: await this.getBiometricProfileId(userId),
+        biometric_profile_id: biometricProfileId,
         pattern_type: pattern.type,
-        pattern_data: pattern,
+        pattern_data: pattern as any, // Cast to Json type
         device_fingerprint: deviceFingerprint,
         context: pattern.context
       });
@@ -149,12 +153,14 @@ export class MultiModalBiometricProcessor {
 
   private async analyzeBehavioralPatterns(userId: string, patterns: BehavioralPattern[], deviceFingerprint: string): Promise<number> {
     // Store patterns and calculate confidence
+    const biometricProfileId = await this.getBiometricProfileId(userId);
+    
     for (const pattern of patterns) {
       await supabase.from('behavioral_patterns').insert({
         user_id: userId,
-        biometric_profile_id: await this.getBiometricProfileId(userId),
+        biometric_profile_id: biometricProfileId,
         pattern_type: pattern.type,
-        pattern_data: pattern.data,
+        pattern_data: pattern.data as any, // Cast to Json type
         device_fingerprint: deviceFingerprint,
         context: pattern.context
       });
