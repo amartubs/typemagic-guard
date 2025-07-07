@@ -168,6 +168,57 @@ export type Database = {
           },
         ]
       }
+      behavioral_patterns: {
+        Row: {
+          biometric_profile_id: string
+          confidence_score: number | null
+          context: string
+          created_at: string
+          device_fingerprint: string | null
+          id: string
+          pattern_data: Json
+          pattern_type: string
+          user_id: string
+        }
+        Insert: {
+          biometric_profile_id: string
+          confidence_score?: number | null
+          context: string
+          created_at?: string
+          device_fingerprint?: string | null
+          id?: string
+          pattern_data: Json
+          pattern_type: string
+          user_id: string
+        }
+        Update: {
+          biometric_profile_id?: string
+          confidence_score?: number | null
+          context?: string
+          created_at?: string
+          device_fingerprint?: string | null
+          id?: string
+          pattern_data?: Json
+          pattern_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "behavioral_patterns_biometric_profile_id_fkey"
+            columns: ["biometric_profile_id"]
+            isOneToOne: false
+            referencedRelation: "biometric_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "behavioral_patterns_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       biometric_profiles: {
         Row: {
           confidence_score: number
@@ -201,6 +252,65 @@ export type Database = {
             foreignKeyName: "biometric_profiles_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      device_capabilities: {
+        Row: {
+          capabilities: Json
+          created_at: string
+          device_fingerprint: string
+          device_type: string
+          has_keyboard: boolean
+          has_mouse: boolean
+          has_touch: boolean
+          has_trackpad: boolean
+          id: string
+          platform: string | null
+          screen_resolution: string | null
+          updated_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          capabilities?: Json
+          created_at?: string
+          device_fingerprint: string
+          device_type: string
+          has_keyboard?: boolean
+          has_mouse?: boolean
+          has_touch?: boolean
+          has_trackpad?: boolean
+          id?: string
+          platform?: string | null
+          screen_resolution?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          capabilities?: Json
+          created_at?: string
+          device_fingerprint?: string
+          device_type?: string
+          has_keyboard?: boolean
+          has_mouse?: boolean
+          has_touch?: boolean
+          has_trackpad?: boolean
+          id?: string
+          platform?: string | null
+          screen_resolution?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "device_capabilities_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -389,6 +499,110 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      mouse_patterns: {
+        Row: {
+          biometric_profile_id: string
+          confidence_score: number | null
+          context: string
+          created_at: string
+          device_fingerprint: string | null
+          id: string
+          pattern_data: Json
+          pattern_type: string
+          user_id: string
+        }
+        Insert: {
+          biometric_profile_id: string
+          confidence_score?: number | null
+          context: string
+          created_at?: string
+          device_fingerprint?: string | null
+          id?: string
+          pattern_data: Json
+          pattern_type: string
+          user_id: string
+        }
+        Update: {
+          biometric_profile_id?: string
+          confidence_score?: number | null
+          context?: string
+          created_at?: string
+          device_fingerprint?: string | null
+          id?: string
+          pattern_data?: Json
+          pattern_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mouse_patterns_biometric_profile_id_fkey"
+            columns: ["biometric_profile_id"]
+            isOneToOne: false
+            referencedRelation: "biometric_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mouse_patterns_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      multimodal_auth_attempts: {
+        Row: {
+          anomaly_details: Json | null
+          combined_confidence: number
+          created_at: string
+          device_fingerprint: string
+          id: string
+          individual_scores: Json
+          ip_address: unknown | null
+          modalities_used: string[]
+          risk_score: number
+          success: boolean
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          anomaly_details?: Json | null
+          combined_confidence: number
+          created_at?: string
+          device_fingerprint: string
+          id?: string
+          individual_scores: Json
+          ip_address?: unknown | null
+          modalities_used: string[]
+          risk_score: number
+          success: boolean
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          anomaly_details?: Json | null
+          combined_confidence?: number
+          created_at?: string
+          device_fingerprint?: string
+          id?: string
+          individual_scores?: Json
+          ip_address?: unknown | null
+          modalities_used?: string[]
+          risk_score?: number
+          success?: boolean
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "multimodal_auth_attempts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -741,6 +955,57 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "system_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      touch_patterns: {
+        Row: {
+          biometric_profile_id: string
+          confidence_score: number | null
+          context: string
+          created_at: string
+          device_fingerprint: string | null
+          id: string
+          pattern_data: Json
+          pattern_type: string
+          user_id: string
+        }
+        Insert: {
+          biometric_profile_id: string
+          confidence_score?: number | null
+          context: string
+          created_at?: string
+          device_fingerprint?: string | null
+          id?: string
+          pattern_data: Json
+          pattern_type: string
+          user_id: string
+        }
+        Update: {
+          biometric_profile_id?: string
+          confidence_score?: number | null
+          context?: string
+          created_at?: string
+          device_fingerprint?: string | null
+          id?: string
+          pattern_data?: Json
+          pattern_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "touch_patterns_biometric_profile_id_fkey"
+            columns: ["biometric_profile_id"]
+            isOneToOne: false
+            referencedRelation: "biometric_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "touch_patterns_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
