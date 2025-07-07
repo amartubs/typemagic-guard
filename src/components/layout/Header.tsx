@@ -45,6 +45,14 @@ const Header = () => {
                 Demo
               </Link>
               <Link 
+                to="/biometric-demo" 
+                className={`text-sm font-medium transition-colors hover:text-[#9b87f5] ${
+                  isActive('/biometric-demo') ? 'text-[#9b87f5]' : 'text-foreground/60'
+                }`}
+              >
+                Multi-Modal Demo
+              </Link>
+              <Link 
                 to="/support" 
                 className={`text-sm font-medium transition-colors hover:text-[#9b87f5] ${
                   isActive('/support') ? 'text-[#9b87f5]' : 'text-foreground/60'

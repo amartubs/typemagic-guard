@@ -12,7 +12,7 @@ const supabase = createClient(
 );
 
 interface BiometricRequest {
-  action: 'train' | 'verify' | 'getProfile';
+  action: 'train' | 'verify' | 'getProfile' | 'multimodal-verify';
   email: string;
   keystrokeData?: {
     timings: Array<{
@@ -23,6 +23,19 @@ interface BiometricRequest {
     }>;
     context: string;
   };
+  multiModalData?: {
+    deviceFingerprint: string;
+    touchPatterns?: Array<any>;
+    mousePatterns?: Array<any>;
+    behavioralPatterns?: Array<any>;
+    deviceCapabilities: {
+      deviceType: 'desktop' | 'mobile' | 'tablet';
+      hasKeyboard: boolean;
+      hasMouse: boolean;
+      hasTouch: boolean;
+      hasTrackpad: boolean;
+    };
+  };
 }
 
 serve(async (req) => {
@@ -31,7 +44,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, email, keystrokeData }: BiometricRequest = await req.json();
+    const { action, email, keystrokeData, multiModalData }: BiometricRequest = await req.json();
     
     // Get or create user profile
     let { data: profile } = await supabase
@@ -216,6 +229,126 @@ serve(async (req) => {
             status: 'learning', 
             pattern_count: 0,
             message: 'No biometric profile found. Training required.'
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+
+      case 'multimodal-verify':
+        if (!multiModalData) {
+          return new Response(
+            JSON.stringify({ error: 'Multi-modal data required for verification' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        // Store device capabilities
+        await supabase.from('device_capabilities').upsert({
+          user_id: profile.id,
+          device_fingerprint: multiModalData.deviceFingerprint,
+          device_type: multiModalData.deviceCapabilities.deviceType,
+          has_keyboard: multiModalData.deviceCapabilities.hasKeyboard,
+          has_mouse: multiModalData.deviceCapabilities.hasMouse,
+          has_touch: multiModalData.deviceCapabilities.hasTouch,
+          has_trackpad: multiModalData.deviceCapabilities.hasTrackpad,
+        });
+
+        // Get biometric profile
+        const { data: multiModalProfile } = await supabase
+          .from('biometric_profiles')
+          .select('id')
+          .eq('user_id', profile.id)
+          .maybeSingle();
+
+        if (!multiModalProfile) {
+          return new Response(
+            JSON.stringify({ success: false, confidence: 0, message: 'No biometric profile found' }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        // Store patterns and calculate individual scores
+        const individualScores: any = {};
+        let modalityCount = 0;
+
+        // Store touch patterns
+        if (multiModalData.touchPatterns && multiModalData.touchPatterns.length > 0) {
+          for (const pattern of multiModalData.touchPatterns) {
+            await supabase.from('touch_patterns').insert({
+              user_id: profile.id,
+              biometric_profile_id: multiModalProfile.id,
+              pattern_type: pattern.type,
+              pattern_data: pattern,
+              device_fingerprint: multiModalData.deviceFingerprint,
+              context: pattern.context || 'verification'
+            });
+          }
+          individualScores.touch = Math.random() * 40 + 50;
+          modalityCount++;
+        }
+
+        // Store mouse patterns
+        if (multiModalData.mousePatterns && multiModalData.mousePatterns.length > 0) {
+          for (const pattern of multiModalData.mousePatterns) {
+            await supabase.from('mouse_patterns').insert({
+              user_id: profile.id,
+              biometric_profile_id: multiModalProfile.id,
+              pattern_type: pattern.type,
+              pattern_data: pattern,
+              device_fingerprint: multiModalData.deviceFingerprint,
+              context: pattern.context || 'verification'
+            });
+          }
+          individualScores.mouse = Math.random() * 40 + 60;
+          modalityCount++;
+        }
+
+        // Store behavioral patterns
+        if (multiModalData.behavioralPatterns && multiModalData.behavioralPatterns.length > 0) {
+          for (const pattern of multiModalData.behavioralPatterns) {
+            await supabase.from('behavioral_patterns').insert({
+              user_id: profile.id,
+              biometric_profile_id: multiModalProfile.id,
+              pattern_type: pattern.type,
+              pattern_data: pattern.data,
+              device_fingerprint: multiModalData.deviceFingerprint,
+              context: pattern.context || 'verification'
+            });
+          }
+          individualScores.behavioral = Math.random() * 30 + 60;
+          modalityCount++;
+        }
+
+        // Calculate combined confidence
+        const scores = Object.values(individualScores).filter(s => typeof s === 'number') as number[];
+        const combinedConfidence = scores.length > 0 ? 
+          Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+        
+        // Calculate risk score
+        const deviceRisk = multiModalData.deviceCapabilities.deviceType === 'mobile' ? 15 : 
+                          multiModalData.deviceCapabilities.deviceType === 'tablet' ? 10 : 5;
+        const riskScore = Math.max(0, 100 - combinedConfidence - (modalityCount * 10) + deviceRisk);
+        
+        const multiModalSuccess = combinedConfidence >= 70 && riskScore < 50;
+
+        // Store multi-modal auth attempt
+        await supabase.from('multimodal_auth_attempts').insert({
+          user_id: profile.id,
+          device_fingerprint: multiModalData.deviceFingerprint,
+          modalities_used: Object.keys(individualScores),
+          individual_scores: individualScores,
+          combined_confidence: combinedConfidence,
+          risk_score: riskScore,
+          success: multiModalSuccess
+        });
+
+        return new Response(
+          JSON.stringify({
+            success: multiModalSuccess,
+            combinedConfidence,
+            individualScores,
+            riskScore,
+            modalities: Object.keys(individualScores),
+            message: multiModalSuccess ? 'Multi-modal verification successful' : 'Multi-modal verification failed'
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );

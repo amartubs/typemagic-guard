@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth';
 import { Lock, User as UserIcon, Shield, AlertCircle, CheckCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import EnhancedBiometricAuth from '@/components/biometric/EnhancedBiometricAuth';
+import MultiModalBiometricAuth from '@/components/biometric/MultiModalBiometricAuth';
 
 const LoginPage: React.FC = () => {
   const { toast } = useToast();
@@ -194,9 +194,10 @@ const LoginPage: React.FC = () => {
               </Alert>
             )}
 
-            <EnhancedBiometricAuth
+            <MultiModalBiometricAuth
               mode="verification"
               onAuthentication={handleBiometricResult}
+              userEmail={email}
             />
 
             <div className="flex flex-col space-y-2">

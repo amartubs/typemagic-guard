@@ -20,6 +20,7 @@ import PatentDrawingsPage from '@/pages/PatentDrawingsPage';
 import FeatureShowcase from '@/pages/FeatureShowcase';
 import NotFound from '@/pages/NotFound';
 import Admin from '@/pages/Admin';
+import BiometricDemo from '@/pages/BiometricDemo';
 import PrivateRoute from '@/components/auth/PrivateRoute';
 import InstallPrompt from '@/components/pwa/InstallPrompt';
 import OfflineIndicator from '@/components/pwa/OfflineIndicator';
@@ -63,6 +64,7 @@ function App() {
                       {/* Public routes */}
                       <Route path="/" element={<Index />} />
                       <Route path="/demo" element={<Demo />} />
+                      <Route path="/biometric-demo" element={<BiometricDemo />} />
                       <Route path="/demo-environment" element={<DemoEnvironment />} />
                       <Route path="/onboarding" element={<Onboarding />} />
                       <Route path="/pricing" element={<Pricing />} />
