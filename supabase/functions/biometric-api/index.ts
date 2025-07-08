@@ -1,6 +1,13 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
+// Rate limiting store (in-memory for simplicity, use Redis in production)
+const rateLimitStore = new Map<string, { count: number; resetTime: number; lockoutTime?: number }>();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 10;
+const LOCKOUT_DURATION = 300000; // 5 minutes
+const MAX_FAILED_ATTEMPTS = 3;
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -12,8 +19,8 @@ const supabase = createClient(
 );
 
 interface BiometricRequest {
-  action: 'train' | 'verify' | 'getProfile' | 'multimodal-verify';
-  email: string;
+  action: 'train' | 'verify' | 'getProfile' | 'multimodal-verify' | 'device-trust' | 'health';
+  email?: string;
   keystrokeData?: {
     timings: Array<{
       key: string;
@@ -36,6 +43,122 @@ interface BiometricRequest {
       hasTrackpad: boolean;
     };
   };
+  deviceData?: {
+    fingerprint: string;
+    ipAddress?: string;
+    userAgent?: string;
+    location?: string;
+  };
+}
+
+interface StandardResponse {
+  success: boolean;
+  confidenceScore?: number;
+  riskLevel?: 'low' | 'medium' | 'high';
+  modalityScores?: {
+    keystroke?: number;
+    touch?: number;
+    mouse?: number;
+    behavioral?: number;
+  };
+  deviceTrust?: number;
+  anomalies?: string[];
+  recommendation?: string;
+  message?: string;
+  timestamp: string;
+  processingTime?: number;
+}
+
+// Rate limiting functions
+function getClientId(req: Request): string {
+  const forwarded = req.headers.get('x-forwarded-for');
+  const realIp = req.headers.get('x-real-ip');
+  return forwarded?.split(',')[0] || realIp || 'unknown';
+}
+
+function checkRateLimit(clientId: string): { allowed: boolean; isLocked: boolean; resetTime?: number } {
+  const now = Date.now();
+  const clientData = rateLimitStore.get(clientId);
+  
+  if (!clientData) {
+    rateLimitStore.set(clientId, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return { allowed: true, isLocked: false };
+  }
+  
+  // Check if client is locked out
+  if (clientData.lockoutTime && now < clientData.lockoutTime) {
+    return { allowed: false, isLocked: true, resetTime: clientData.lockoutTime };
+  }
+  
+  // Reset window if expired
+  if (now > clientData.resetTime) {
+    clientData.count = 1;
+    clientData.resetTime = now + RATE_LIMIT_WINDOW;
+    clientData.lockoutTime = undefined;
+    return { allowed: true, isLocked: false };
+  }
+  
+  // Check rate limit
+  if (clientData.count >= MAX_REQUESTS_PER_WINDOW) {
+    return { allowed: false, isLocked: false, resetTime: clientData.resetTime };
+  }
+  
+  clientData.count++;
+  return { allowed: true, isLocked: false };
+}
+
+function trackFailedAttempt(email: string): boolean {
+  const key = `failed_${email}`;
+  const now = Date.now();
+  const clientData = rateLimitStore.get(key);
+  
+  if (!clientData) {
+    rateLimitStore.set(key, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return false;
+  }
+  
+  if (now > clientData.resetTime) {
+    clientData.count = 1;
+    clientData.resetTime = now + RATE_LIMIT_WINDOW;
+    return false;
+  }
+  
+  clientData.count++;
+  if (clientData.count >= MAX_FAILED_ATTEMPTS) {
+    clientData.lockoutTime = now + LOCKOUT_DURATION;
+    return true; // Account locked
+  }
+  
+  return false;
+}
+
+function createStandardResponse(data: Partial<StandardResponse>): StandardResponse {
+  return {
+    success: data.success ?? false,
+    timestamp: new Date().toISOString(),
+    ...data
+  };
+}
+
+function calculateRiskLevel(confidence: number, riskScore: number): 'low' | 'medium' | 'high' {
+  if (confidence >= 85 && riskScore <= 20) return 'low';
+  if (confidence >= 70 && riskScore <= 40) return 'medium';
+  return 'high';
+}
+
+function calculateDeviceTrust(deviceFingerprint: string, behaviorHistory: any[]): number {
+  // Simple device trust calculation - would be more sophisticated in production
+  let trust = 50; // Base trust
+  
+  // Trust increases with consistent behavior
+  if (behaviorHistory.length > 10) trust += 20;
+  if (behaviorHistory.length > 50) trust += 10;
+  
+  // Device fingerprint entropy affects trust
+  const entropy = new Set(deviceFingerprint.split('')).size;
+  trust += Math.min(20, entropy);
+  
+  return Math.min(100, Math.max(0, trust));
 }
 
 serve(async (req) => {
@@ -43,8 +166,105 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const startTime = performance.now();
+  const clientId = getClientId(req);
+
   try {
-    const { action, email, keystrokeData, multiModalData }: BiometricRequest = await req.json();
+    // Check rate limiting
+    const rateLimitCheck = checkRateLimit(clientId);
+    if (!rateLimitCheck.allowed) {
+      const errorResponse = createStandardResponse({
+        success: false,
+        message: rateLimitCheck.isLocked ? 'Account temporarily locked due to suspicious activity' : 'Rate limit exceeded',
+        anomalies: ['rate_limit_exceeded'],
+        processingTime: performance.now() - startTime
+      });
+      
+      return new Response(
+        JSON.stringify(errorResponse),
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json',
+            'X-RateLimit-Reset': rateLimitCheck.resetTime?.toString() || ''
+          } 
+        }
+      );
+    }
+
+    const { action, email, keystrokeData, multiModalData, deviceData }: BiometricRequest = await req.json();
+
+    // Handle health check
+    if (action === 'health') {
+      const healthResponse = createStandardResponse({
+        success: true,
+        message: 'Biometric API is healthy',
+        processingTime: performance.now() - startTime
+      });
+      
+      return new Response(
+        JSON.stringify(healthResponse),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Handle device trust scoring
+    if (action === 'device-trust') {
+      if (!deviceData?.fingerprint) {
+        const errorResponse = createStandardResponse({
+          success: false,
+          message: 'Device fingerprint required for trust assessment',
+          anomalies: ['missing_device_data'],
+          processingTime: performance.now() - startTime
+        });
+        
+        return new Response(
+          JSON.stringify(errorResponse),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Get device behavior history
+      const { data: deviceHistory } = await supabase
+        .from('device_capabilities')
+        .select('*')
+        .eq('device_fingerprint', deviceData.fingerprint)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      const deviceTrust = calculateDeviceTrust(deviceData.fingerprint, deviceHistory || []);
+      const riskLevel = deviceTrust >= 70 ? 'low' : deviceTrust >= 40 ? 'medium' : 'high';
+
+      const trustResponse = createStandardResponse({
+        success: true,
+        deviceTrust,
+        riskLevel,
+        message: `Device trust score: ${deviceTrust}%`,
+        recommendation: riskLevel === 'high' ? 'Additional verification recommended' : 'Device appears trustworthy',
+        processingTime: performance.now() - startTime
+      });
+
+      return new Response(
+        JSON.stringify(trustResponse),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate email for other actions
+    if (!email) {
+      const errorResponse = createStandardResponse({
+        success: false,
+        message: 'Email is required',
+        anomalies: ['missing_email'],
+        processingTime: performance.now() - startTime
+      });
+      
+      return new Response(
+        JSON.stringify(errorResponse),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
     
     // Get or create user profile
     let { data: profile } = await supabase
@@ -147,8 +367,15 @@ serve(async (req) => {
           console.error('Failed to update pattern count:', updateError);
         }
 
+        const trainingResponse = createStandardResponse({
+          success: true,
+          message: 'Training pattern stored successfully',
+          recommendation: 'Continue training for improved accuracy',
+          processingTime: performance.now() - startTime
+        });
+
         return new Response(
-          JSON.stringify({ success: true, message: 'Training pattern stored' }),
+          JSON.stringify(trainingResponse),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
 
@@ -197,6 +424,34 @@ serve(async (req) => {
         // Simple verification logic (you'd use your advanced analyzer here)
         const confidence = Math.random() * 40 + 50; // Mock confidence 50-90%
         const success = confidence > 65;
+        const riskScore = Math.max(0, 100 - confidence);
+        const riskLevel = calculateRiskLevel(confidence, riskScore);
+
+        // Track failed attempts and apply progressive delays
+        if (!success) {
+          const isLocked = trackFailedAttempt(email);
+          if (isLocked) {
+            const lockoutResponse = createStandardResponse({
+              success: false,
+              confidenceScore: Math.round(confidence),
+              riskLevel: 'high',
+              message: 'Account temporarily locked due to multiple failed attempts',
+              anomalies: ['account_locked', 'multiple_failures'],
+              recommendation: 'Wait 5 minutes before attempting again',
+              processingTime: performance.now() - startTime
+            });
+
+            return new Response(
+              JSON.stringify(lockoutResponse),
+              { status: 423, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+          
+          // Progressive delay for failed attempts
+          const failedAttempts = rateLimitStore.get(`failed_${email}`)?.count || 0;
+          const delay = Math.min(5000, failedAttempts * 1000); // Max 5 second delay
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
 
         // Log authentication attempt
         await supabase
@@ -204,15 +459,23 @@ serve(async (req) => {
           .insert({
             user_id: profile.id,
             success,
-            confidence_score: Math.round(confidence)
+            confidence_score: Math.round(confidence),
+            anomaly_details: !success ? { reason: 'Low confidence score' } : null
           });
 
+        const verifyResponse = createStandardResponse({
+          success,
+          confidenceScore: Math.round(confidence),
+          riskLevel,
+          modalityScores: { keystroke: Math.round(confidence) },
+          anomalies: !success ? ['low_confidence'] : [],
+          message: success ? 'Biometric verification successful' : 'Biometric verification failed',
+          recommendation: success ? 'Authentication completed' : 'Please try again or use alternative verification',
+          processingTime: performance.now() - startTime
+        });
+
         return new Response(
-          JSON.stringify({ 
-            success, 
-            confidence: Math.round(confidence),
-            message: success ? 'Biometric verification successful' : 'Biometric verification failed'
-          }),
+          JSON.stringify(verifyResponse),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
 
@@ -223,12 +486,22 @@ serve(async (req) => {
           .eq('user_id', profile.id)
           .maybeSingle();
 
+        const profileResponse = createStandardResponse({
+          success: true,
+          confidenceScore: profileData?.confidence_score || 0,
+          message: profileData ? 'Biometric profile retrieved successfully' : 'No biometric profile found. Training required.',
+          recommendation: profileData?.pattern_count < 5 ? 'Complete additional training for better accuracy' : 'Profile ready for authentication',
+          processingTime: performance.now() - startTime
+        });
+
         return new Response(
-          JSON.stringify(profileData || { 
-            confidence_score: 0, 
-            status: 'learning', 
-            pattern_count: 0,
-            message: 'No biometric profile found. Training required.'
+          JSON.stringify({
+            ...profileResponse,
+            profile: profileData || { 
+              confidence_score: 0, 
+              status: 'learning', 
+              pattern_count: 0
+            }
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
@@ -326,9 +599,31 @@ serve(async (req) => {
         // Calculate risk score
         const deviceRisk = multiModalData.deviceCapabilities.deviceType === 'mobile' ? 15 : 
                           multiModalData.deviceCapabilities.deviceType === 'tablet' ? 10 : 5;
-        const riskScore = Math.max(0, 100 - combinedConfidence - (modalityCount * 10) + deviceRisk);
+        const multiModalRiskScore = Math.max(0, 100 - combinedConfidence - (modalityCount * 10) + deviceRisk);
+        const multiModalRiskLevel = calculateRiskLevel(combinedConfidence, multiModalRiskScore);
         
-        const multiModalSuccess = combinedConfidence >= 70 && riskScore < 50;
+        const multiModalSuccess = combinedConfidence >= 70 && multiModalRiskScore < 50;
+
+        // Track failed attempts for multi-modal too
+        if (!multiModalSuccess) {
+          const isLocked = trackFailedAttempt(email);
+          if (isLocked) {
+            const lockoutResponse = createStandardResponse({
+              success: false,
+              confidenceScore: combinedConfidence,
+              riskLevel: 'high',
+              message: 'Account temporarily locked due to multiple failed attempts',
+              anomalies: ['account_locked', 'multi_modal_failure'],
+              recommendation: 'Wait 5 minutes before attempting again',
+              processingTime: performance.now() - startTime
+            });
+
+            return new Response(
+              JSON.stringify(lockoutResponse),
+              { status: 423, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+        }
 
         // Store multi-modal auth attempt
         await supabase.from('multimodal_auth_attempts').insert({
@@ -337,18 +632,31 @@ serve(async (req) => {
           modalities_used: Object.keys(individualScores),
           individual_scores: individualScores,
           combined_confidence: combinedConfidence,
-          risk_score: riskScore,
-          success: multiModalSuccess
+          risk_score: multiModalRiskScore,
+          success: multiModalSuccess,
+          anomaly_details: !multiModalSuccess ? { 
+            reason: 'Multi-modal verification failed',
+            modalities: Object.keys(individualScores),
+            risk_score: multiModalRiskScore
+          } : null
+        });
+
+        const multiModalResponse = createStandardResponse({
+          success: multiModalSuccess,
+          confidenceScore: combinedConfidence,
+          riskLevel: multiModalRiskLevel,
+          modalityScores: individualScores,
+          deviceTrust: calculateDeviceTrust(multiModalData.deviceFingerprint, []),
+          anomalies: !multiModalSuccess ? ['low_confidence', 'high_risk'] : [],
+          message: multiModalSuccess ? 'Multi-modal verification successful' : 'Multi-modal verification failed',
+          recommendation: multiModalSuccess ? 'Authentication completed with multiple biometric factors' : 'Consider additional verification methods',
+          processingTime: performance.now() - startTime
         });
 
         return new Response(
           JSON.stringify({
-            success: multiModalSuccess,
-            combinedConfidence,
-            individualScores,
-            riskScore,
-            modalities: Object.keys(individualScores),
-            message: multiModalSuccess ? 'Multi-modal verification successful' : 'Multi-modal verification failed'
+            ...multiModalResponse,
+            modalities: Object.keys(individualScores)
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );

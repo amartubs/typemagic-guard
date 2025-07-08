@@ -6,6 +6,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import BiometricMonitor from '@/components/admin/BiometricMonitor';
+import { BiometricSecurityDashboard } from '@/components/monitoring/BiometricSecurityDashboard';
 
 const Admin = () => {
   const { user } = useAuth();
@@ -37,9 +38,10 @@ const Admin = () => {
       <main className="container mx-auto py-8 px-4">
         <div className="max-w-7xl mx-auto">
           <Tabs defaultValue="dashboard" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="dashboard">System Dashboard</TabsTrigger>
               <TabsTrigger value="biometric">Biometric Monitor</TabsTrigger>
+              <TabsTrigger value="security">Security Dashboard</TabsTrigger>
             </TabsList>
             
             <TabsContent value="dashboard">
@@ -48,6 +50,10 @@ const Admin = () => {
             
             <TabsContent value="biometric">
               <BiometricMonitor />
+            </TabsContent>
+            
+            <TabsContent value="security">
+              <BiometricSecurityDashboard />
             </TabsContent>
           </Tabs>
         </div>
