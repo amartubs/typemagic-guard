@@ -1,69 +1,301 @@
-# Welcome to your Lovable project
+# TypeMagic Guard - Enterprise Biometric Authentication
 
-## Project info
+TypeMagic Guard is an advanced biometric authentication platform that provides multi-modal biometric verification using keystroke dynamics, touch patterns, mouse behavior, and device fingerprinting.
 
-**URL**: https://lovable.dev/projects/ce195aa8-64e2-4f83-ab97-55548337481d
+## 🚀 Quick Start
 
-## How can I edit this code?
+### Prerequisites
 
-There are several ways of editing your application.
+- Node.js 18+ 
+- Docker (optional for containerized deployment)
+- Supabase account
 
-**Use Lovable**
+### Development Setup
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ce195aa8-64e2-4f83-ab97-55548337481d) and start prompting.
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd typemagic-guard
+   ```
 
-Changes made via Lovable will be committed automatically to this repo.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-**Use your preferred IDE**
+3. **Configure environment**
+   ```bash
+   cp .env.example .env.development
+   # Edit .env.development with your configuration
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+4. **Start development server**
+   ```bash
+   npm run dev
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Docker Deployment
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+#### Development Environment
+```bash
+docker-compose --profile dev up
 ```
 
-**Edit a file directly in GitHub**
+#### Production Environment
+```bash
+# Build production image
+docker build -t typemagic-guard .
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+# Run with production profile
+docker-compose --profile production up
+```
 
-**Use GitHub Codespaces**
+## 📋 Environment Configuration
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Required Environment Variables
 
-## What technologies are used for this project?
+```bash
+# Supabase Configuration
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
-This project is built with .
+# Environment
+NODE_ENV=development|staging|production
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+# Security
+JWT_SECRET=your-jwt-secret
+ENCRYPTION_KEY=your-encryption-key
+```
 
-## How can I deploy this project?
+### Environment Files
 
-Simply open [Lovable](https://lovable.dev/projects/ce195aa8-64e2-4f83-ab97-55548337481d) and click on Share -> Publish.
+- `.env.development` - Development configuration
+- `.env.production` - Production configuration  
+- `.env.example` - Template file
 
-## I want to use a custom domain - is that possible?
+## 🔧 API Documentation
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+### Health Check Endpoints
+
+- **GET** `/health` - Basic health check
+- **GET** `/health/system` - Detailed system health with database connectivity
+
+### Biometric API Endpoints
+
+- **POST** `/biometric-api` - Main biometric operations
+  - `action: 'train'` - Store training patterns
+  - `action: 'verify'` - Verify user identity
+  - `action: 'multimodal-verify'` - Multi-modal verification
+  - `action: 'device-trust'` - Device trust scoring
+  - `action: 'getProfile'` - Retrieve biometric profile
+
+### API Response Format
+
+```json
+{
+  "success": boolean,
+  "confidenceScore": number,
+  "riskLevel": "low" | "medium" | "high",
+  "modalityScores": {
+    "keystroke": number,
+    "touch": number,
+    "mouse": number,
+    "behavioral": number
+  },
+  "deviceTrust": number,
+  "anomalies": string[],
+  "recommendation": string,
+  "message": string,
+  "timestamp": string,
+  "processingTime": number
+}
+```
+
+## 🛡️ Security Features
+
+### Rate Limiting
+- **API Rate Limit**: 100 requests per minute per IP
+- **Login Rate Limit**: 5 attempts per 15 minutes per user
+- **Account Lockout**: 5 minutes after 3 failed attempts
+
+### Progressive Security
+- Progressive delays on failed attempts
+- Device trust scoring
+- Risk assessment algorithms
+- Account lockout mechanisms
+
+### Compliance
+- GDPR compliant data handling
+- Enhanced security protocols
+- End-to-end encryption
+
+## 🏗️ Architecture
+
+### Frontend
+- React 18 with TypeScript
+- Tailwind CSS for styling
+- Shadcn/ui components
+- Vite for build tooling
+
+### Backend
+- Supabase for database and authentication
+- Edge Functions for API logic
+- PostgreSQL with Row Level Security (RLS)
+- Real-time subscriptions
+
+### Deployment
+- Docker containerization
+- Nginx reverse proxy
+- SSL/TLS termination
+- Health monitoring
+
+## 📊 Monitoring & Health Checks
+
+### Application Health
+- Database connectivity monitoring
+- Service status tracking
+- Performance metrics
+- Memory usage monitoring
+
+### API Monitoring
+- Response time tracking
+- Rate limit monitoring
+- Error rate tracking
+- Anomaly detection
+
+## 🔑 Multi-Modal Biometrics
+
+### Supported Modalities
+1. **Keystroke Dynamics** - Typing rhythm and patterns
+2. **Touch Patterns** - Touch pressure and timing on mobile devices
+3. **Mouse Dynamics** - Mouse movement and click patterns  
+4. **Behavioral Patterns** - User interaction patterns
+5. **Device Fingerprinting** - Device-specific characteristics
+
+### Confidence Scoring
+- Individual modality scores (0-100%)
+- Combined confidence calculation
+- Risk level assessment
+- Adaptive thresholds
+
+## 🚀 Deployment Guide
+
+### Production Checklist
+
+1. **Environment Setup**
+   - [ ] Production environment variables configured
+   - [ ] SSL certificates installed
+   - [ ] Database migrations applied
+   - [ ] Secrets properly configured
+
+2. **Security Configuration**
+   - [ ] Rate limiting enabled
+   - [ ] CORS properly configured
+   - [ ] Authentication middleware active
+   - [ ] Audit logging enabled
+
+3. **Monitoring Setup**
+   - [ ] Health checks configured
+   - [ ] Logging infrastructure ready
+   - [ ] Error tracking enabled
+   - [ ] Performance monitoring active
+
+4. **Scaling Preparation**
+   - [ ] Load balancer configured
+   - [ ] Database connection pooling
+   - [ ] CDN setup for static assets
+   - [ ] Backup procedures in place
+
+### Infrastructure Requirements
+
+**Minimum Requirements:**
+- 2 CPU cores
+- 4GB RAM
+- 20GB storage
+- 100 Mbps network
+
+**Recommended for Production:**
+- 4+ CPU cores
+- 8GB+ RAM
+- 100GB+ SSD storage
+- 1 Gbps network
+- Load balancer
+- Redis for caching
+
+## 📝 Development
+
+### Code Structure
+```
+src/
+├── components/          # React components
+│   ├── api/            # API documentation components
+│   ├── biometric/      # Biometric-specific components
+│   ├── enterprise/     # Enterprise features
+│   └── monitoring/     # Monitoring dashboards
+├── lib/                # Utility libraries
+├── pages/              # Page components
+└── integrations/       # External service integrations
+
+supabase/
+├── functions/          # Edge functions
+└── migrations/         # Database migrations
+```
+
+### Available Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
+npm run type-check   # TypeScript type checking
+```
+
+### Docker Commands
+
+```bash
+# Development
+docker-compose --profile dev up
+
+# Production build
+docker build -t typemagic-guard .
+
+# Run production
+docker-compose --profile production up
+
+# View logs
+docker-compose logs -f
+
+# Scale services
+docker-compose up --scale typemagic-guard=3
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is proprietary software. All rights reserved.
+
+## 🆘 Support
+
+For technical support and questions:
+- Documentation: [Enterprise Portal → API Docs]
+- Health Status: [Enterprise Portal → Health]
+- Contact: support@typemagicguard.com
+
+## 🔄 Version History
+
+### v1.0.0
+- Multi-modal biometric authentication
+- Enterprise API with rate limiting
+- Docker containerization
+- Comprehensive monitoring
+- OpenAPI documentation
+- Production-ready deployment

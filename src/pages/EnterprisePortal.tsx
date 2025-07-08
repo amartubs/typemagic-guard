@@ -13,6 +13,8 @@ import AdvancedAnalytics from "@/components/analytics/AdvancedAnalytics";
 import PerformanceMonitor from "@/components/monitoring/PerformanceMonitor";
 import SecurityDashboard from "@/components/security/SecurityDashboard";
 import SystemHealthMonitor from "@/components/monitoring/SystemHealthMonitor";
+import OpenApiDocumentation from '@/components/api/OpenApiDocumentation';
+import HealthCheck from '@/components/api/HealthCheck';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -128,7 +130,7 @@ const EnterprisePortal = () => {
       </div>
 
       <Tabs defaultValue="api-keys" className="space-y-8">
-        <TabsList className="grid grid-cols-2 md:grid-cols-9 gap-2">
+        <TabsList className="grid grid-cols-2 md:grid-cols-10 gap-2">
           <TabsTrigger value="api-keys" className="flex items-center gap-2">
             <Key className="h-4 w-4" />
             <span className="hidden sm:inline">API Keys</span>
@@ -141,6 +143,10 @@ const EnterprisePortal = () => {
             <FileText className="h-4 w-4" />
             <span className="hidden sm:inline">Documentation</span>
           </TabsTrigger>
+          <TabsTrigger value="openapi" className="flex items-center gap-2">
+            <Code className="h-4 w-4" />
+            <span className="hidden sm:inline">OpenAPI</span>
+          </TabsTrigger>
           <TabsTrigger value="integrations" className="flex items-center gap-2">
             <Code className="h-4 w-4" />
             <span className="hidden sm:inline">Integrations</span>
@@ -152,6 +158,10 @@ const EnterprisePortal = () => {
           <TabsTrigger value="monitoring" className="flex items-center gap-2">
             <Monitor className="h-4 w-4" />
             <span className="hidden sm:inline">Monitoring</span>
+          </TabsTrigger>
+          <TabsTrigger value="health" className="flex items-center gap-2">
+            <Activity className="h-4 w-4" />
+            <span className="hidden sm:inline">Health</span>
           </TabsTrigger>
           <TabsTrigger value="analytics" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
@@ -179,6 +189,10 @@ const EnterprisePortal = () => {
           <ApiDocumentation />
         </TabsContent>
 
+        <TabsContent value="openapi">
+          <OpenApiDocumentation />
+        </TabsContent>
+
         <TabsContent value="integrations">
           <IntegrationTutorials />
         </TabsContent>
@@ -192,6 +206,10 @@ const EnterprisePortal = () => {
             <SystemHealthMonitor />
             <PerformanceMonitor />
           </div>
+        </TabsContent>
+
+        <TabsContent value="health">
+          <HealthCheck />
         </TabsContent>
 
         <TabsContent value="analytics">
