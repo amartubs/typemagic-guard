@@ -21,6 +21,7 @@ import FeatureShowcase from '@/pages/FeatureShowcase';
 import NotFound from '@/pages/NotFound';
 import Admin from '@/pages/Admin';
 import BiometricDemo from '@/pages/BiometricDemo';
+import LicenseManagement from '@/pages/LicenseManagement';
 import PrivateRoute from '@/components/auth/PrivateRoute';
 import InstallPrompt from '@/components/pwa/InstallPrompt';
 import OfflineIndicator from '@/components/pwa/OfflineIndicator';
@@ -144,6 +145,16 @@ function App() {
                           <ErrorBoundary>
                             <PrivateRoute>
                               <Admin />
+                            </PrivateRoute>
+                          </ErrorBoundary>
+                        }
+                      />
+                      <Route
+                        path="/license"
+                        element={
+                          <ErrorBoundary>
+                            <PrivateRoute>
+                              <LicenseManagement />
                             </PrivateRoute>
                           </ErrorBoundary>
                         }

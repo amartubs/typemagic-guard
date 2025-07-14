@@ -7,6 +7,8 @@ import { toast } from '@/hooks/use-toast';
 export interface SubscriptionLimits {
   maxUsers: number;
   maxDevices: number;
+  maxDailyAuth: number;
+  maxMonthlyAuth: number;
   advancedAnalytics: boolean;
   prioritySupport: boolean;
   customSecurity: boolean;
@@ -46,8 +48,10 @@ export const useSubscription = () => {
     switch (tier) {
       case 'basic':
         return {
-          maxUsers: 1,
-          maxDevices: 3,
+          maxUsers: 100,
+          maxDevices: 50,
+          maxDailyAuth: 1000,
+          maxMonthlyAuth: 10000,
           advancedAnalytics: false,
           prioritySupport: false,
           customSecurity: true,
@@ -55,8 +59,10 @@ export const useSubscription = () => {
         };
       case 'professional':
         return {
-          maxUsers: 25,
-          maxDevices: -1, // unlimited
+          maxUsers: 1000,
+          maxDevices: 500,
+          maxDailyAuth: 10000,
+          maxMonthlyAuth: 100000,
           advancedAnalytics: true,
           prioritySupport: true,
           customSecurity: true,
@@ -66,6 +72,8 @@ export const useSubscription = () => {
         return {
           maxUsers: -1, // unlimited
           maxDevices: -1, // unlimited
+          maxDailyAuth: -1, // unlimited
+          maxMonthlyAuth: -1, // unlimited
           advancedAnalytics: true,
           prioritySupport: true,
           customSecurity: true,
@@ -73,8 +81,10 @@ export const useSubscription = () => {
         };
       default: // free
         return {
-          maxUsers: 1,
-          maxDevices: 1,
+          maxUsers: 10,
+          maxDevices: 5,
+          maxDailyAuth: 100,
+          maxMonthlyAuth: 1000,
           advancedAnalytics: false,
           prioritySupport: false,
           customSecurity: false,
