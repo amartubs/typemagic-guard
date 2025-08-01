@@ -112,14 +112,20 @@ export class ComplianceManager {
 
   static async getComplianceConfig(userId: string): Promise<ComplianceConfig | null> {
     try {
+      // For now, simulate with admin_settings table until types are updated
       const { data, error } = await supabase
-        .from('compliance_configs')
+        .from('admin_settings')
         .select('*')
         .eq('user_id', userId)
+        .eq('setting_key', 'compliance_config')
         .maybeSingle();
 
       if (error) throw error;
-      return data;
+      
+      if (data && data.setting_value) {
+        return data.setting_value as any as ComplianceConfig;
+      }
+      return null;
     } catch (error) {
       console.error('Error fetching compliance config:', error);
       return null;
@@ -135,7 +141,8 @@ export class ComplianceManager {
       const defaults = this.INDUSTRY_DEFAULTS[industry];
       const standards = customStandards || defaults.standards;
 
-      const config: Partial<ComplianceConfig> = {
+      const config: ComplianceConfig = {
+        id: crypto.randomUUID(),
         user_id: userId,
         industry,
         standards,
@@ -143,17 +150,24 @@ export class ComplianceManager {
         audit_level: industry === 'financial' || industry === 'healthcare' ? 'forensic' : 'enhanced',
         encryption_required: industry !== 'general',
         anonymization_required: industry === 'healthcare',
-        legal_hold_enabled: industry === 'legal' || industry === 'government'
+        legal_hold_enabled: industry === 'legal' || industry === 'government',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
 
+      // Store in admin_settings until types are updated
       const { data, error } = await supabase
-        .from('compliance_configs')
-        .insert(config)
+        .from('admin_settings')
+        .insert({
+          user_id: userId,
+          setting_key: 'compliance_config',
+          setting_value: config as any
+        })
         .select()
         .single();
 
       if (error) throw error;
-      return data;
+      return config;
     } catch (error) {
       console.error('Error creating compliance config:', error);
       return null;
@@ -165,15 +179,23 @@ export class ComplianceManager {
     updates: Partial<ComplianceConfig>
   ): Promise<ComplianceConfig | null> {
     try {
+      const existing = await this.getComplianceConfig(userId);
+      if (!existing) return null;
+
+      const updatedConfig = { ...existing, ...updates, updated_at: new Date().toISOString() };
+
       const { data, error } = await supabase
-        .from('compliance_configs')
-        .update(updates)
+        .from('admin_settings')
+        .update({
+          setting_value: updatedConfig as any
+        })
         .eq('user_id', userId)
+        .eq('setting_key', 'compliance_config')
         .select()
         .single();
 
       if (error) throw error;
-      return data;
+      return updatedConfig;
     } catch (error) {
       console.error('Error updating compliance config:', error);
       return null;

@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ComplianceDashboard } from '@/components/compliance/ComplianceDashboard';
+import { SessionMonitoringDashboard } from '@/components/monitoring/SessionMonitoringDashboard';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Users, 
@@ -150,8 +152,10 @@ const AdminDashboard = () => {
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="compliance">Compliance</TabsTrigger>
+          <TabsTrigger value="monitoring">Session Monitor</TabsTrigger>
           <TabsTrigger value="users">User Management</TabsTrigger>
           <TabsTrigger value="security">Security Logs</TabsTrigger>
         </TabsList>
@@ -184,6 +188,14 @@ const AdminDashboard = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+        
+        <TabsContent value="compliance">
+          <ComplianceDashboard />
+        </TabsContent>
+        
+        <TabsContent value="monitoring">
+          <SessionMonitoringDashboard />
         </TabsContent>
         
         <TabsContent value="users">

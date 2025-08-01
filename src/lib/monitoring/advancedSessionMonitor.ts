@@ -50,7 +50,15 @@ export class AdvancedSessionMonitor {
         .single();
 
       if (!error && profile) {
-        this.baselineProfiles.set(userId, profile);
+        // Transform database profile to BiometricProfile format
+        const biometricProfile: BiometricProfile = {
+          userId: profile.user_id,
+          keystrokePatterns: [], // Would be loaded separately
+          confidenceScore: profile.confidence_score,
+          status: profile.status,
+          lastUpdated: new Date(profile.last_updated).getTime()
+        };
+        this.baselineProfiles.set(userId, biometricProfile);
       }
 
       // Initialize session behavior tracking
@@ -187,7 +195,7 @@ export class AdvancedSessionMonitor {
     
     return {
       current_score: currentScore,
-      baseline_score: baseline.confidence_score,
+      baseline_score: baseline.confidenceScore,
       factors: {
         behavioral_consistency: Math.round(behavioralConsistency),
         session_legitimacy: Math.round(sessionLegitimacy),
@@ -202,19 +210,28 @@ export class AdvancedSessionMonitor {
   private static calculateTypingSpeed(pattern: KeystrokePattern): number {
     if (!pattern.timings || pattern.timings.length === 0) return 0;
     
-    const totalTime = pattern.timings.reduce((sum, timing) => sum + timing.dwellTime + timing.flightTime, 0);
-    const charactersPerMinute = (pattern.timings.length / totalTime) * 60000;
+    const totalTime = pattern.timings.reduce((sum, timing) => {
+      const duration = timing.duration || 0;
+      return sum + duration;
+    }, 0);
+    const charactersPerMinute = totalTime > 0 ? (pattern.timings.length / totalTime) * 60000 : 0;
     return Math.round(charactersPerMinute);
   }
 
   private static extractRhythmPattern(pattern: KeystrokePattern): number[] {
     if (!pattern.timings) return [];
-    return pattern.timings.map(t => t.dwellTime + t.flightTime);
+    return pattern.timings.map(t => t.duration || 0);
   }
 
   private static extractPausePattern(pattern: KeystrokePattern): number[] {
     if (!pattern.timings) return [];
-    return pattern.timings.map(t => t.flightTime).filter(f => f > 200); // Pauses > 200ms
+    // Calculate pauses between keystrokes
+    const pauses: number[] = [];
+    for (let i = 1; i < pattern.timings.length; i++) {
+      const pause = pattern.timings[i].pressTime - (pattern.timings[i-1].releaseTime || pattern.timings[i-1].pressTime);
+      if (pause > 200) pauses.push(pause); // Pauses > 200ms
+    }
+    return pauses;
   }
 
   private static detectSpeedDeviation(session: SessionBehavior, baseline: BiometricProfile): BehavioralDeviation | null {

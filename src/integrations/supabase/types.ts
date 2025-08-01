@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instanciate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "12.2.12 (cd3cf9e)"
   }
   public: {
     Tables: {
@@ -262,6 +262,48 @@ export type Database = {
           },
         ]
       }
+      compliance_configs: {
+        Row: {
+          anonymization_required: boolean
+          audit_level: string
+          created_at: string
+          data_retention_days: number
+          encryption_required: boolean
+          id: string
+          industry: string
+          legal_hold_enabled: boolean
+          standards: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          anonymization_required?: boolean
+          audit_level?: string
+          created_at?: string
+          data_retention_days?: number
+          encryption_required?: boolean
+          id?: string
+          industry: string
+          legal_hold_enabled?: boolean
+          standards?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          anonymization_required?: boolean
+          audit_level?: string
+          created_at?: string
+          data_retention_days?: number
+          encryption_required?: boolean
+          id?: string
+          industry?: string
+          legal_hold_enabled?: boolean
+          standards?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       device_capabilities: {
         Row: {
           capabilities: Json
@@ -442,6 +484,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      legal_audit_logs: {
+        Row: {
+          action: string
+          compliance_standards: string[]
+          created_at: string
+          cryptographic_signature: string | null
+          details: Json | null
+          hash_chain_previous: string | null
+          id: string
+          ip_address: unknown | null
+          legal_hold: boolean | null
+          legal_significance: string
+          resource_id: string | null
+          resource_type: string
+          retention_required_until: string | null
+          tamper_evidence: Json | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          compliance_standards?: string[]
+          created_at?: string
+          cryptographic_signature?: string | null
+          details?: Json | null
+          hash_chain_previous?: string | null
+          id?: string
+          ip_address?: unknown | null
+          legal_hold?: boolean | null
+          legal_significance: string
+          resource_id?: string | null
+          resource_type: string
+          retention_required_until?: string | null
+          tamper_evidence?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          compliance_standards?: string[]
+          created_at?: string
+          cryptographic_signature?: string | null
+          details?: Json | null
+          hash_chain_previous?: string | null
+          id?: string
+          ip_address?: unknown | null
+          legal_hold?: boolean | null
+          legal_significance?: string
+          resource_id?: string | null
+          resource_type?: string
+          retention_required_until?: string | null
+          tamper_evidence?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       live_chat_messages: {
         Row: {
@@ -694,6 +793,45 @@ export type Database = {
           max_failed_attempts?: number
           min_confidence_threshold?: number
           security_level?: Database["public"]["Enums"]["security_level"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      session_monitoring: {
+        Row: {
+          behavioral_data: Json
+          context_sensitivity: string | null
+          created_at: string
+          deviations: Json | null
+          id: string
+          risk_level: string | null
+          session_id: string | null
+          trust_score: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          behavioral_data?: Json
+          context_sensitivity?: string | null
+          created_at?: string
+          deviations?: Json | null
+          id?: string
+          risk_level?: string | null
+          session_id?: string | null
+          trust_score?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          behavioral_data?: Json
+          context_sensitivity?: string | null
+          created_at?: string
+          deviations?: Json | null
+          id?: string
+          risk_level?: string | null
+          session_id?: string | null
+          trust_score?: number | null
           updated_at?: string
           user_id?: string
         }

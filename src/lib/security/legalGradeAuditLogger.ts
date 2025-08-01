@@ -24,10 +24,10 @@ export class LegalGradeAuditLogger {
   
   static async logLegalEvent(entry: LegalGradeAuditEntry): Promise<string | null> {
     try {
-      // Get the last audit entry for hash chaining
+      // Get the last audit entry for hash chaining (using audit_logs table)
       const { data: lastEntry } = await supabase
-        .from('legal_audit_logs')
-        .select('id, cryptographic_signature')
+        .from('audit_logs')
+        .select('id, details')
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -39,7 +39,7 @@ export class LegalGradeAuditLogger {
       });
       
       const entryHash = await this.createHash(entryData);
-      const previousHash = lastEntry?.cryptographic_signature || '0';
+      const previousHash = lastEntry?.details ? (lastEntry.details as any).cryptographic_signature || '0' : '0';
       const chainHash = await this.createHash(previousHash + entryHash);
 
       // Create tamper evidence
@@ -49,22 +49,26 @@ export class LegalGradeAuditLogger {
         timestamp_signature: await this.createTimestampSignature(entryData)
       };
 
-      // Insert into database
+      // Store in audit_logs with enhanced details until types are updated
+      const enhancedDetails = {
+        ...entry.details,
+        compliance_standards: entry.compliance_standards,
+        legal_significance: entry.legal_significance,
+        hash_chain_previous: previousHash,
+        cryptographic_signature: chainHash,
+        tamper_evidence: tamperEvidence,
+        retention_required_until: entry.retention_required_until,
+        legal_hold: entry.legal_hold || false
+      };
+
       const { data, error } = await supabase
-        .from('legal_audit_logs')
+        .from('audit_logs')
         .insert({
           user_id: entry.userId || null,
           action: entry.action,
           resource_type: entry.resourceType,
           resource_id: entry.resourceId || null,
-          details: entry.details || {},
-          compliance_standards: entry.compliance_standards,
-          legal_significance: entry.legal_significance,
-          hash_chain_previous: previousHash,
-          cryptographic_signature: chainHash,
-          tamper_evidence: tamperEvidence,
-          retention_required_until: entry.retention_required_until,
-          legal_hold: entry.legal_hold || false,
+          details: enhancedDetails as any, // Cast to any to handle complex nested types
           ip_address: await this.getClientIP(),
           user_agent: navigator.userAgent
         })
@@ -136,12 +140,15 @@ export class LegalGradeAuditLogger {
   static async verifyAuditIntegrity(entryId: string): Promise<boolean> {
     try {
       const { data: entry, error } = await supabase
-        .from('legal_audit_logs')
+        .from('audit_logs')
         .select('*')
         .eq('id', entryId)
         .single();
 
       if (error || !entry) return false;
+      
+      const details = entry.details as any;
+      if (!details.cryptographic_signature) return false;
 
       // Verify hash chain
       const entryData = JSON.stringify({
@@ -154,10 +161,10 @@ export class LegalGradeAuditLogger {
 
       const expectedHash = await this.createHash(entryData);
       const expectedChainHash = await this.createHash(
-        entry.hash_chain_previous + expectedHash
+        (details.hash_chain_previous || '') + expectedHash
       );
 
-      return expectedChainHash === entry.cryptographic_signature;
+      return expectedChainHash === details.cryptographic_signature;
     } catch (error) {
       console.error('Error verifying audit integrity:', error);
       return false;
@@ -172,19 +179,25 @@ export class LegalGradeAuditLogger {
   ): Promise<any> {
     try {
       const { data: entries, error } = await supabase
-        .from('legal_audit_logs')
+        .from('audit_logs')
         .select('*')
         .eq('user_id', userId)
         .gte('created_at', startDate)
         .lte('created_at', endDate)
-        .overlaps('compliance_standards', complianceStandards)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
 
+      // Filter entries that match compliance standards
+      const filteredEntries = entries.filter(entry => {
+        const details = entry.details as any;
+        return details.compliance_standards && 
+               details.compliance_standards.some((std: string) => complianceStandards.includes(std as ComplianceStandard));
+      });
+
       // Verify integrity of all entries
       const verificationResults = await Promise.all(
-        entries.map(async (entry) => ({
+        filteredEntries.map(async (entry) => ({
           id: entry.id,
           verified: await this.verifyAuditIntegrity(entry.id)
         }))
@@ -194,16 +207,16 @@ export class LegalGradeAuditLogger {
         user_id: userId,
         period: { start: startDate, end: endDate },
         compliance_standards: complianceStandards,
-        total_entries: entries.length,
+        total_entries: filteredEntries.length,
         integrity_verified: verificationResults.every(r => r.verified),
         failed_verifications: verificationResults.filter(r => !r.verified),
-        entries: entries,
+        entries: filteredEntries,
         generated_at: new Date().toISOString(),
         report_signature: await this.createHash(JSON.stringify({
           userId,
           startDate,
           endDate,
-          entriesCount: entries.length
+          entriesCount: filteredEntries.length
         }))
       };
 
