@@ -8,6 +8,8 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ComplianceDashboard } from '@/components/compliance/ComplianceDashboard';
 import { SessionMonitoringDashboard } from '@/components/monitoring/SessionMonitoringDashboard';
+import { AdaptiveSecurityPanel } from '@/components/auth/AdaptiveSecurityPanel';
+import { MultiModalAuthDashboard } from '@/components/auth/MultiModalAuthDashboard';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Users, 
@@ -152,10 +154,12 @@ const AdminDashboard = () => {
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="compliance">Compliance</TabsTrigger>
           <TabsTrigger value="monitoring">Session Monitor</TabsTrigger>
+          <TabsTrigger value="adaptive-security">Adaptive Security</TabsTrigger>
+          <TabsTrigger value="multimodal-auth">Multimodal Auth</TabsTrigger>
           <TabsTrigger value="users">User Management</TabsTrigger>
           <TabsTrigger value="security">Security Logs</TabsTrigger>
         </TabsList>
@@ -196,6 +200,14 @@ const AdminDashboard = () => {
         
         <TabsContent value="monitoring">
           <SessionMonitoringDashboard />
+        </TabsContent>
+
+        <TabsContent value="adaptive-security">
+          <AdaptiveSecurityPanel />
+        </TabsContent>
+
+        <TabsContent value="multimodal-auth">
+          <MultiModalAuthDashboard />
         </TabsContent>
         
         <TabsContent value="users">
