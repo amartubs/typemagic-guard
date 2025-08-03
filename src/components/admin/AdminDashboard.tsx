@@ -10,6 +10,9 @@ import { ComplianceDashboard } from '@/components/compliance/ComplianceDashboard
 import { SessionMonitoringDashboard } from '@/components/monitoring/SessionMonitoringDashboard';
 import { AdaptiveSecurityPanel } from '@/components/auth/AdaptiveSecurityPanel';
 import { MultiModalAuthDashboard } from '@/components/auth/MultiModalAuthDashboard';
+import { RemoteWorkSecurityDashboard } from '@/components/security/RemoteWorkSecurityDashboard';
+import { EducationSecurityDashboard } from '@/components/security/EducationSecurityDashboard';
+import { GovernmentSecurityDashboard } from '@/components/security/GovernmentSecurityDashboard';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Users, 
@@ -154,12 +157,15 @@ const AdminDashboard = () => {
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-5 lg:grid-cols-10">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="compliance">Compliance</TabsTrigger>
           <TabsTrigger value="monitoring">Session Monitor</TabsTrigger>
           <TabsTrigger value="adaptive-security">Adaptive Security</TabsTrigger>
           <TabsTrigger value="multimodal-auth">Multimodal Auth</TabsTrigger>
+          <TabsTrigger value="remote-work">Remote Work</TabsTrigger>
+          <TabsTrigger value="education">Education</TabsTrigger>
+          <TabsTrigger value="government">Government</TabsTrigger>
           <TabsTrigger value="users">User Management</TabsTrigger>
           <TabsTrigger value="security">Security Logs</TabsTrigger>
         </TabsList>
@@ -208,6 +214,18 @@ const AdminDashboard = () => {
 
         <TabsContent value="multimodal-auth">
           <MultiModalAuthDashboard />
+        </TabsContent>
+
+        <TabsContent value="remote-work">
+          <RemoteWorkSecurityDashboard />
+        </TabsContent>
+
+        <TabsContent value="education">
+          <EducationSecurityDashboard />
+        </TabsContent>
+
+        <TabsContent value="government">
+          <GovernmentSecurityDashboard />
         </TabsContent>
         
         <TabsContent value="users">
