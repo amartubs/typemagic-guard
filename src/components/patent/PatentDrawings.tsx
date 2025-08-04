@@ -1013,6 +1013,207 @@ const PatentDrawings: React.FC = () => {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="more">
+          <div className="space-y-6">
+            {/* Figure 8: PWA Architecture */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Figure 8: Progressive Web Application (PWA) Architecture</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <svg viewBox="0 0 900 400" className="w-full border rounded">
+                  <text x="450" y="25" textAnchor="middle" className="text-lg font-bold">PWA BIOMETRIC AUTHENTICATION ARCHITECTURE</text>
+                  
+                  <rect x="50" y="50" width="800" height="80" fill="#e3f2fd" stroke="#1976d2" strokeWidth="2"/>
+                  <text x="450" y="75" textAnchor="middle" className="fill-blue-800 font-semibold">SERVICE WORKER LAYER (3100-3199)</text>
+                  
+                  <rect x="80" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="140" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Background Sync (3110)</text>
+                  
+                  <rect x="220" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="280" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Offline Storage (3120)</text>
+                  
+                  <rect x="360" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="420" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Cache Strategy (3130)</text>
+                  
+                  <rect x="500" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="560" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Push Notifications (3140)</text>
+                  
+                  <rect x="640" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="700" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Auto Updates (3150)</text>
+
+                  <rect x="50" y="160" width="800" height="80" fill="#f3e5f5" stroke="#7b1fa2" strokeWidth="2"/>
+                  <text x="450" y="185" textAnchor="middle" className="fill-purple-800 font-semibold">OFFLINE PROCESSING (3200-3299)</text>
+                  
+                  <rect x="100" y="210" width="120" height="20" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="160" y="223" textAnchor="middle" className="fill-purple-900 text-sm">Local ML Models (3210)</text>
+                  
+                  <rect x="240" y="210" width="120" height="20" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="300" y="223" textAnchor="middle" className="fill-purple-900 text-sm">Edge Processing (3220)</text>
+                  
+                  <rect x="380" y="210" width="120" height="20" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="440" y="223" textAnchor="middle" className="fill-purple-900 text-sm">Queue Management (3230)</text>
+                  
+                  <rect x="520" y="210" width="120" height="20" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="580" y="223" textAnchor="middle" className="fill-purple-900 text-sm">Sync Resolution (3240)</text>
+                  
+                  <rect x="660" y="210" width="120" height="20" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="720" y="223" textAnchor="middle" className="fill-purple-900 text-sm">Conflict Handling (3250)</text>
+
+                  <rect x="50" y="270" width="800" height="80" fill="#e8f5e8" stroke="#388e3c" strokeWidth="2"/>
+                  <text x="450" y="295" textAnchor="middle" className="fill-green-800 font-semibold">CROSS-PLATFORM DEPLOYMENT (3300-3399)</text>
+                  
+                  <rect x="100" y="320" width="120" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="160" y="333" textAnchor="middle" className="fill-green-900 text-sm">Mobile Web (3310)</text>
+                  
+                  <rect x="240" y="320" width="120" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="300" y="333" textAnchor="middle" className="fill-green-900 text-sm">Desktop App (3320)</text>
+                  
+                  <rect x="380" y="320" width="120" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="440" y="333" textAnchor="middle" className="fill-green-900 text-sm">Tablet Optimized (3330)</text>
+                  
+                  <rect x="520" y="320" width="120" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="580" y="333" textAnchor="middle" className="fill-green-900 text-sm">Kiosk Mode (3340)</text>
+                  
+                  <rect x="660" y="320" width="120" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="720" y="333" textAnchor="middle" className="fill-green-900 text-sm">IoT Integration (3350)</text>
+
+                  <line x1="450" y1="130" x2="450" y2="160" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                  <line x1="450" y1="240" x2="450" y2="270" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                </svg>
+                <div className="mt-4 text-sm space-y-2">
+                  <p><strong>PWA Components:</strong></p>
+                  <p>(3100-3150) Service Worker: Background sync, offline storage, caching strategy</p>
+                  <p>(3200-3250) Offline Processing: Local ML models, edge processing, queue management</p>
+                  <p>(3300-3350) Cross-Platform: Mobile, desktop, tablet, kiosk, IoT deployment</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Figure 9: Continuous Session Monitoring */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Figure 9: Continuous Session Monitoring System</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <svg viewBox="0 0 900 350" className="w-full border rounded">
+                  <text x="450" y="25" textAnchor="middle" className="text-lg font-bold">REAL-TIME SESSION MONITORING ARCHITECTURE</text>
+                  
+                  <rect x="50" y="50" width="800" height="60" fill="#e3f2fd" stroke="#1976d2" strokeWidth="2"/>
+                  <text x="450" y="70" textAnchor="middle" className="fill-blue-800 font-semibold">BEHAVIORAL TRACKING (3400-3499)</text>
+                  
+                  <rect x="80" y="85" width="100" height="15" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="130" y="95" textAnchor="middle" className="fill-blue-900 text-xs">Mouse Tracking (3410)</text>
+                  
+                  <rect x="200" y="85" width="100" height="15" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="250" y="95" textAnchor="middle" className="fill-blue-900 text-xs">Scroll Patterns (3420)</text>
+                  
+                  <rect x="320" y="85" width="100" height="15" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="370" y="95" textAnchor="middle" className="fill-blue-900 text-xs">Click Analysis (3430)</text>
+                  
+                  <rect x="440" y="85" width="100" height="15" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="490" y="95" textAnchor="middle" className="fill-blue-900 text-xs">Idle Detection (3440)</text>
+                  
+                  <rect x="560" y="85" width="100" height="15" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="610" y="95" textAnchor="middle" className="fill-blue-900 text-xs">Focus Tracking (3450)</text>
+                  
+                  <rect x="680" y="85" width="100" height="15" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="730" y="95" textAnchor="middle" className="fill-blue-900 text-xs">Session Context (3460)</text>
+
+                  <rect x="50" y="140" width="800" height="60" fill="#f3e5f5" stroke="#7b1fa2" strokeWidth="2"/>
+                  <text x="450" y="160" textAnchor="middle" className="fill-purple-800 font-semibold">ANOMALY DETECTION (3500-3599)</text>
+                  
+                  <rect x="100" y="175" width="120" height="15" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="160" y="185" textAnchor="middle" className="fill-purple-900 text-xs">Pattern Deviation (3510)</text>
+                  
+                  <rect x="240" y="175" width="120" height="15" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="300" y="185" textAnchor="middle" className="fill-purple-900 text-xs">Speed Changes (3520)</text>
+                  
+                  <rect x="380" y="175" width="120" height="15" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="440" y="185" textAnchor="middle" className="fill-purple-900 text-xs">Behavior Shifts (3530)</text>
+                  
+                  <rect x="520" y="175" width="120" height="15" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="580" y="185" textAnchor="middle" className="fill-purple-900 text-xs">Trust Degradation (3540)</text>
+                  
+                  <rect x="660" y="175" width="120" height="15" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="720" y="185" textAnchor="middle" className="fill-purple-900 text-xs">Risk Escalation (3550)</text>
+
+                  <rect x="50" y="230" width="800" height="80" fill="#e8f5e8" stroke="#388e3c" strokeWidth="2"/>
+                  <text x="450" y="250" textAnchor="middle" className="fill-green-800 font-semibold">ADAPTIVE RESPONSE SYSTEM (3600-3699)</text>
+                  
+                  <rect x="80" y="270" width="100" height="30" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="130" y="288" textAnchor="middle" className="fill-green-900 text-sm">Re-auth (3610)</text>
+                  
+                  <rect x="200" y="270" width="100" height="30" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="250" y="288" textAnchor="middle" className="fill-green-900 text-sm">Step-up Auth (3620)</text>
+                  
+                  <rect x="320" y="270" width="100" height="30" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="370" y="288" textAnchor="middle" className="fill-green-900 text-sm">Session Lock (3630)</text>
+                  
+                  <rect x="440" y="270" width="100" height="30" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="490" y="288" textAnchor="middle" className="fill-green-900 text-sm">Privilege Drop (3640)</text>
+                  
+                  <rect x="560" y="270" width="100" height="30" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="610" y="288" textAnchor="middle" className="fill-green-900 text-sm">Alert Admin (3650)</text>
+                  
+                  <rect x="680" y="270" width="100" height="30" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="730" y="288" textAnchor="middle" className="fill-green-900 text-sm">Forensic Log (3660)</text>
+
+                  <line x1="450" y1="110" x2="450" y2="140" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                  <line x1="450" y1="200" x2="450" y2="230" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                </svg>
+                <div className="mt-4 text-sm space-y-2">
+                  <p><strong>Session Monitoring Components:</strong></p>
+                  <p>(3400-3460) Behavioral Tracking: Mouse, scroll, click, idle, focus patterns</p>
+                  <p>(3500-3550) Anomaly Detection: Pattern deviation, speed changes, trust degradation</p>
+                  <p>(3600-3660) Adaptive Response: Re-authentication, session control, privilege management</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Complete Patent Drawing Portfolio Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Complete Patent Drawing Portfolio Summary</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-6 text-sm">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold">Core System Drawings (1-7):</h4>
+                    <p>• Figure 1: Enhanced Multi-Modal System Architecture</p>
+                    <p>• Figure 2: Multi-Modal Biometric Fusion Engine</p>
+                    <p>• Figure 3: Industry-Specific Compliance Engine</p>
+                    <p>• Figure 4: Enterprise Integration Platform</p>
+                    <p>• Figure 5: Legal-Grade Audit System</p>
+                    <p>• Figure 6: Predictive Analytics Engine</p>
+                    <p>• Figure 7: Quantum-Resistant Security Architecture</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold">Implementation Drawings (8-16):</h4>
+                    <p>• Figure 8: PWA Architecture & Offline Processing</p>
+                    <p>• Figure 9: Continuous Session Monitoring</p>
+                    <p>• Figure 10: Government & Healthcare Security</p>
+                    <p>• Figure 11: Database Schema & Data Flow</p>
+                    <p>• Figure 12: Risk-Based Authentication Engine</p>
+                    <p>• Figure 13: Cross-Platform Deployment</p>
+                    <p>• Figure 14: Advanced Threat Detection</p>
+                    <p>• Figure 15: Performance Optimization</p>
+                    <p>• Figure 16: Integration Test Framework</p>
+                  </div>
+                </div>
+                <div className="mt-6 p-4 bg-muted rounded-lg">
+                  <p className="font-semibold text-center">Patent Protection Scope</p>
+                  <p className="text-center text-muted-foreground mt-2">
+                    This comprehensive 16-drawing patent portfolio provides complete intellectual property protection 
+                    for the novel multi-modal continuous biometric authentication system with enterprise compliance, 
+                    legal-grade audit trails, and quantum-resistant security across all deployment environments.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
       </Tabs>
     </div>
   );
