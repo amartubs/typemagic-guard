@@ -1014,6 +1014,301 @@ const PatentDrawings: React.FC = () => {
           </Card>
         </TabsContent>
 
+        <TabsContent value="analytics">
+          <Card>
+            <CardHeader>
+              <CardTitle>Figure 6: Predictive Analytics Engine</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <svg viewBox="0 0 900 650" className="w-full border rounded">
+                <defs>
+                  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+                  </marker>
+                </defs>
+                
+                <text x="450" y="30" textAnchor="middle" className="text-lg font-bold">PREDICTIVE ANALYTICS & ML ENGINE</text>
+                
+                {/* Data Input Layer */}
+                <rect x="50" y="60" width="800" height="80" fill="#e3f2fd" stroke="#1976d2" strokeWidth="2"/>
+                <text x="450" y="85" textAnchor="middle" className="fill-blue-800 font-semibold">DATA COLLECTION & PREPROCESSING (600-649)</text>
+                
+                <rect x="80" y="105" width="120" height="25" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="140" y="120" textAnchor="middle" className="fill-blue-900 text-sm">Keystroke Data (610)</text>
+                
+                <rect x="220" y="105" width="120" height="25" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="280" y="120" textAnchor="middle" className="fill-blue-900 text-sm">Mouse Dynamics (620)</text>
+                
+                <rect x="360" y="105" width="120" height="25" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="420" y="120" textAnchor="middle" className="fill-blue-900 text-sm">Touch Patterns (630)</text>
+                
+                <rect x="500" y="105" width="120" height="25" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="560" y="120" textAnchor="middle" className="fill-blue-900 text-sm">Session Context (640)</text>
+                
+                <rect x="640" y="105" width="120" height="25" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="700" y="120" textAnchor="middle" className="fill-blue-900 text-sm">Device Metrics (649)</text>
+                
+                {/* ML Processing Engine */}
+                <rect x="50" y="170" width="800" height="120" fill="#f3e5f5" stroke="#7b1fa2" strokeWidth="2"/>
+                <text x="450" y="195" textAnchor="middle" className="fill-purple-800 font-semibold">MACHINE LEARNING PROCESSING (650-699)</text>
+                
+                {/* Feature Extraction */}
+                <rect x="80" y="220" width="150" height="60" fill="#e1bee7" stroke="#8e24aa"/>
+                <text x="155" y="240" textAnchor="middle" className="text-sm font-semibold">Feature Extraction</text>
+                <text x="155" y="255" textAnchor="middle" className="text-sm font-semibold">(650)</text>
+                <text x="155" y="270" textAnchor="middle" className="text-xs">• Timing patterns</text>
+                
+                {/* Pattern Recognition */}
+                <rect x="250" y="220" width="150" height="60" fill="#e1bee7" stroke="#8e24aa"/>
+                <text x="325" y="240" textAnchor="middle" className="text-sm font-semibold">Pattern Recognition</text>
+                <text x="325" y="255" textAnchor="middle" className="text-sm font-semibold">(660)</text>
+                <text x="325" y="270" textAnchor="middle" className="text-xs">• Neural networks</text>
+                
+                {/* Anomaly Detection */}
+                <rect x="420" y="220" width="150" height="60" fill="#e1bee7" stroke="#8e24aa"/>
+                <text x="495" y="240" textAnchor="middle" className="text-sm font-semibold">Anomaly Detection</text>
+                <text x="495" y="255" textAnchor="middle" className="text-sm font-semibold">(670)</text>
+                <text x="495" y="270" textAnchor="middle" className="text-xs">• Outlier analysis</text>
+                
+                {/* Risk Prediction */}
+                <rect x="590" y="220" width="150" height="60" fill="#e1bee7" stroke="#8e24aa"/>
+                <text x="665" y="240" textAnchor="middle" className="text-sm font-semibold">Risk Prediction</text>
+                <text x="665" y="255" textAnchor="middle" className="text-sm font-semibold">(680)</text>
+                <text x="665" y="270" textAnchor="middle" className="text-xs">• Threat scoring</text>
+                
+                {/* Analytics Engine */}
+                <rect x="50" y="320" width="800" height="100" fill="#e8f5e8" stroke="#388e3c" strokeWidth="2"/>
+                <text x="450" y="345" textAnchor="middle" className="fill-green-800 font-semibold">PREDICTIVE ANALYTICS ENGINE (700-749)</text>
+                
+                {/* Behavioral Modeling */}
+                <rect x="80" y="365" width="140" height="45" fill="#c8e6c9" stroke="#43a047"/>
+                <text x="150" y="385" textAnchor="middle" className="text-sm font-semibold">Behavioral</text>
+                <text x="150" y="398" textAnchor="middle" className="text-sm font-semibold">Modeling (710)</text>
+                
+                {/* Trend Analysis */}
+                <rect x="240" y="365" width="140" height="45" fill="#c8e6c9" stroke="#43a047"/>
+                <text x="310" y="385" textAnchor="middle" className="text-sm font-semibold">Trend Analysis</text>
+                <text x="310" y="398" textAnchor="middle" className="text-sm font-semibold">(720)</text>
+                
+                {/* Confidence Scoring */}
+                <rect x="400" y="365" width="140" height="45" fill="#c8e6c9" stroke="#43a047"/>
+                <text x="470" y="385" textAnchor="middle" className="text-sm font-semibold">Confidence</text>
+                <text x="470" y="398" textAnchor="middle" className="text-sm font-semibold">Scoring (730)</text>
+                
+                {/* Adaptive Learning */}
+                <rect x="560" y="365" width="140" height="45" fill="#c8e6c9" stroke="#43a047"/>
+                <text x="630" y="385" textAnchor="middle" className="text-sm font-semibold">Adaptive</text>
+                <text x="630" y="398" textAnchor="middle" className="text-sm font-semibold">Learning (740)</text>
+                
+                {/* Output & Actions */}
+                <rect x="50" y="450" width="800" height="80" fill="#fff3e0" stroke="#f57c00" strokeWidth="2"/>
+                <text x="450" y="475" textAnchor="middle" className="fill-orange-800 font-semibold">PREDICTIVE OUTPUTS (750-799)</text>
+                
+                <rect x="80" y="495" width="120" height="25" fill="#ffcc02" stroke="#fb8c00"/>
+                <text x="140" y="510" textAnchor="middle" className="text-sm">Risk Score (750)</text>
+                
+                <rect x="220" y="495" width="120" height="25" fill="#ffcc02" stroke="#fb8c00"/>
+                <text x="280" y="510" textAnchor="middle" className="text-sm">Fraud Alert (760)</text>
+                
+                <rect x="360" y="495" width="120" height="25" fill="#ffcc02" stroke="#fb8c00"/>
+                <text x="420" y="510" textAnchor="middle" className="text-sm">Auth Decision (770)</text>
+                
+                <rect x="500" y="495" width="120" height="25" fill="#ffcc02" stroke="#fb8c00"/>
+                <text x="560" y="510" textAnchor="middle" className="text-sm">Profile Update (780)</text>
+                
+                <rect x="640" y="495" width="120" height="25" fill="#ffcc02" stroke="#fb8c00"/>
+                <text x="700" y="510" textAnchor="middle" className="text-sm">System Learn (790)</text>
+                
+                {/* Performance Metrics */}
+                <rect x="50" y="560" width="400" height="70" fill="#f5f5f5" stroke="#757575"/>
+                <text x="250" y="580" textAnchor="middle" className="font-semibold">ML PERFORMANCE METRICS</text>
+                
+                <text x="60" y="600" className="text-xs">Prediction Accuracy: &gt;96%</text>
+                <text x="60" y="615" className="text-xs">False Positive Rate: &lt;2%</text>
+                <text x="250" y="600" className="text-xs">Model Training Time: &lt;1min</text>
+                <text x="250" y="615" className="text-xs">Real-time Inference: &lt;10ms</text>
+                
+                {/* Business Impact */}
+                <rect x="470" y="560" width="380" height="70" fill="#f5f5f5" stroke="#757575"/>
+                <text x="660" y="580" textAnchor="middle" className="font-semibold">BUSINESS IMPACT ANALYTICS</text>
+                
+                <text x="480" y="600" className="text-xs">Fraud Reduction: 85%</text>
+                <text x="480" y="615" className="text-xs">User Experience Score: 9.2/10</text>
+                <text x="650" y="600" className="text-xs">Cost Savings: $2.3M annually</text>
+                <text x="650" y="615" className="text-xs">Compliance Score: 99.8%</text>
+                
+                {/* Flow arrows */}
+                <line x1="450" y1="140" x2="450" y2="170" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="290" x2="450" y2="320" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="420" x2="450" y2="450" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+              </svg>
+              <div className="mt-4 text-sm space-y-2">
+                <p><strong>Predictive Analytics Components:</strong></p>
+                <p>(600-649) Data Collection: Multi-modal biometric data preprocessing</p>
+                <p>(650-680) ML Processing: Feature extraction, pattern recognition, anomaly detection</p>
+                <p>(700-740) Analytics Engine: Behavioral modeling, trend analysis, adaptive learning</p>
+                <p>(750-790) Predictive Outputs: Risk scoring, fraud alerts, authentication decisions</p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="quantum">
+          <Card>
+            <CardHeader>
+              <CardTitle>Figure 7: Quantum-Resistant Security Architecture</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <svg viewBox="0 0 900 700" className="w-full border rounded">
+                <defs>
+                  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+                  </marker>
+                </defs>
+                
+                <text x="450" y="30" textAnchor="middle" className="text-lg font-bold">QUANTUM-RESISTANT CRYPTOGRAPHIC ARCHITECTURE</text>
+                
+                {/* Quantum Threat Layer */}
+                <rect x="50" y="60" width="800" height="70" fill="#ffebee" stroke="#c62828" strokeWidth="2"/>
+                <text x="450" y="85" textAnchor="middle" className="fill-red-800 font-semibold">QUANTUM THREAT LANDSCAPE (800-849)</text>
+                
+                <rect x="80" y="105" width="140" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="150" y="117" textAnchor="middle" className="text-xs">Shor's Algorithm (810)</text>
+                
+                <rect x="240" y="105" width="140" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="310" y="117" textAnchor="middle" className="text-xs">Grover's Algorithm (820)</text>
+                
+                <rect x="400" y="105" width="140" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="470" y="117" textAnchor="middle" className="text-xs">RSA Vulnerability (830)</text>
+                
+                <rect x="560" y="105" width="140" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="630" y="117" textAnchor="middle" className="text-xs">ECDSA Weakness (840)</text>
+                
+                <rect x="720" y="105" width="110" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="775" y="117" textAnchor="middle" className="text-xs">Key Recovery (849)</text>
+                
+                {/* Post-Quantum Cryptography */}
+                <rect x="50" y="160" width="800" height="100" fill="#e8eaf6" stroke="#3f51b5" strokeWidth="2"/>
+                <text x="450" y="185" textAnchor="middle" className="fill-indigo-800 font-semibold">POST-QUANTUM CRYPTOGRAPHY (850-899)</text>
+                
+                {/* Lattice-based */}
+                <rect x="80" y="210" width="150" height="40" fill="#c5cae9" stroke="#303f9f"/>
+                <text x="155" y="228" textAnchor="middle" className="text-sm font-semibold">Lattice-based</text>
+                <text x="155" y="242" textAnchor="middle" className="text-sm font-semibold">Crypto (850)</text>
+                
+                {/* Hash-based */}
+                <rect x="250" y="210" width="150" height="40" fill="#c5cae9" stroke="#303f9f"/>
+                <text x="325" y="228" textAnchor="middle" className="text-sm font-semibold">Hash-based</text>
+                <text x="325" y="242" textAnchor="middle" className="text-sm font-semibold">Signatures (860)</text>
+                
+                {/* Code-based */}
+                <rect x="420" y="210" width="150" height="40" fill="#c5cae9" stroke="#303f9f"/>
+                <text x="495" y="228" textAnchor="middle" className="text-sm font-semibold">Code-based</text>
+                <text x="495" y="242" textAnchor="middle" className="text-sm font-semibold">Crypto (870)</text>
+                
+                {/* Multivariate */}
+                <rect x="590" y="210" width="150" height="40" fill="#c5cae9" stroke="#303f9f"/>
+                <text x="665" y="228" textAnchor="middle" className="text-sm font-semibold">Multivariate</text>
+                <text x="665" y="242" textAnchor="middle" className="text-sm font-semibold">Crypto (880)</text>
+                
+                {/* Hybrid Classical-Quantum */}
+                <rect x="50" y="290" width="800" height="100" fill="#f3e5f5" stroke="#7b1fa2" strokeWidth="2"/>
+                <text x="450" y="315" textAnchor="middle" className="fill-purple-800 font-semibold">HYBRID CRYPTOGRAPHIC SYSTEM (900-949)</text>
+                
+                {/* Classical Layer */}
+                <rect x="80" y="340" width="160" height="40" fill="#e1bee7" stroke="#8e24aa"/>
+                <text x="160" y="358" textAnchor="middle" className="text-sm font-semibold">Classical Crypto</text>
+                <text x="160" y="372" textAnchor="middle" className="text-sm font-semibold">(900-920)</text>
+                
+                {/* Quantum Layer */}
+                <rect x="260" y="340" width="160" height="40" fill="#e1bee7" stroke="#8e24aa"/>
+                <text x="340" y="358" textAnchor="middle" className="text-sm font-semibold">Quantum Crypto</text>
+                <text x="340" y="372" textAnchor="middle" className="text-sm font-semibold">(921-940)</text>
+                
+                {/* Transition Protocol */}
+                <rect x="440" y="340" width="160" height="40" fill="#e1bee7" stroke="#8e24aa"/>
+                <text x="520" y="358" textAnchor="middle" className="text-sm font-semibold">Transition Protocol</text>
+                <text x="520" y="372" textAnchor="middle" className="text-sm font-semibold">(941-949)</text>
+                
+                {/* Key Management */}
+                <rect x="620" y="340" width="160" height="40" fill="#e1bee7" stroke="#8e24aa"/>
+                <text x="700" y="358" textAnchor="middle" className="text-sm font-semibold">Key Management</text>
+                <text x="700" y="372" textAnchor="middle" className="text-sm font-semibold">(945-949)</text>
+                
+                {/* Biometric Integration */}
+                <rect x="50" y="420" width="800" height="80" fill="#e8f5e8" stroke="#388e3c" strokeWidth="2"/>
+                <text x="450" y="445" textAnchor="middle" className="fill-green-800 font-semibold">QUANTUM-SAFE BIOMETRIC PROCESSING (950-979)</text>
+                
+                <rect x="80" y="465" width="140" height="25" fill="#c8e6c9" stroke="#43a047"/>
+                <text x="150" y="480" textAnchor="middle" className="text-sm">Secure Templates (950)</text>
+                
+                <rect x="240" y="465" width="140" height="25" fill="#c8e6c9" stroke="#43a047"/>
+                <text x="310" y="480" textAnchor="middle" className="text-sm">Encrypted Matching (960)</text>
+                
+                <rect x="400" y="465" width="140" height="25" fill="#c8e6c9" stroke="#43a047"/>
+                <text x="470" y="480" textAnchor="middle" className="text-sm">Privacy Preserving (970)</text>
+                
+                <rect x="560" y="465" width="140" height="25" fill="#c8e6c9" stroke="#43a047"/>
+                <text x="630" y="480" textAnchor="middle" className="text-sm">Quantum Hash (975)</text>
+                
+                <rect x="720" y="465" width="100" height="25" fill="#c8e6c9" stroke="#43a047"/>
+                <text x="770" y="480" textAnchor="middle" className="text-sm">Zero-Knowledge (979)</text>
+                
+                {/* Implementation Strategy */}
+                <rect x="50" y="530" width="800" height="100" fill="#fff3e0" stroke="#f57c00" strokeWidth="2"/>
+                <text x="450" y="555" textAnchor="middle" className="fill-orange-800 font-semibold">IMPLEMENTATION STRATEGY (980-999)</text>
+                
+                {/* Migration Phase */}
+                <rect x="80" y="575" width="130" height="45" fill="#ffcc02" stroke="#fb8c00"/>
+                <text x="145" y="595" textAnchor="middle" className="text-sm font-semibold">Migration</text>
+                <text x="145" y="608" textAnchor="middle" className="text-sm font-semibold">Phase (980)</text>
+                
+                {/* Compatibility */}
+                <rect x="230" y="575" width="130" height="45" fill="#ffcc02" stroke="#fb8c00"/>
+                <text x="295" y="595" textAnchor="middle" className="text-sm font-semibold">Backward</text>
+                <text x="295" y="608" textAnchor="middle" className="text-sm font-semibold">Compatibility (985)</text>
+                
+                {/* Performance */}
+                <rect x="380" y="575" width="130" height="45" fill="#ffcc02" stroke="#fb8c00"/>
+                <text x="445" y="595" textAnchor="middle" className="text-sm font-semibold">Performance</text>
+                <text x="445" y="608" textAnchor="middle" className="text-sm font-semibold">Optimization (990)</text>
+                
+                {/* Monitoring */}
+                <rect x="530" y="575" width="130" height="45" fill="#ffcc02" stroke="#fb8c00"/>
+                <text x="595" y="595" textAnchor="middle" className="text-sm font-semibold">Security</text>
+                <text x="595" y="608" textAnchor="middle" className="text-sm font-semibold">Monitoring (995)</text>
+                
+                {/* Future-Proofing */}
+                <rect x="680" y="575" width="130" height="45" fill="#ffcc02" stroke="#fb8c00"/>
+                <text x="745" y="595" textAnchor="middle" className="text-sm font-semibold">Future</text>
+                <text x="745" y="608" textAnchor="middle" className="text-sm font-semibold">Proofing (999)</text>
+                
+                {/* Security Metrics */}
+                <rect x="50" y="650" width="420" height="40" fill="#f5f5f5" stroke="#757575"/>
+                <text x="260" y="665" textAnchor="middle" className="font-semibold text-sm">QUANTUM SECURITY METRICS</text>
+                <text x="60" y="680" className="text-xs">Key Length: 256-bit minimum | Quantum Resistance: 128-bit security | Migration Ready: Yes</text>
+                
+                <rect x="480" y="650" width="370" height="40" fill="#f5f5f5" stroke="#757575"/>
+                <text x="665" y="665" textAnchor="middle" className="font-semibold text-sm">COMPLIANCE STANDARDS</text>
+                <text x="490" y="680" className="text-xs">NIST PQC Standards | FIPS 140-2 Level 3 | Common Criteria EAL4+</text>
+                
+                {/* Flow arrows */}
+                <line x1="450" y1="130" x2="450" y2="160" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="260" x2="450" y2="290" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="390" x2="450" y2="420" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="500" x2="450" y2="530" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+              </svg>
+              <div className="mt-4 text-sm space-y-2">
+                <p><strong>Quantum Security Components:</strong></p>
+                <p>(800-849) Threat Analysis: Quantum computing vulnerabilities and attack vectors</p>
+                <p>(850-899) Post-Quantum Crypto: Lattice, hash, code, and multivariate-based algorithms</p>
+                <p>(900-949) Hybrid System: Classical-quantum cryptographic transition framework</p>
+                <p>(950-999) Implementation: Secure biometric processing and future-proof deployment</p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="more">
           <div className="space-y-6">
             {/* Figure 8: PWA Architecture */}
