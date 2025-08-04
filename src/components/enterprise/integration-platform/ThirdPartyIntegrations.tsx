@@ -18,7 +18,12 @@ import {
   Shield,
   Users,
   Database,
-  Bell
+  Bell,
+  Heart,
+  DollarSign,
+  Scale,
+  GraduationCap,
+  Monitor
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -292,20 +297,202 @@ export const ThirdPartyIntegrations: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="marketplace" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Integration Marketplace</CardTitle>
-              <CardDescription>Discover new integrations to enhance your TypeMagic setup</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <Tabs defaultValue="industry-specific" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="industry-specific">Industry Specific</TabsTrigger>
+              <TabsTrigger value="general">General</TabsTrigger>
+              <TabsTrigger value="enterprise">Enterprise</TabsTrigger>
+              <TabsTrigger value="developer">Developer Tools</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="industry-specific" className="space-y-4">
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Heart className="h-5 w-5 text-blue-500" />
+                    <h3 className="text-lg font-semibold">Healthcare Integrations</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[
+                      { name: 'Epic MyChart', description: 'Patient portal integration', status: 'Available' },
+                      { name: 'Cerner PowerChart', description: 'EMR system integration', status: 'Available' },
+                      { name: 'AllScripts', description: 'Practice management', status: 'Beta' },
+                      { name: 'athenahealth', description: 'Cloud-based EMR', status: 'Coming Soon' }
+                    ].map((item, index) => (
+                      <Card key={index}>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm flex items-center gap-2">
+                            <Heart className="h-4 w-4 text-blue-500" />
+                            {item.name}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-xs text-muted-foreground mb-2">{item.description}</p>
+                          <div className="flex items-center justify-between">
+                            <Badge variant={item.status === 'Available' ? 'default' : 'secondary'}>
+                              {item.status}
+                            </Badge>
+                            <Button size="sm" variant="outline" disabled={item.status !== 'Available'}>
+                              Install
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-5 w-5 text-green-500" />
+                    <h3 className="text-lg font-semibold">Financial Services</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[
+                      { name: 'Plaid', description: 'Banking data API', status: 'Available' },
+                      { name: 'Stripe Connect', description: 'Payment processing', status: 'Available' },
+                      { name: 'Yodlee', description: 'Financial data aggregation', status: 'Beta' },
+                      { name: 'Finicity', description: 'Open banking platform', status: 'Coming Soon' }
+                    ].map((item, index) => (
+                      <Card key={index}>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm flex items-center gap-2">
+                            <DollarSign className="h-4 w-4 text-green-500" />
+                            {item.name}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-xs text-muted-foreground mb-2">{item.description}</p>
+                          <div className="flex items-center justify-between">
+                            <Badge variant={item.status === 'Available' ? 'default' : 'secondary'}>
+                              {item.status}
+                            </Badge>
+                            <Button size="sm" variant="outline" disabled={item.status !== 'Available'}>
+                              Install
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Scale className="h-5 w-5 text-purple-500" />
+                    <h3 className="text-lg font-semibold">Legal Industry</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[
+                      { name: 'DocuSign', description: 'Digital signature platform', status: 'Available' },
+                      { name: 'Adobe Sign', description: 'Document e-signatures', status: 'Available' },
+                      { name: 'HelloSign', description: 'Simple e-signature', status: 'Available' },
+                      { name: 'PandaDoc', description: 'Document automation', status: 'Beta' }
+                    ].map((item, index) => (
+                      <Card key={index}>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm flex items-center gap-2">
+                            <Scale className="h-4 w-4 text-purple-500" />
+                            {item.name}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-xs text-muted-foreground mb-2">{item.description}</p>
+                          <div className="flex items-center justify-between">
+                            <Badge variant={item.status === 'Available' ? 'default' : 'secondary'}>
+                              {item.status}
+                            </Badge>
+                            <Button size="sm" variant="outline" disabled={item.status !== 'Available'}>
+                              Install
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <GraduationCap className="h-5 w-5 text-indigo-500" />
+                    <h3 className="text-lg font-semibold">Education Platforms</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[
+                      { name: 'Canvas LMS', description: 'Learning management system', status: 'Available' },
+                      { name: 'Moodle', description: 'Open-source LMS', status: 'Available' },
+                      { name: 'Blackboard', description: 'Educational technology', status: 'Beta' },
+                      { name: 'Google Classroom', description: 'Classroom management', status: 'Coming Soon' }
+                    ].map((item, index) => (
+                      <Card key={index}>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm flex items-center gap-2">
+                            <GraduationCap className="h-4 w-4 text-indigo-500" />
+                            {item.name}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-xs text-muted-foreground mb-2">{item.description}</p>
+                          <div className="flex items-center justify-between">
+                            <Badge variant={item.status === 'Available' ? 'default' : 'secondary'}>
+                              {item.status}
+                            </Badge>
+                            <Button size="sm" variant="outline" disabled={item.status !== 'Available'}>
+                              Install
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Monitor className="h-5 w-5 text-orange-500" />
+                    <h3 className="text-lg font-semibold">VDI & Remote Work</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[
+                      { name: 'Citrix Virtual Apps', description: 'Virtual application delivery', status: 'Available' },
+                      { name: 'VMware Horizon', description: 'VDI platform', status: 'Available' },
+                      { name: 'Microsoft RDS', description: 'Remote desktop services', status: 'Beta' },
+                      { name: 'Amazon WorkSpaces', description: 'Cloud-based desktops', status: 'Coming Soon' }
+                    ].map((item, index) => (
+                      <Card key={index}>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm flex items-center gap-2">
+                            <Monitor className="h-4 w-4 text-orange-500" />
+                            {item.name}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-xs text-muted-foreground mb-2">{item.description}</p>
+                          <div className="flex items-center justify-between">
+                            <Badge variant={item.status === 'Available' ? 'default' : 'secondary'}>
+                              {item.status}
+                            </Badge>
+                            <Button size="sm" variant="outline" disabled={item.status !== 'Available'}>
+                              Install
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="general" className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
-                  { name: 'Microsoft Azure AD', category: 'Enterprise SSO', status: 'Coming Soon' },
                   { name: 'Google Analytics', category: 'Web Analytics', status: 'Beta' },
-                  { name: 'Splunk', category: 'Security Analytics', status: 'Available' },
-                  { name: 'Jira', category: 'Issue Tracking', status: 'Available' },
-                  { name: 'Datadog', category: 'Monitoring', status: 'Beta' },
-                  { name: 'PagerDuty', category: 'Incident Response', status: 'Coming Soon' }
+                  { name: 'Mixpanel', category: 'Product Analytics', status: 'Available' },
+                  { name: 'Segment', category: 'Customer Data Platform', status: 'Available' },
+                  { name: 'Intercom', category: 'Customer Messaging', status: 'Available' },
+                  { name: 'Zendesk', category: 'Customer Support', status: 'Beta' },
+                  { name: 'HubSpot', category: 'CRM & Marketing', status: 'Coming Soon' }
                 ].map((item, index) => (
                   <Card key={index}>
                     <CardHeader className="pb-2">
@@ -318,16 +505,75 @@ export const ThirdPartyIntegrations: React.FC = () => {
                           {item.status}
                         </Badge>
                         <Button size="sm" variant="outline" disabled={item.status !== 'Available'}>
-                          <ExternalLink className="h-3 w-3 mr-1" />
-                          View
+                          Install
                         </Button>
                       </div>
                     </CardContent>
                   </Card>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </TabsContent>
+
+            <TabsContent value="enterprise" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { name: 'Microsoft Azure AD', category: 'Enterprise SSO', status: 'Available' },
+                  { name: 'Okta', category: 'Identity Management', status: 'Available' },
+                  { name: 'Splunk', category: 'Security Analytics', status: 'Available' },
+                  { name: 'Datadog', category: 'Monitoring', status: 'Beta' },
+                  { name: 'PagerDuty', category: 'Incident Response', status: 'Available' },
+                  { name: 'ServiceNow', category: 'IT Service Management', status: 'Coming Soon' }
+                ].map((item, index) => (
+                  <Card key={index}>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm">{item.name}</CardTitle>
+                      <CardDescription className="text-xs">{item.category}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between">
+                        <Badge variant={item.status === 'Available' ? 'default' : 'secondary'}>
+                          {item.status}
+                        </Badge>
+                        <Button size="sm" variant="outline" disabled={item.status !== 'Available'}>
+                          Install
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="developer" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { name: 'GitHub', category: 'Version Control', status: 'Available' },
+                  { name: 'GitLab', category: 'DevOps Platform', status: 'Available' },
+                  { name: 'Jira', category: 'Issue Tracking', status: 'Available' },
+                  { name: 'Slack', category: 'Team Communication', status: 'Available' },
+                  { name: 'Discord', category: 'Community Chat', status: 'Beta' },
+                  { name: 'Webhooks', category: 'Custom Integration', status: 'Available' }
+                ].map((item, index) => (
+                  <Card key={index}>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm">{item.name}</CardTitle>
+                      <CardDescription className="text-xs">{item.category}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between">
+                        <Badge variant={item.status === 'Available' ? 'default' : 'secondary'}>
+                          {item.status}
+                        </Badge>
+                        <Button size="sm" variant="outline" disabled={item.status !== 'Available'}>
+                          Install
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
         </TabsContent>
 
         <TabsContent value="custom" className="space-y-4">

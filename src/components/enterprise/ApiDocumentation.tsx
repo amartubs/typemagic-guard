@@ -8,6 +8,8 @@ import QuickStartGuides from './api-docs/QuickStartGuides';
 import ApiEndpoints from './api-docs/ApiEndpoints';
 import SdkLibraries from './api-docs/SdkLibraries';
 import BestPracticesGuide from './api-docs/BestPracticesGuide';
+import { IndustryApis } from './api-docs/IndustryApis';
+import { ApiSecurity } from './api-docs/ApiSecurity';
 
 const ApiDocumentation = () => {
   return (
@@ -20,10 +22,12 @@ const ApiDocumentation = () => {
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="quickstart">Quick Start</TabsTrigger>
           <TabsTrigger value="endpoints">API Reference</TabsTrigger>
+          <TabsTrigger value="industry">Industry APIs</TabsTrigger>
+          <TabsTrigger value="security">Security</TabsTrigger>
           <TabsTrigger value="sdks">SDKs</TabsTrigger>
           <TabsTrigger value="guides">Best Practices</TabsTrigger>
         </TabsList>
@@ -38,6 +42,14 @@ const ApiDocumentation = () => {
 
         <TabsContent value="endpoints" className="space-y-6">
           <ApiEndpoints />
+        </TabsContent>
+
+        <TabsContent value="industry" className="space-y-6">
+          <IndustryApis />
+        </TabsContent>
+
+        <TabsContent value="security" className="space-y-6">
+          <ApiSecurity />
         </TabsContent>
 
         <TabsContent value="sdks" className="space-y-6">
