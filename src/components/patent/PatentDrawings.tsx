@@ -1311,6 +1311,540 @@ const PatentDrawings: React.FC = () => {
 
         <TabsContent value="more">
           <div className="space-y-6">
+            
+            {/* Figure 10: Government & Healthcare Security */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Figure 10: Government & Healthcare Security Framework</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <svg viewBox="0 0 900 500" className="w-full border rounded">
+                  <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+                    </marker>
+                  </defs>
+                  
+                  <text x="450" y="25" textAnchor="middle" className="text-lg font-bold">GOVERNMENT & HEALTHCARE SECURITY COMPLIANCE</text>
+                  
+                  {/* Government Security Layer */}
+                  <rect x="50" y="50" width="380" height="180" fill="#e8eaf6" stroke="#3f51b5" strokeWidth="2"/>
+                  <text x="240" y="75" textAnchor="middle" className="fill-indigo-800 font-semibold">GOVERNMENT SECURITY (3700-3799)</text>
+                  
+                  <rect x="70" y="95" width="100" height="40" fill="#c5cae9" stroke="#303f9f"/>
+                  <text x="120" y="113" textAnchor="middle" className="text-sm font-semibold">FIPS 140-2</text>
+                  <text x="120" y="127" textAnchor="middle" className="text-sm font-semibold">(3710)</text>
+                  
+                  <rect x="190" y="95" width="100" height="40" fill="#c5cae9" stroke="#303f9f"/>
+                  <text x="240" y="113" textAnchor="middle" className="text-sm font-semibold">Common</text>
+                  <text x="240" y="127" textAnchor="middle" className="text-sm font-semibold">Criteria (3720)</text>
+                  
+                  <rect x="310" y="95" width="100" height="40" fill="#c5cae9" stroke="#303f9f"/>
+                  <text x="360" y="113" textAnchor="middle" className="text-sm font-semibold">FedRAMP</text>
+                  <text x="360" y="127" textAnchor="middle" className="text-sm font-semibold">(3730)</text>
+                  
+                  <rect x="70" y="155" width="160" height="30" fill="#9fa8da" stroke="#1a237e"/>
+                  <text x="150" y="173" textAnchor="middle" className="text-sm font-semibold">Air-Gapped Deploy (3740)</text>
+                  
+                  <rect x="250" y="155" width="160" height="30" fill="#9fa8da" stroke="#1a237e"/>
+                  <text x="330" y="173" textAnchor="middle" className="text-sm font-semibold">Classified Processing (3750)</text>
+                  
+                  <rect x="70" y="195" width="340" height="25" fill="#7986cb" stroke="#0d47a1"/>
+                  <text x="240" y="210" textAnchor="middle" className="text-sm font-semibold">National Security Compliance Framework (3760-3799)</text>
+                  
+                  {/* Healthcare Security Layer */}
+                  <rect x="470" y="50" width="380" height="180" fill="#e8f5e8" stroke="#388e3c" strokeWidth="2"/>
+                  <text x="660" y="75" textAnchor="middle" className="fill-green-800 font-semibold">HEALTHCARE SECURITY (3800-3899)</text>
+                  
+                  <rect x="490" y="95" width="100" height="40" fill="#c8e6c9" stroke="#1b5e20"/>
+                  <text x="540" y="113" textAnchor="middle" className="text-sm font-semibold">HIPAA</text>
+                  <text x="540" y="127" textAnchor="middle" className="text-sm font-semibold">(3810)</text>
+                  
+                  <rect x="610" y="95" width="100" height="40" fill="#c8e6c9" stroke="#1b5e20"/>
+                  <text x="660" y="113" textAnchor="middle" className="text-sm font-semibold">HITECH</text>
+                  <text x="660" y="127" textAnchor="middle" className="text-sm font-semibold">(3820)</text>
+                  
+                  <rect x="730" y="95" width="100" height="40" fill="#c8e6c9" stroke="#1b5e20"/>
+                  <text x="780" y="113" textAnchor="middle" className="text-sm font-semibold">FDA 21 CFR</text>
+                  <text x="780" y="127" textAnchor="middle" className="text-sm font-semibold">(3830)</text>
+                  
+                  <rect x="490" y="155" width="160" height="30" fill="#a5d6a7" stroke="#2e7d32"/>
+                  <text x="570" y="173" textAnchor="middle" className="text-sm font-semibold">PHI Protection (3840)</text>
+                  
+                  <rect x="670" y="155" width="160" height="30" fill="#a5d6a7" stroke="#2e7d32"/>
+                  <text x="750" y="173" textAnchor="middle" className="text-sm font-semibold">Audit Trails (3850)</text>
+                  
+                  <rect x="490" y="195" width="340" height="25" fill="#81c784" stroke="#1b5e20"/>
+                  <text x="660" y="210" textAnchor="middle" className="text-sm font-semibold">Medical Data Security Framework (3860-3899)</text>
+                  
+                  {/* Unified Compliance Engine */}
+                  <rect x="50" y="270" width="800" height="100" fill="#fff3e0" stroke="#f57c00" strokeWidth="2"/>
+                  <text x="450" y="295" textAnchor="middle" className="fill-orange-800 font-semibold">UNIFIED COMPLIANCE ENGINE (3900-3999)</text>
+                  
+                  <rect x="80" y="315" width="130" height="45" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="145" y="335" textAnchor="middle" className="text-sm font-semibold">Policy Engine</text>
+                  <text x="145" y="348" textAnchor="middle" className="text-sm font-semibold">(3910)</text>
+                  
+                  <rect x="230" y="315" width="130" height="45" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="295" y="335" textAnchor="middle" className="text-sm font-semibold">Audit Logger</text>
+                  <text x="295" y="348" textAnchor="middle" className="text-sm font-semibold">(3920)</text>
+                  
+                  <rect x="380" y="315" width="130" height="45" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="445" y="335" textAnchor="middle" className="text-sm font-semibold">Risk Manager</text>
+                  <text x="445" y="348" textAnchor="middle" className="text-sm font-semibold">(3930)</text>
+                  
+                  <rect x="530" y="315" width="130" height="45" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="595" y="335" textAnchor="middle" className="text-sm font-semibold">Report Generator</text>
+                  <text x="595" y="348" textAnchor="middle" className="text-sm font-semibold">(3940)</text>
+                  
+                  <rect x="680" y="315" width="130" height="45" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="745" y="335" textAnchor="middle" className="text-sm font-semibold">Cert Manager</text>
+                  <text x="745" y="348" textAnchor="middle" className="text-sm font-semibold">(3950)</text>
+                  
+                  {/* Metrics */}
+                  <rect x="50" y="390" width="800" height="80" fill="#f5f5f5" stroke="#757575"/>
+                  <text x="450" y="415" textAnchor="middle" className="font-semibold">COMPLIANCE METRICS & CERTIFICATIONS</text>
+                  
+                  <text x="70" y="435" className="text-sm">Government: FIPS 140-2 Level 3 | FedRAMP High | Common Criteria EAL4+</text>
+                  <text x="70" y="450" className="text-sm">Healthcare: HIPAA Compliant | HITECH Secure | FDA 21 CFR Part 11</text>
+                  <text x="70" y="465" className="text-sm">Audit Coverage: 100% | Incident Response: &lt;5min | Compliance Score: 99.9%</text>
+                  
+                  {/* Flow arrows */}
+                  <line x1="240" y1="230" x2="340" y2="270" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
+                  <line x1="660" y1="230" x2="560" y2="270" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
+                </svg>
+                <div className="mt-4 text-sm space-y-2">
+                  <p><strong>Compliance Framework Components:</strong></p>
+                  <p>(3700-3799) Government Security: FIPS 140-2, FedRAMP, air-gapped deployment</p>
+                  <p>(3800-3899) Healthcare Security: HIPAA, HITECH, FDA compliance frameworks</p>
+                  <p>(3900-3999) Unified Engine: Policy management, audit logging, certification</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Figure 11: Database Schema & Data Flow */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Figure 11: Database Schema & Data Flow Architecture</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <svg viewBox="0 0 900 600" className="w-full border rounded">
+                  <text x="450" y="25" textAnchor="middle" className="text-lg font-bold">DATABASE ARCHITECTURE & DATA FLOW MANAGEMENT</text>
+                  
+                  {/* Core Tables Layer */}
+                  <rect x="50" y="50" width="800" height="120" fill="#e3f2fd" stroke="#1976d2" strokeWidth="2"/>
+                  <text x="450" y="75" textAnchor="middle" className="fill-blue-800 font-semibold">CORE DATABASE SCHEMA (4000-4099)</text>
+                  
+                  <rect x="80" y="95" width="120" height="60" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="140" y="115" textAnchor="middle" className="text-sm font-semibold">Users (4010)</text>
+                  <text x="140" y="130" textAnchor="middle" className="text-xs">id, email, profile</text>
+                  <text x="140" y="145" textAnchor="middle" className="text-xs">auth_data, created</text>
+                  
+                  <rect x="220" y="95" width="120" height="60" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="280" y="115" textAnchor="middle" className="text-sm font-semibold">Biometrics (4020)</text>
+                  <text x="280" y="130" textAnchor="middle" className="text-xs">patterns, confidence</text>
+                  <text x="280" y="145" textAnchor="middle" className="text-xs">vectors, metadata</text>
+                  
+                  <rect x="360" y="95" width="120" height="60" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="420" y="115" textAnchor="middle" className="text-sm font-semibold">Sessions (4030)</text>
+                  <text x="420" y="130" textAnchor="middle" className="text-xs">session_id, start</text>
+                  <text x="420" y="145" textAnchor="middle" className="text-xs">end, status, risk</text>
+                  
+                  <rect x="500" y="95" width="120" height="60" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="560" y="115" textAnchor="middle" className="text-sm font-semibold">Audit_Logs (4040)</text>
+                  <text x="560" y="130" textAnchor="middle" className="text-xs">event, timestamp</text>
+                  <text x="560" y="145" textAnchor="middle" className="text-xs">user, action, result</text>
+                  
+                  <rect x="640" y="95" width="120" height="60" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="700" y="115" textAnchor="middle" className="text-sm font-semibold">Analytics (4050)</text>
+                  <text x="700" y="130" textAnchor="middle" className="text-xs">metrics, trends</text>
+                  <text x="700" y="145" textAnchor="middle" className="text-xs">performance, alerts</text>
+                  
+                  {/* Data Processing Layer */}
+                  <rect x="50" y="200" width="800" height="100" fill="#f3e5f5" stroke="#7b1fa2" strokeWidth="2"/>
+                  <text x="450" y="225" textAnchor="middle" className="fill-purple-800 font-semibold">DATA PROCESSING PIPELINE (4100-4199)</text>
+                  
+                  <rect x="80" y="250" width="140" height="40" fill="#e1bee7" stroke="#8e24aa"/>
+                  <text x="150" y="268" textAnchor="middle" className="text-sm font-semibold">Data Ingestion</text>
+                  <text x="150" y="282" textAnchor="middle" className="text-sm font-semibold">(4110)</text>
+                  
+                  <rect x="240" y="250" width="140" height="40" fill="#e1bee7" stroke="#8e24aa"/>
+                  <text x="310" y="268" textAnchor="middle" className="text-sm font-semibold">Validation</text>
+                  <text x="310" y="282" textAnchor="middle" className="text-sm font-semibold">(4120)</text>
+                  
+                  <rect x="400" y="250" width="140" height="40" fill="#e1bee7" stroke="#8e24aa"/>
+                  <text x="470" y="268" textAnchor="middle" className="text-sm font-semibold">Encryption</text>
+                  <text x="470" y="282" textAnchor="middle" className="text-sm font-semibold">(4130)</text>
+                  
+                  <rect x="560" y="250" width="140" height="40" fill="#e1bee7" stroke="#8e24aa"/>
+                  <text x="630" y="268" textAnchor="middle" className="text-sm font-semibold">Storage</text>
+                  <text x="630" y="282" textAnchor="middle" className="text-sm font-semibold">(4140)</text>
+                  
+                  <rect x="720" y="250" width="100" height="40" fill="#e1bee7" stroke="#8e24aa"/>
+                  <text x="770" y="268" textAnchor="middle" className="text-sm font-semibold">Indexing</text>
+                  <text x="770" y="282" textAnchor="middle" className="text-sm font-semibold">(4150)</text>
+                  
+                  {/* Security & Access Layer */}
+                  <rect x="50" y="330" width="800" height="80" fill="#e8f5e8" stroke="#388e3c" strokeWidth="2"/>
+                  <text x="450" y="355" textAnchor="middle" className="fill-green-800 font-semibold">SECURITY & ACCESS CONTROL (4200-4299)</text>
+                  
+                  <rect x="80" y="375" width="140" height="25" fill="#c8e6c9" stroke="#43a047"/>
+                  <text x="150" y="390" textAnchor="middle" className="text-sm">RLS Policies (4210)</text>
+                  
+                  <rect x="240" y="375" width="140" height="25" fill="#c8e6c9" stroke="#43a047"/>
+                  <text x="310" y="390" textAnchor="middle" className="text-sm">Encryption Keys (4220)</text>
+                  
+                  <rect x="400" y="375" width="140" height="25" fill="#c8e6c9" stroke="#43a047"/>
+                  <text x="470" y="390" textAnchor="middle" className="text-sm">Access Logs (4230)</text>
+                  
+                  <rect x="560" y="375" width="140" height="25" fill="#c8e6c9" stroke="#43a047"/>
+                  <text x="630" y="390" textAnchor="middle" className="text-sm">Backup Systems (4240)</text>
+                  
+                  <rect x="720" y="375" width="100" height="25" fill="#c8e6c9" stroke="#43a047"/>
+                  <text x="770" y="390" textAnchor="middle" className="text-sm">Replication (4250)</text>
+                  
+                  {/* Performance Optimization */}
+                  <rect x="50" y="440" width="800" height="120" fill="#fff3e0" stroke="#f57c00" strokeWidth="2"/>
+                  <text x="450" y="465" textAnchor="middle" className="fill-orange-800 font-semibold">PERFORMANCE OPTIMIZATION (4300-4399)</text>
+                  
+                  <rect x="80" y="485" width="160" height="30" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="160" y="502" textAnchor="middle" className="text-sm">Query Optimization (4310)</text>
+                  
+                  <rect x="260" y="485" width="160" height="30" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="340" y="502" textAnchor="middle" className="text-sm">Connection Pooling (4320)</text>
+                  
+                  <rect x="440" y="485" width="160" height="30" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="520" y="502" textAnchor="middle" className="text-sm">Caching Strategy (4330)</text>
+                  
+                  <rect x="620" y="485" width="160" height="30" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="700" y="502" textAnchor="middle" className="text-sm">Load Balancing (4340)</text>
+                  
+                  <rect x="170" y="525" width="200" height="25" fill="#ffb74d" stroke="#f57c00"/>
+                  <text x="270" y="540" textAnchor="middle" className="text-sm">Read Replicas (4350)</text>
+                  
+                  <rect x="390" y="525" width="200" height="25" fill="#ffb74d" stroke="#f57c00"/>
+                  <text x="490" y="540" textAnchor="middle" className="text-sm">Sharding Strategy (4360)</text>
+                  
+                  <rect x="610" y="525" width="200" height="25" fill="#ffb74d" stroke="#f57c00"/>
+                  <text x="710" y="540" textAnchor="middle" className="text-sm">Monitoring (4370)</text>
+                  
+                  {/* Flow arrows */}
+                  <line x1="450" y1="170" x2="450" y2="200" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                  <line x1="450" y1="300" x2="450" y2="330" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                  <line x1="450" y1="410" x2="450" y2="440" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                </svg>
+                <div className="mt-4 text-sm space-y-2">
+                  <p><strong>Database Architecture Components:</strong></p>
+                  <p>(4000-4099) Core Schema: User profiles, biometric data, sessions, audit trails</p>
+                  <p>(4100-4199) Data Pipeline: Ingestion, validation, encryption, storage, indexing</p>
+                  <p>(4200-4299) Security Layer: RLS policies, encryption, access control, backups</p>
+                  <p>(4300-4399) Performance: Query optimization, caching, load balancing, monitoring</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Figure 12: Risk-Based Authentication Engine */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Figure 12: Risk-Based Authentication Engine</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <svg viewBox="0 0 900 550" className="w-full border rounded">
+                  <text x="450" y="25" textAnchor="middle" className="text-lg font-bold">ADAPTIVE RISK-BASED AUTHENTICATION SYSTEM</text>
+                  
+                  {/* Risk Assessment Input */}
+                  <rect x="50" y="50" width="800" height="80" fill="#ffebee" stroke="#c62828" strokeWidth="2"/>
+                  <text x="450" y="75" textAnchor="middle" className="fill-red-800 font-semibold">RISK FACTOR ANALYSIS (4400-4499)</text>
+                  
+                  <rect x="80" y="100" width="120" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                  <text x="140" y="112" textAnchor="middle" className="text-xs">Device Trust (4410)</text>
+                  
+                  <rect x="220" y="100" width="120" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                  <text x="280" y="112" textAnchor="middle" className="text-xs">Location Risk (4420)</text>
+                  
+                  <rect x="360" y="100" width="120" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                  <text x="420" y="112" textAnchor="middle" className="text-xs">Behavior Change (4430)</text>
+                  
+                  <rect x="500" y="100" width="120" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                  <text x="560" y="112" textAnchor="middle" className="text-xs">Time Anomaly (4440)</text>
+                  
+                  <rect x="640" y="100" width="120" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                  <text x="700" y="112" textAnchor="middle" className="text-xs">Network Risk (4450)</text>
+                  
+                  {/* Risk Calculation Engine */}
+                  <rect x="50" y="160" width="800" height="100" fill="#e8eaf6" stroke="#3f51b5" strokeWidth="2"/>
+                  <text x="450" y="185" textAnchor="middle" className="fill-indigo-800 font-semibold">RISK CALCULATION ENGINE (4500-4599)</text>
+                  
+                  <rect x="80" y="210" width="150" height="40" fill="#c5cae9" stroke="#303f9f"/>
+                  <text x="155" y="228" textAnchor="middle" className="text-sm font-semibold">Weighted Scoring</text>
+                  <text x="155" y="242" textAnchor="middle" className="text-sm font-semibold">(4510)</text>
+                  
+                  <rect x="250" y="210" width="150" height="40" fill="#c5cae9" stroke="#303f9f"/>
+                  <text x="325" y="228" textAnchor="middle" className="text-sm font-semibold">ML Prediction</text>
+                  <text x="325" y="242" textAnchor="middle" className="text-sm font-semibold">(4520)</text>
+                  
+                  <rect x="420" y="210" width="150" height="40" fill="#c5cae9" stroke="#303f9f"/>
+                  <text x="495" y="228" textAnchor="middle" className="text-sm font-semibold">Historical Analysis</text>
+                  <text x="495" y="242" textAnchor="middle" className="text-sm font-semibold">(4530)</text>
+                  
+                  <rect x="590" y="210" width="150" height="40" fill="#c5cae9" stroke="#303f9f"/>
+                  <text x="665" y="228" textAnchor="middle" className="text-sm font-semibold">Context Evaluation</text>
+                  <text x="665" y="242" textAnchor="middle" className="text-sm font-semibold">(4540)</text>
+                  
+                  {/* Authentication Decision Matrix */}
+                  <rect x="50" y="290" width="800" height="120" fill="#e8f5e8" stroke="#388e3c" strokeWidth="2"/>
+                  <text x="450" y="315" textAnchor="middle" className="fill-green-800 font-semibold">ADAPTIVE AUTHENTICATION DECISION (4600-4699)</text>
+                  
+                  {/* Low Risk */}
+                  <rect x="80" y="340" width="140" height="60" fill="#c8e6c9" stroke="#43a047"/>
+                  <text x="150" y="360" textAnchor="middle" className="text-sm font-semibold">LOW RISK</text>
+                  <text x="150" y="375" textAnchor="middle" className="text-sm font-semibold">(0-30%)</text>
+                  <text x="150" y="390" textAnchor="middle" className="text-xs">→ Allow Access</text>
+                  
+                  {/* Medium Risk */}
+                  <rect x="240" y="340" width="140" height="60" fill="#fff9c4" stroke="#f9a825"/>
+                  <text x="310" y="360" textAnchor="middle" className="text-sm font-semibold">MEDIUM RISK</text>
+                  <text x="310" y="375" textAnchor="middle" className="text-sm font-semibold">(31-60%)</text>
+                  <text x="310" y="390" textAnchor="middle" className="text-xs">→ Step-up Auth</text>
+                  
+                  {/* High Risk */}
+                  <rect x="400" y="340" width="140" height="60" fill="#ffccbc" stroke="#ff6f00"/>
+                  <text x="470" y="360" textAnchor="middle" className="text-sm font-semibold">HIGH RISK</text>
+                  <text x="470" y="375" textAnchor="middle" className="text-sm font-semibold">(61-85%)</text>
+                  <text x="470" y="390" textAnchor="middle" className="text-xs">→ MFA Required</text>
+                  
+                  {/* Critical Risk */}
+                  <rect x="560" y="340" width="140" height="60" fill="#ffcdd2" stroke="#d32f2f"/>
+                  <text x="630" y="360" textAnchor="middle" className="text-sm font-semibold">CRITICAL RISK</text>
+                  <text x="630" y="375" textAnchor="middle" className="text-sm font-semibold">(86-100%)</text>
+                  <text x="630" y="390" textAnchor="middle" className="text-xs">→ Block Access</text>
+                  
+                  {/* Adaptive Learning */}
+                  <rect x="720" y="340" width="100" height="60" fill="#e1bee7" stroke="#8e24aa"/>
+                  <text x="770" y="360" textAnchor="middle" className="text-sm font-semibold">LEARNING</text>
+                  <text x="770" y="375" textAnchor="middle" className="text-sm font-semibold">ENGINE</text>
+                  <text x="770" y="390" textAnchor="middle" className="text-xs">Adapt Thresholds</text>
+                  
+                  {/* Response Actions */}
+                  <rect x="50" y="430" width="800" height="90" fill="#f3e5f5" stroke="#7b1fa2" strokeWidth="2"/>
+                  <text x="450" y="455" textAnchor="middle" className="fill-purple-800 font-semibold">RESPONSE ACTIONS & MONITORING (4700-4799)</text>
+                  
+                  <rect x="80" y="470" width="120" height="20" fill="#e1bee7" stroke="#8e24aa"/>
+                  <text x="140" y="482" textAnchor="middle" className="text-xs">Silent Monitoring (4710)</text>
+                  
+                  <rect x="220" y="470" width="120" height="20" fill="#e1bee7" stroke="#8e24aa"/>
+                  <text x="280" y="482" textAnchor="middle" className="text-xs">Email Verification (4720)</text>
+                  
+                  <rect x="360" y="470" width="120" height="20" fill="#e1bee7" stroke="#8e24aa"/>
+                  <text x="420" y="482" textAnchor="middle" className="text-xs">SMS Challenge (4730)</text>
+                  
+                  <rect x="500" y="470" width="120" height="20" fill="#e1bee7" stroke="#8e24aa"/>
+                  <text x="560" y="482" textAnchor="middle" className="text-xs">Admin Alert (4740)</text>
+                  
+                  <rect x="640" y="470" width="120" height="20" fill="#e1bee7" stroke="#8e24aa"/>
+                  <text x="700" y="482" textAnchor="middle" className="text-xs">Forensic Log (4750)</text>
+                  
+                  <rect x="200" y="500" width="200" height="15" fill="#d1c4e9" stroke="#512da8"/>
+                  <text x="300" y="510" textAnchor="middle" className="text-xs">Session Risk Tracking (4760)</text>
+                  
+                  <rect x="420" y="500" width="200" height="15" fill="#d1c4e9" stroke="#512da8"/>
+                  <text x="520" y="510" textAnchor="middle" className="text-xs">Behavioral Baseline Update (4770)</text>
+                  
+                  {/* Flow arrows */}
+                  <line x1="450" y1="130" x2="450" y2="160" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                  <line x1="450" y1="260" x2="450" y2="290" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                  <line x1="450" y1="410" x2="450" y2="430" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                </svg>
+                <div className="mt-4 text-sm space-y-2">
+                  <p><strong>Risk-Based Authentication Components:</strong></p>
+                  <p>(4400-4499) Risk Factors: Device, location, behavior, time, network analysis</p>
+                  <p>(4500-4599) Calculation Engine: Weighted scoring, ML prediction, historical analysis</p>
+                  <p>(4600-4699) Decision Matrix: Risk-based authentication requirements</p>
+                  <p>(4700-4799) Response Actions: Monitoring, challenges, alerts, forensic logging</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Figure 13: Cross-Platform Deployment */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Figure 13: Cross-Platform Deployment Architecture</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <svg viewBox="0 0 900 500" className="w-full border rounded">
+                  <text x="450" y="25" textAnchor="middle" className="text-lg font-bold">UNIVERSAL CROSS-PLATFORM DEPLOYMENT</text>
+                  
+                  {/* Platform Layer */}
+                  <rect x="50" y="50" width="800" height="100" fill="#e3f2fd" stroke="#1976d2" strokeWidth="2"/>
+                  <text x="450" y="75" textAnchor="middle" className="fill-blue-800 font-semibold">TARGET PLATFORMS (4800-4899)</text>
+                  
+                  <rect x="80" y="95" width="100" height="45" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="130" y="115" textAnchor="middle" className="text-sm font-semibold">Web Apps</text>
+                  <text x="130" y="130" textAnchor="middle" className="text-sm font-semibold">(4810)</text>
+                  
+                  <rect x="200" y="95" width="100" height="45" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="250" y="115" textAnchor="middle" className="text-sm font-semibold">Mobile</text>
+                  <text x="250" y="130" textAnchor="middle" className="text-sm font-semibold">(4820)</text>
+                  
+                  <rect x="320" y="95" width="100" height="45" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="370" y="115" textAnchor="middle" className="text-sm font-semibold">Desktop</text>
+                  <text x="370" y="130" textAnchor="middle" className="text-sm font-semibold">(4830)</text>
+                  
+                  <rect x="440" y="95" width="100" height="45" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="490" y="115" textAnchor="middle" className="text-sm font-semibold">Kiosks</text>
+                  <text x="490" y="130" textAnchor="middle" className="text-sm font-semibold">(4840)</text>
+                  
+                  <rect x="560" y="95" width="100" height="45" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="610" y="115" textAnchor="middle" className="text-sm font-semibold">IoT Devices</text>
+                  <text x="610" y="130" textAnchor="middle" className="text-sm font-semibold">(4850)</text>
+                  
+                  <rect x="680" y="95" width="100" height="45" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="730" y="115" textAnchor="middle" className="text-sm font-semibold">Embedded</text>
+                  <text x="730" y="130" textAnchor="middle" className="text-sm font-semibold">(4860)</text>
+                  
+                  {/* Deployment Layer */}
+                  <rect x="50" y="180" width="800" height="100" fill="#f3e5f5" stroke="#7b1fa2" strokeWidth="2"/>
+                  <text x="450" y="205" textAnchor="middle" className="fill-purple-800 font-semibold">DEPLOYMENT STRATEGIES (4900-4999)</text>
+                  
+                  <rect x="80" y="225" width="140" height="45" fill="#e1bee7" stroke="#8e24aa"/>
+                  <text x="150" y="245" textAnchor="middle" className="text-sm font-semibold">Cloud Native</text>
+                  <text x="150" y="260" textAnchor="middle" className="text-sm font-semibold">(4910)</text>
+                  
+                  <rect x="240" y="225" width="140" height="45" fill="#e1bee7" stroke="#8e24aa"/>
+                  <text x="310" y="245" textAnchor="middle" className="text-sm font-semibold">On-Premises</text>
+                  <text x="310" y="260" textAnchor="middle" className="text-sm font-semibold">(4920)</text>
+                  
+                  <rect x="400" y="225" width="140" height="45" fill="#e1bee7" stroke="#8e24aa"/>
+                  <text x="470" y="245" textAnchor="middle" className="text-sm font-semibold">Hybrid Cloud</text>
+                  <text x="470" y="260" textAnchor="middle" className="text-sm font-semibold">(4930)</text>
+                  
+                  <rect x="560" y="225" width="140" height="45" fill="#e1bee7" stroke="#8e24aa"/>
+                  <text x="630" y="245" textAnchor="middle" className="text-sm font-semibold">Edge Computing</text>
+                  <text x="630" y="260" textAnchor="middle" className="text-sm font-semibold">(4940)</text>
+                  
+                  <rect x="720" y="225" width="100" height="45" fill="#e1bee7" stroke="#8e24aa"/>
+                  <text x="770" y="245" textAnchor="middle" className="text-sm font-semibold">Air-Gapped</text>
+                  <text x="770" y="260" textAnchor="middle" className="text-sm font-semibold">(4950)</text>
+                  
+                  {/* Integration Layer */}
+                  <rect x="50" y="310" width="800" height="100" fill="#e8f5e8" stroke="#388e3c" strokeWidth="2"/>
+                  <text x="450" y="335" textAnchor="middle" className="fill-green-800 font-semibold">INTEGRATION FRAMEWORK (5000-5099)</text>
+                  
+                  <rect x="80" y="355" width="120" height="45" fill="#c8e6c9" stroke="#43a047"/>
+                  <text x="140" y="375" textAnchor="middle" className="text-sm font-semibold">REST APIs</text>
+                  <text x="140" y="390" textAnchor="middle" className="text-sm font-semibold">(5010)</text>
+                  
+                  <rect x="220" y="355" width="120" height="45" fill="#c8e6c9" stroke="#43a047"/>
+                  <text x="280" y="375" textAnchor="middle" className="text-sm font-semibold">GraphQL</text>
+                  <text x="280" y="390" textAnchor="middle" className="text-sm font-semibold">(5020)</text>
+                  
+                  <rect x="360" y="355" width="120" height="45" fill="#c8e6c9" stroke="#43a047"/>
+                  <text x="420" y="375" textAnchor="middle" className="text-sm font-semibold">WebSockets</text>
+                  <text x="420" y="390" textAnchor="middle" className="text-sm font-semibold">(5030)</text>
+                  
+                  <rect x="500" y="355" width="120" height="45" fill="#c8e6c9" stroke="#43a047"/>
+                  <text x="560" y="375" textAnchor="middle" className="text-sm font-semibold">SDKs</text>
+                  <text x="560" y="390" textAnchor="middle" className="text-sm font-semibold">(5040)</text>
+                  
+                  <rect x="640" y="355" width="120" height="45" fill="#c8e6c9" stroke="#43a047"/>
+                  <text x="700" y="375" textAnchor="middle" className="text-sm font-semibold">Webhooks</text>
+                  <text x="700" y="390" textAnchor="middle" className="text-sm font-semibold">(5050)</text>
+                  
+                  <rect x="780" y="355" width="60" height="45" fill="#c8e6c9" stroke="#43a047"/>
+                  <text x="810" y="375" textAnchor="middle" className="text-sm font-semibold">Events</text>
+                  <text x="810" y="390" textAnchor="middle" className="text-sm font-semibold">(5060)</text>
+                  
+                  {/* Monitoring & Management */}
+                  <rect x="50" y="430" width="800" height="50" fill="#fff3e0" stroke="#f57c00" strokeWidth="2"/>
+                  <text x="450" y="450" textAnchor="middle" className="fill-orange-800 font-semibold">CENTRALIZED MANAGEMENT (5100-5199)</text>
+                  
+                  <rect x="80" y="460" width="120" height="15" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="140" y="470" textAnchor="middle" className="text-xs">Health Monitoring (5110)</text>
+                  
+                  <rect x="220" y="460" width="120" height="15" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="280" y="470" textAnchor="middle" className="text-xs">Config Management (5120)</text>
+                  
+                  <rect x="360" y="460" width="120" height="15" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="420" y="470" textAnchor="middle" className="text-xs">Auto Scaling (5130)</text>
+                  
+                  <rect x="500" y="460" width="120" height="15" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="560" y="470" textAnchor="middle" className="text-xs">Update Management (5140)</text>
+                  
+                  <rect x="640" y="460" width="120" height="15" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="700" y="470" textAnchor="middle" className="text-xs">Analytics Dashboard (5150)</text>
+                  
+                  {/* Flow arrows */}
+                  <line x1="450" y1="150" x2="450" y2="180" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                  <line x1="450" y1="280" x2="450" y2="310" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                  <line x1="450" y1="410" x2="450" y2="430" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                </svg>
+                <div className="mt-4 text-sm space-y-2">
+                  <p><strong>Cross-Platform Deployment Components:</strong></p>
+                  <p>(4800-4899) Target Platforms: Web, mobile, desktop, kiosks, IoT, embedded systems</p>
+                  <p>(4900-4999) Deployment Strategies: Cloud, on-premises, hybrid, edge, air-gapped</p>
+                  <p>(5000-5099) Integration Framework: APIs, SDKs, webhooks, real-time communication</p>
+                  <p>(5100-5199) Management: Health monitoring, configuration, scaling, updates</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Figures 14-16 Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Figures 14-16: Advanced Implementation Components</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                  <div className="p-4 border rounded-lg bg-muted/50">
+                    <h4 className="font-semibold mb-2">Figure 14: Advanced Threat Detection</h4>
+                    <p className="text-xs space-y-1">
+                      • AI-powered threat identification (5200-5299)<br/>
+                      • Behavioral anomaly detection algorithms<br/>
+                      • Real-time attack pattern recognition<br/>
+                      • Automated incident response workflows<br/>
+                      • Threat intelligence integration<br/>
+                      • Advanced persistent threat (APT) detection
+                    </p>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg bg-muted/50">
+                    <h4 className="font-semibold mb-2">Figure 15: Performance Optimization</h4>
+                    <p className="text-xs space-y-1">
+                      • Latency optimization techniques (5300-5399)<br/>
+                      • Distributed processing architecture<br/>
+                      • Edge computing implementation<br/>
+                      • Memory management strategies<br/>
+                      • Network optimization protocols<br/>
+                      • Resource allocation algorithms
+                    </p>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg bg-muted/50">
+                    <h4 className="font-semibold mb-2">Figure 16: Integration Test Framework</h4>
+                    <p className="text-xs space-y-1">
+                      • Automated testing pipelines (5400-5499)<br/>
+                      • Biometric simulation environments<br/>
+                      • Load testing and stress analysis<br/>
+                      • Security penetration testing<br/>
+                      • Compliance validation suites<br/>
+                      • Continuous integration workflows
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="mt-6 p-4 bg-primary/10 rounded-lg">
+                  <h4 className="font-semibold text-center mb-2">Complete Patent Coverage Summary</h4>
+                  <p className="text-center text-sm text-muted-foreground">
+                    This comprehensive 16-figure patent portfolio covers all aspects of the novel multi-modal 
+                    continuous biometric authentication system, providing complete intellectual property protection 
+                    across system architecture, security frameworks, compliance engines, deployment strategies, 
+                    and performance optimization techniques. The detailed technical drawings demonstrate 
+                    the innovative approaches to biometric authentication, risk-based security, quantum-resistant 
+                    cryptography, and enterprise-grade compliance across all target industries and deployment environments.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
             {/* Figure 8: PWA Architecture */}
             <Card>
               <CardHeader>
