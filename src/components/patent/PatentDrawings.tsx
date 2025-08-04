@@ -8,98 +8,132 @@ const PatentDrawings: React.FC = () => {
       <div className="text-center space-y-4">
         <h1 className="text-3xl font-bold">Patent Technical Drawings</h1>
         <p className="text-lg text-muted-foreground">
-          Advanced Keystroke Dynamics Authentication System with Continuous Learning and Fraud Detection
+          Multi-Modal Continuous Biometric Authentication System with Legal-Grade Audit Trails and Compliance Automation
         </p>
       </div>
 
       <Tabs defaultValue="architecture" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="architecture">Architecture</TabsTrigger>
-          <TabsTrigger value="process">Process Flow</TabsTrigger>
-          <TabsTrigger value="timing">Timing Analysis</TabsTrigger>
-          <TabsTrigger value="security">Security Framework</TabsTrigger>
-          <TabsTrigger value="learning">ML Engine</TabsTrigger>
-          <TabsTrigger value="fraud">Fraud Detection</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-8">
+          <TabsTrigger value="architecture">System Architecture</TabsTrigger>
+          <TabsTrigger value="multimodal">Multi-Modal Engine</TabsTrigger>
+          <TabsTrigger value="compliance">Compliance Engine</TabsTrigger>
+          <TabsTrigger value="enterprise">Enterprise Platform</TabsTrigger>
+          <TabsTrigger value="audit">Legal Audit System</TabsTrigger>
+          <TabsTrigger value="analytics">Predictive Analytics</TabsTrigger>
+          <TabsTrigger value="quantum">Quantum Security</TabsTrigger>
+          <TabsTrigger value="more">More Drawings</TabsTrigger>
         </TabsList>
 
         <TabsContent value="architecture">
           <Card>
             <CardHeader>
-              <CardTitle>Figure 1: System Architecture Overview</CardTitle>
+              <CardTitle>Figure 1: Enhanced Multi-Modal System Architecture</CardTitle>
             </CardHeader>
             <CardContent>
-              <svg viewBox="0 0 800 600" className="w-full border rounded">
-                {/* Client Layer */}
-                <rect x="50" y="50" width="700" height="100" fill="#e3f2fd" stroke="#1976d2" strokeWidth="2"/>
-                <text x="400" y="75" textAnchor="middle" className="fill-blue-800 font-semibold">CLIENT LAYER</text>
+              <svg viewBox="0 0 900 700" className="w-full border rounded">
+                {/* Title */}
+                <text x="450" y="25" textAnchor="middle" className="text-lg font-bold">MULTI-MODAL BIOMETRIC AUTHENTICATION ECOSYSTEM</text>
                 
-                {/* Keystroke Capture */}
-                <rect x="70" y="90" width="150" height="40" fill="#bbdefb" stroke="#1565c0"/>
-                <text x="145" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Keystroke Capture (10)</text>
+                {/* Multi-Modal Input Layer */}
+                <rect x="50" y="50" width="800" height="100" fill="#e3f2fd" stroke="#1976d2" strokeWidth="2"/>
+                <text x="450" y="75" textAnchor="middle" className="fill-blue-800 font-semibold">MULTI-MODAL INPUT LAYER (100-199)</text>
                 
-                {/* Real-time Processing */}
-                <rect x="240" y="90" width="150" height="40" fill="#bbdefb" stroke="#1565c0"/>
-                <text x="315" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Real-time Processing (11)</text>
+                <rect x="70" y="90" width="120" height="40" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="130" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Keystroke Dynamics (110)</text>
                 
-                {/* Encryption Module */}
-                <rect x="410" y="90" width="150" height="40" fill="#bbdefb" stroke="#1565c0"/>
-                <text x="485" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Encryption Module (12)</text>
+                <rect x="210" y="90" width="120" height="40" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="270" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Mouse Patterns (120)</text>
                 
-                {/* UI Components */}
-                <rect x="580" y="90" width="150" height="40" fill="#bbdefb" stroke="#1565c0"/>
-                <text x="655" y="113" textAnchor="middle" className="fill-blue-900 text-sm">UI Components (13)</text>
+                <rect x="350" y="90" width="120" height="40" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="410" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Touch Dynamics (130)</text>
+                
+                <rect x="490" y="90" width="120" height="40" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="550" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Device Fingerprint (140)</text>
+                
+                <rect x="630" y="90" width="120" height="40" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="690" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Behavioral Context (150)</text>
+                
+                <rect x="770" y="90" width="60" height="40" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="800" y="113" textAnchor="middle" className="fill-blue-900 text-sm">PWA (160)</text>
 
-                {/* Processing Layer */}
-                <rect x="50" y="200" width="700" height="120" fill="#f3e5f5" stroke="#7b1fa2" strokeWidth="2"/>
-                <text x="400" y="225" textAnchor="middle" className="fill-purple-800 font-semibold">PROCESSING LAYER</text>
+                {/* Enterprise Processing Layer */}
+                <rect x="50" y="180" width="800" height="120" fill="#f3e5f5" stroke="#7b1fa2" strokeWidth="2"/>
+                <text x="450" y="205" textAnchor="middle" className="fill-purple-800 font-semibold">ENTERPRISE PROCESSING LAYER (200-299)</text>
                 
-                {/* Biometric Processor */}
-                <rect x="70" y="250" width="160" height="50" fill="#e1bee7" stroke="#6a1b9a"/>
-                <text x="150" y="278" textAnchor="middle" className="fill-purple-900 text-sm">Biometric Processor (20)</text>
+                <rect x="70" y="230" width="140" height="50" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="140" y="258" textAnchor="middle" className="fill-purple-900 text-sm">Multi-Modal Fusion (210)</text>
                 
-                {/* Pattern Analyzer */}
-                <rect x="250" y="250" width="160" height="50" fill="#e1bee7" stroke="#6a1b9a"/>
-                <text x="330" y="278" textAnchor="middle" className="fill-purple-900 text-sm">Pattern Analyzer (21)</text>
+                <rect x="230" y="230" width="140" height="50" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="300" y="258" textAnchor="middle" className="fill-purple-900 text-sm">Risk Assessment (220)</text>
                 
-                {/* Fraud Detection */}
-                <rect x="430" y="250" width="160" height="50" fill="#e1bee7" stroke="#6a1b9a"/>
-                <text x="510" y="278" textAnchor="middle" className="fill-purple-900 text-sm">Fraud Detection (22)</text>
+                <rect x="390" y="230" width="140" height="50" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="460" y="258" textAnchor="middle" className="fill-purple-900 text-sm">API Gateway (230)</text>
                 
-                {/* Confidence Calculator */}
-                <rect x="610" y="250" width="120" height="50" fill="#e1bee7" stroke="#6a1b9a"/>
-                <text x="670" y="278" textAnchor="middle" className="fill-purple-900 text-sm">Confidence Calc (23)</text>
+                <rect x="550" y="230" width="140" height="50" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="620" y="258" textAnchor="middle" className="fill-purple-900 text-sm">White-Label Engine (240)</text>
+                
+                <rect x="710" y="230" width="120" height="50" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="770" y="258" textAnchor="middle" className="fill-purple-900 text-sm">Webhooks (250)</text>
 
-                {/* Learning Layer */}
-                <rect x="50" y="370" width="700" height="100" fill="#e8f5e8" stroke="#388e3c" strokeWidth="2"/>
-                <text x="400" y="395" textAnchor="middle" className="fill-green-800 font-semibold">CONTINUOUS LEARNING LAYER</text>
+                {/* Compliance & Security Layer */}
+                <rect x="50" y="330" width="800" height="120" fill="#e8f5e8" stroke="#388e3c" strokeWidth="2"/>
+                <text x="450" y="355" textAnchor="middle" className="fill-green-800 font-semibold">COMPLIANCE & SECURITY LAYER (300-399)</text>
                 
-                {/* Learning Engine */}
-                <rect x="100" y="420" width="200" height="40" fill="#c8e6c9" stroke="#2e7d32"/>
-                <text x="200" y="443" textAnchor="middle" className="fill-green-900 text-sm">Learning Engine (30)</text>
+                <rect x="70" y="380" width="110" height="50" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="125" y="408" textAnchor="middle" className="fill-green-900 text-sm">HIPAA Engine (310)</text>
                 
-                {/* Pattern Pruner */}
-                <rect x="320" y="420" width="160" height="40" fill="#c8e6c9" stroke="#2e7d32"/>
-                <text x="400" y="443" textAnchor="middle" className="fill-green-900 text-sm">Pattern Pruner (31)</text>
+                <rect x="200" y="380" width="110" height="50" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="255" y="408" textAnchor="middle" className="fill-green-900 text-sm">PCI-DSS Engine (320)</text>
                 
-                {/* Database Manager */}
-                <rect x="500" y="420" width="180" height="40" fill="#c8e6c9" stroke="#2e7d32"/>
-                <text x="590" y="443" textAnchor="middle" className="fill-green-900 text-sm">Database Manager (32)</text>
+                <rect x="330" y="380" width="110" height="50" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="385" y="408" textAnchor="middle" className="fill-green-900 text-sm">NIST Framework (330)</text>
+                
+                <rect x="460" y="380" width="110" height="50" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="515" y="408" textAnchor="middle" className="fill-green-900 text-sm">GDPR Manager (340)</text>
+                
+                <rect x="590" y="380" width="110" height="50" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="645" y="408" textAnchor="middle" className="fill-green-900 text-sm">Quantum Crypto (350)</text>
+                
+                <rect x="720" y="380" width="110" height="50" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="775" y="408" textAnchor="middle" className="fill-green-900 text-sm">Legal Audit (360)</text>
 
-                {/* Storage Layer */}
-                <rect x="50" y="520" width="700" height="60" fill="#fff3e0" stroke="#f57c00" strokeWidth="2"/>
-                <text x="400" y="545" textAnchor="middle" className="fill-orange-800 font-semibold">SECURE STORAGE LAYER</text>
+                {/* Analytics & Learning Layer */}
+                <rect x="50" y="480" width="800" height="100" fill="#fff3e0" stroke="#f57c00" strokeWidth="2"/>
+                <text x="450" y="505" textAnchor="middle" className="fill-orange-800 font-semibold">ANALYTICS & LEARNING LAYER (400-499)</text>
                 
-                {/* Encrypted Database */}
-                <rect x="150" y="555" width="200" height="20" fill="#ffcc02" stroke="#e65100"/>
-                <text x="250" y="568" textAnchor="middle" className="fill-orange-900 text-xs">Encrypted Biometric DB (40)</text>
+                <rect x="70" y="520" width="140" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="140" y="543" textAnchor="middle" className="fill-orange-900 text-sm">Continuous Learning (410)</text>
                 
-                {/* Audit Logs */}
-                <rect x="370" y="555" width="150" height="20" fill="#ffcc02" stroke="#e65100"/>
-                <text x="445" y="568" textAnchor="middle" className="fill-orange-900 text-xs">Audit Logs (41)</text>
+                <rect x="230" y="520" width="140" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="300" y="543" textAnchor="middle" className="fill-orange-900 text-sm">Predictive Analytics (420)</text>
                 
-                {/* Session Store */}
-                <rect x="540" y="555" width="130" height="20" fill="#ffcc02" stroke="#e65100"/>
-                <text x="605" y="568" textAnchor="middle" className="fill-orange-900 text-xs">Session Store (42)</text>
+                <rect x="390" y="520" width="140" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="460" y="543" textAnchor="middle" className="fill-orange-900 text-sm">Behavioral Analysis (430)</text>
+                
+                <rect x="550" y="520" width="140" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="620" y="543" textAnchor="middle" className="fill-orange-900 text-sm">Industry Analytics (440)</text>
+                
+                <rect x="710" y="520" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="770" y="543" textAnchor="middle" className="fill-orange-900 text-sm">A/B Testing (450)</text>
+
+                {/* Secure Storage Layer */}
+                <rect x="50" y="610" width="800" height="60" fill="#ffebee" stroke="#c62828" strokeWidth="2"/>
+                <text x="450" y="635" textAnchor="middle" className="fill-red-800 font-semibold">SECURE STORAGE LAYER (500-599)</text>
+                
+                <rect x="100" y="650" width="130" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="165" y="663" textAnchor="middle" className="fill-red-900 text-xs">Encrypted Biometric DB (510)</text>
+                
+                <rect x="250" y="650" width="130" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="315" y="663" textAnchor="middle" className="fill-red-900 text-xs">Immutable Audit Logs (520)</text>
+                
+                <rect x="400" y="650" width="130" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="465" y="663" textAnchor="middle" className="fill-red-900 text-xs">Compliance Reports (530)</text>
+                
+                <rect x="550" y="650" width="130" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="615" y="663" textAnchor="middle" className="fill-red-900 text-xs">Session Management (540)</text>
+                
+                <rect x="700" y="650" width="130" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="765" y="663" textAnchor="middle" className="fill-red-900 text-xs">Hash Chain Store (550)</text>
 
                 {/* Data Flow Arrows */}
                 <defs>
@@ -108,225 +142,504 @@ const PatentDrawings: React.FC = () => {
                   </marker>
                 </defs>
                 
-                {/* Vertical arrows */}
-                <line x1="145" y1="150" x2="145" y2="200" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
-                <line x1="315" y1="150" x2="315" y2="200" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
-                <line x1="485" y1="150" x2="485" y2="200" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
-                <line x1="400" y1="320" x2="400" y2="370" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
-                <line x1="400" y1="470" x2="400" y2="520" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
+                {/* Vertical data flow */}
+                <line x1="450" y1="150" x2="450" y2="180" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="300" x2="450" y2="330" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="450" x2="450" y2="480" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="580" x2="450" y2="610" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
               </svg>
               <div className="mt-4 text-sm space-y-2">
-                <p><strong>Key Components:</strong></p>
-                <p>(10) Keystroke Capture: Real-time keyboard event monitoring with μs precision</p>
-                <p>(20) Biometric Processor: Statistical analysis engine for pattern recognition</p>
-                <p>(30) Learning Engine: Adaptive algorithms for profile evolution</p>
-                <p>(40) Encrypted Storage: AES-256 encrypted biometric data repository</p>
+                <p><strong>Novel Architecture Components:</strong></p>
+                <p>(100-160) Multi-Modal Inputs: Keystroke + Mouse + Touch + Device + Context + PWA</p>
+                <p>(200-250) Enterprise Platform: Fusion algorithms, API gateway, white-label engine</p>
+                <p>(300-360) Compliance Engines: Industry-specific automated compliance (HIPAA, PCI, NIST, GDPR)</p>
+                <p>(400-450) Advanced Analytics: ML learning, predictive analysis, behavioral insights</p>
+                <p>(500-550) Secure Storage: Quantum-resistant encryption, immutable audit trails</p>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="process">
+        <TabsContent value="multimodal">
           <Card>
             <CardHeader>
-              <CardTitle>Figure 2: Authentication Process Flow</CardTitle>
+              <CardTitle>Figure 2: Multi-Modal Biometric Fusion Engine</CardTitle>
             </CardHeader>
             <CardContent>
-              <svg viewBox="0 0 800 700" className="w-full border rounded">
-                {/* Start */}
-                <ellipse cx="100" cy="50" rx="60" ry="25" fill="#4caf50" stroke="#2e7d32"/>
-                <text x="100" y="57" textAnchor="middle" className="fill-white font-semibold">START (100)</text>
+              <svg viewBox="0 0 900 650" className="w-full border rounded">
+                {/* Title */}
+                <text x="450" y="25" textAnchor="middle" className="text-lg font-bold">MULTI-MODAL BIOMETRIC FUSION ARCHITECTURE</text>
                 
-                {/* Keystroke Input */}
-                <rect x="50" y="100" width="100" height="40" fill="#2196f3" stroke="#1565c0"/>
-                <text x="100" y="123" textAnchor="middle" className="fill-white text-sm">Keystroke Input (101)</text>
+                {/* Input Modalities */}
+                <rect x="50" y="50" width="800" height="120" fill="#e3f2fd" stroke="#1976d2" strokeWidth="2"/>
+                <text x="450" y="75" textAnchor="middle" className="fill-blue-800 font-semibold">BIOMETRIC INPUT MODALITIES (600-699)</text>
                 
-                {/* Timing Capture */}
-                <rect x="200" y="100" width="120" height="40" fill="#2196f3" stroke="#1565c0"/>
-                <text x="260" y="123" textAnchor="middle" className="fill-white text-sm">Timing Capture (102)</text>
+                {/* Keystroke Dynamics */}
+                <rect x="70" y="100" width="140" height="60" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="140" y="120" textAnchor="middle" className="fill-blue-900 text-sm font-semibold">Keystroke Dynamics</text>
+                <text x="140" y="135" textAnchor="middle" className="fill-blue-900 text-sm font-semibold">(610)</text>
+                <text x="140" y="150" textAnchor="middle" className="fill-blue-900 text-xs">• Dwell time patterns</text>
                 
-                {/* Pattern Creation */}
-                <rect x="370" y="100" width="120" height="40" fill="#2196f3" stroke="#1565c0"/>
-                <text x="430" y="123" textAnchor="middle" className="fill-white text-sm">Pattern Creation (103)</text>
+                {/* Mouse Dynamics */}
+                <rect x="230" y="100" width="140" height="60" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="300" y="120" textAnchor="middle" className="fill-blue-900 text-sm font-semibold">Mouse Dynamics</text>
+                <text x="300" y="135" textAnchor="middle" className="fill-blue-900 text-sm font-semibold">(620)</text>
+                <text x="300" y="150" textAnchor="middle" className="fill-blue-900 text-xs">• Velocity profiles</text>
                 
-                {/* Decision: Profile Exists? */}
-                <polygon points="430,180 480,200 430,220 380,200" fill="#ff9800" stroke="#ef6c00"/>
-                <text x="430" y="205" textAnchor="middle" className="fill-white text-xs">Profile Exists? (104)</text>
+                {/* Touch Dynamics */}
+                <rect x="390" y="100" width="140" height="60" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="460" y="120" textAnchor="middle" className="fill-blue-900 text-sm font-semibold">Touch Dynamics</text>
+                <text x="460" y="135" textAnchor="middle" className="fill-blue-900 text-sm font-semibold">(630)</text>
+                <text x="460" y="150" textAnchor="middle" className="fill-blue-900 text-xs">• Pressure patterns</text>
                 
-                {/* New Profile Branch */}
-                <rect x="200" y="260" width="120" height="40" fill="#9c27b0" stroke="#6a1b9a"/>
-                <text x="260" y="283" textAnchor="middle" className="fill-white text-sm">Create Profile (105)</text>
+                {/* Device Fingerprinting */}
+                <rect x="550" y="100" width="140" height="60" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="620" y="120" textAnchor="middle" className="fill-blue-900 text-sm font-semibold">Device Fingerprint</text>
+                <text x="620" y="135" textAnchor="middle" className="fill-blue-900 text-sm font-semibold">(640)</text>
+                <text x="620" y="150" textAnchor="middle" className="fill-blue-900 text-xs">• Hardware signatures</text>
                 
-                {/* Existing Profile Branch */}
-                <rect x="520" y="260" width="120" height="40" fill="#9c27b0" stroke="#6a1b9a"/>
-                <text x="580" y="283" textAnchor="middle" className="fill-white text-sm">Load Profile (106)</text>
-                
-                {/* Pattern Analysis */}
-                <rect x="350" y="340" width="160" height="40" fill="#ff5722" stroke="#d84315"/>
-                <text x="430" y="363" textAnchor="middle" className="fill-white text-sm">Pattern Analysis (107)</text>
-                
-                {/* Fraud Detection */}
-                <rect x="350" y="410" width="160" height="40" fill="#ff5722" stroke="#d84315"/>
-                <text x="430" y="433" textAnchor="middle" className="fill-white text-sm">Fraud Detection (108)</text>
-                
-                {/* Confidence Calculation */}
-                <rect x="350" y="480" width="160" height="40" fill="#ff5722" stroke="#d84315"/>
-                <text x="430" y="503" textAnchor="middle" className="fill-white text-sm">Confidence Calc (109)</text>
-                
-                {/* Decision: Pass Threshold? */}
-                <polygon points="430,560 480,580 430,600 380,580" fill="#ff9800" stroke="#ef6c00"/>
-                <text x="430" y="585" textAnchor="middle" className="fill-white text-xs">Pass Threshold? (110)</text>
-                
-                {/* Success */}
-                <ellipse cx="600" cy="580" rx="60" ry="25" fill="#4caf50" stroke="#2e7d32"/>
-                <text x="600" y="587" textAnchor="middle" className="fill-white font-semibold">SUCCESS (111)</text>
-                
-                {/* Failure */}
-                <ellipse cx="260" cy="580" rx="60" ry="25" fill="#f44336" stroke="#c62828"/>
-                <text x="260" y="587" textAnchor="middle" className="fill-white font-semibold">FAILURE (112)</text>
-                
-                {/* Learning Update */}
-                <rect x="550" y="480" width="100" height="40" fill="#607d8b" stroke="#37474f"/>
-                <text x="600" y="503" textAnchor="middle" className="fill-white text-sm">Update Learning (113)</text>
+                {/* Context Analysis */}
+                <rect x="710" y="100" width="120" height="60" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="770" y="120" textAnchor="middle" className="fill-blue-900 text-sm font-semibold">Context Analysis</text>
+                <text x="770" y="135" textAnchor="middle" className="fill-blue-900 text-sm font-semibold">(650)</text>
+                <text x="770" y="150" textAnchor="middle" className="fill-blue-900 text-xs">• Environmental data</text>
 
-                {/* Flow Arrows */}
-                <line x1="100" y1="75" x2="100" y2="100" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
-                <line x1="150" y1="120" x2="200" y2="120" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
-                <line x1="320" y1="120" x2="370" y2="120" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
-                <line x1="430" y1="140" x2="430" y2="180" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
+                {/* Feature Extraction Layer */}
+                <rect x="50" y="200" width="800" height="100" fill="#f3e5f5" stroke="#7b1fa2" strokeWidth="2"/>
+                <text x="450" y="225" textAnchor="middle" className="fill-purple-800 font-semibold">FEATURE EXTRACTION & NORMALIZATION (700-799)</text>
                 
-                {/* Yes/No branches */}
-                <line x1="380" y1="200" x2="260" y2="260" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
-                <text x="300" y="225" className="fill-red-600 font-semibold text-sm">NO</text>
+                <rect x="100" y="250" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="160" y="273" textAnchor="middle" className="fill-purple-900 text-sm">Statistical Features (710)</text>
                 
-                <line x1="480" y1="200" x2="580" y2="260" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
-                <text x="540" y="225" className="fill-green-600 font-semibold text-sm">YES</text>
+                <rect x="240" y="250" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="300" y="273" textAnchor="middle" className="fill-purple-900 text-sm">Temporal Features (720)</text>
                 
-                {/* Convergence */}
-                <line x1="260" y1="300" x2="430" y2="340" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
-                <line x1="580" y1="300" x2="430" y2="340" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
+                <rect x="380" y="250" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="440" y="273" textAnchor="middle" className="fill-purple-900 text-sm">Spatial Features (730)</text>
                 
-                {/* Vertical flow */}
-                <line x1="430" y1="380" x2="430" y2="410" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
-                <line x1="430" y1="450" x2="430" y2="480" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
-                <line x1="430" y1="520" x2="430" y2="560" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
+                <rect x="520" y="250" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="580" y="273" textAnchor="middle" className="fill-purple-900 text-sm">Frequency Features (740)</text>
                 
-                {/* Final branches */}
-                <line x1="380" y1="580" x2="320" y2="580" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
-                <text x="340" y="575" className="fill-red-600 font-semibold text-sm">NO</text>
+                <rect x="660" y="250" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="720" y="273" textAnchor="middle" className="fill-purple-900 text-sm">Normalization (750)</text>
+
+                {/* Fusion Engine */}
+                <rect x="50" y="330" width="800" height="120" fill="#e8f5e8" stroke="#388e3c" strokeWidth="2"/>
+                <text x="450" y="355" textAnchor="middle" className="fill-green-800 font-semibold">FUSION ENGINE & CONFIDENCE WEIGHTING (800-899)</text>
                 
-                <line x1="480" y1="580" x2="540" y2="580" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
-                <text x="510" y="575" className="fill-green-600 font-semibold text-sm">YES</text>
+                <rect x="100" y="380" width="140" height="50" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="170" y="408" textAnchor="middle" className="fill-green-900 text-sm">Ensemble Methods (810)</text>
                 
-                {/* Learning update */}
-                <line x1="510" y1="500" x2="550" y2="500" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
+                <rect x="260" y="380" width="140" height="50" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="330" y="408" textAnchor="middle" className="fill-green-900 text-sm">Weight Optimization (820)</text>
+                
+                <rect x="420" y="380" width="140" height="50" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="490" y="408" textAnchor="middle" className="fill-green-900 text-sm">Confidence Scoring (830)</text>
+                
+                <rect x="580" y="380" width="140" height="50" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="650" y="408" textAnchor="middle" className="fill-green-900 text-sm">Decision Fusion (840)</text>
+
+                {/* Output Layer */}
+                <rect x="50" y="480" width="800" height="100" fill="#fff3e0" stroke="#f57c00" strokeWidth="2"/>
+                <text x="450" y="505" textAnchor="middle" className="fill-orange-800 font-semibold">AUTHENTICATION OUTPUT & LEARNING (900-999)</text>
+                
+                <rect x="100" y="530" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="160" y="553" textAnchor="middle" className="fill-orange-900 text-sm">Final Score (910)</text>
+                
+                <rect x="240" y="530" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="300" y="553" textAnchor="middle" className="fill-orange-900 text-sm">Risk Level (920)</text>
+                
+                <rect x="380" y="530" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="440" y="553" textAnchor="middle" className="fill-orange-900 text-sm">Auth Decision (930)</text>
+                
+                <rect x="520" y="530" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="580" y="553" textAnchor="middle" className="fill-orange-900 text-sm">Profile Update (940)</text>
+                
+                <rect x="660" y="530" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="720" y="553" textAnchor="middle" className="fill-orange-900 text-sm">Audit Log (950)</text>
+
+                {/* Technical Specifications */}
+                <rect x="50" y="600" width="800" height="40" fill="#f5f5f5" stroke="#757575"/>
+                <text x="450" y="615" textAnchor="middle" className="font-semibold">FUSION ALGORITHM SPECIFICATIONS</text>
+                <text x="100" y="630" className="text-xs">Weighted Average: W₁×K + W₂×M + W₃×T + W₄×D + W₅×C</text>
+                <text x="500" y="630" className="text-xs">Confidence = Σ(wi × ci × ri) where wi=weight, ci=confidence, ri=reliability</text>
+
+                {/* Data Flow Arrows */}
+                <line x1="450" y1="170" x2="450" y2="200" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="300" x2="450" y2="330" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="450" x2="450" y2="480" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
               </svg>
               <div className="mt-4 text-sm space-y-2">
-                <p><strong>Process Steps:</strong></p>
-                <p>(101-103) Data Capture: Keystroke timing collection and pattern formation</p>
-                <p>(104-106) Profile Management: User profile creation or retrieval</p>
-                <p>(107-109) Analysis Pipeline: Pattern matching and confidence scoring</p>
-                <p>(110-113) Decision & Learning: Authentication result and adaptive learning</p>
+                <p><strong>Multi-Modal Fusion Components:</strong></p>
+                <p>(600-650) Input Modalities: 5 distinct biometric input types with unique characteristics</p>
+                <p>(700-750) Feature Extraction: Advanced signal processing and normalization algorithms</p>
+                <p>(800-840) Fusion Engine: Ensemble methods with dynamic weight optimization</p>
+                <p>(900-950) Output Processing: Authentication decisions with continuous learning integration</p>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="timing">
+        <TabsContent value="compliance">
           <Card>
             <CardHeader>
-              <CardTitle>Figure 3: Keystroke Timing Analysis</CardTitle>
+              <CardTitle>Figure 3: Industry-Specific Compliance Engine</CardTitle>
             </CardHeader>
             <CardContent>
-              <svg viewBox="0 0 800 500" className="w-full border rounded">
-                {/* Timeline */}
-                <line x1="50" y1="400" x2="750" y2="400" stroke="#333" strokeWidth="2"/>
+              <svg viewBox="0 0 900 700" className="w-full border rounded">
+                {/* Title */}
+                <text x="450" y="25" textAnchor="middle" className="text-lg font-bold">AUTOMATED COMPLIANCE ENGINE ARCHITECTURE</text>
                 
-                {/* Time markers */}
-                <text x="50" y="420" textAnchor="middle" className="text-xs">t0</text>
-                <text x="150" y="420" textAnchor="middle" className="text-xs">t1</text>
-                <text x="250" y="420" textAnchor="middle" className="text-xs">t2</text>
-                <text x="350" y="420" textAnchor="middle" className="text-xs">t3</text>
-                <text x="450" y="420" textAnchor="middle" className="text-xs">t4</text>
-                <text x="550" y="420" textAnchor="middle" className="text-xs">t5</text>
-                <text x="650" y="420" textAnchor="middle" className="text-xs">t6</text>
+                {/* Industry Input Layer */}
+                <rect x="50" y="50" width="800" height="80" fill="#e3f2fd" stroke="#1976d2" strokeWidth="2"/>
+                <text x="450" y="75" textAnchor="middle" className="fill-blue-800 font-semibold">INDUSTRY CONFIGURATION (1000-1099)</text>
                 
-                {/* Key presses */}
-                <rect x="75" y="300" width="50" height="100" fill="#4caf50" stroke="#2e7d32"/>
-                <text x="100" y="350" textAnchor="middle" className="fill-white font-bold">T</text>
+                <rect x="80" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="140" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Healthcare (1010)</text>
                 
-                <rect x="175" y="280" width="50" height="120" fill="#2196f3" stroke="#1565c0"/>
-                <text x="200" y="340" textAnchor="middle" className="fill-white font-bold">H</text>
+                <rect x="220" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="280" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Financial (1020)</text>
                 
-                <rect x="275" y="320" width="50" height="80" fill="#ff9800" stroke="#ef6c00"/>
-                <text x="300" y="365" textAnchor="middle" className="fill-white font-bold">E</text>
+                <rect x="360" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="420" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Government (1030)</text>
                 
-                <rect x="375" y="290" width="50" height="110" fill="#9c27b0" stroke="#6a1b9a"/>
-                <text x="400" y="350" textAnchor="middle" className="fill-white font-bold">space</text>
+                <rect x="500" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="560" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Education (1040)</text>
                 
-                <rect x="475" y="310" width="50" height="90" fill="#f44336" stroke="#c62828"/>
-                <text x="500" y="360" textAnchor="middle" className="fill-white font-bold">Q</text>
+                <rect x="640" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="700" y="113" textAnchor="middle" className="fill-blue-900 text-sm">European (1050)</text>
+
+                {/* Regulation Engine Layer */}
+                <rect x="50" y="160" width="800" height="100" fill="#f3e5f5" stroke="#7b1fa2" strokeWidth="2"/>
+                <text x="450" y="185" textAnchor="middle" className="fill-purple-800 font-semibold">REGULATION PROCESSING ENGINES (1100-1199)</text>
                 
-                <rect x="575" y="270" width="50" height="130" fill="#607d8b" stroke="#37474f"/>
-                <text x="600" y="340" textAnchor="middle" className="fill-white font-bold">U</text>
+                <rect x="80" y="210" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="140" y="233" textAnchor="middle" className="fill-purple-900 text-sm">HIPAA Engine (1110)</text>
                 
-                {/* Dwell time annotations */}
-                <path d="M 75 250 L 125 250" stroke="#e91e63" strokeWidth="2"/>
-                <path d="M 75 245 L 75 255" stroke="#e91e63" strokeWidth="2"/>
-                <path d="M 125 245 L 125 255" stroke="#e91e63" strokeWidth="2"/>
-                <text x="100" y="240" textAnchor="middle" className="text-sm fill-pink-600">Dwell Time (200)</text>
+                <rect x="220" y="210" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="280" y="233" textAnchor="middle" className="fill-purple-900 text-sm">PCI-DSS Engine (1120)</text>
                 
-                <path d="M 175 230 L 225 230" stroke="#e91e63" strokeWidth="2"/>
-                <path d="M 175 225 L 175 235" stroke="#e91e63" strokeWidth="2"/>
-                <path d="M 225 225 L 225 235" stroke="#e91e63" strokeWidth="2"/>
-                <text x="200" y="220" textAnchor="middle" className="text-sm fill-pink-600">DT₂ (201)</text>
+                <rect x="360" y="210" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="420" y="233" textAnchor="middle" className="fill-purple-900 text-sm">NIST Framework (1130)</text>
                 
-                {/* Flight time annotations */}
-                <path d="M 125 450 L 175 450" stroke="#3f51b5" strokeWidth="2"/>
-                <path d="M 125 445 L 125 455" stroke="#3f51b5" strokeWidth="2"/>
-                <path d="M 175 445 L 175 455" stroke="#3f51b5" strokeWidth="2"/>
-                <text x="150" y="470" textAnchor="middle" className="text-sm fill-indigo-600">Flight Time (202)</text>
+                <rect x="500" y="210" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="560" y="233" textAnchor="middle" className="fill-purple-900 text-sm">FERPA Engine (1140)</text>
                 
-                <path d="M 225 450 L 275 450" stroke="#3f51b5" strokeWidth="2"/>
-                <path d="M 225 445 L 225 455" stroke="#3f51b5" strokeWidth="2"/>
-                <path d="M 275 445 L 275 455" stroke="#3f51b5" strokeWidth="2"/>
-                <text x="250" y="470" textAnchor="middle" className="text-sm fill-indigo-600">FT₂ (203)</text>
+                <rect x="640" y="210" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="700" y="233" textAnchor="middle" className="fill-purple-900 text-sm">GDPR Engine (1150)</text>
+
+                {/* Rule Processing Layer */}
+                <rect x="50" y="290" width="800" height="120" fill="#e8f5e8" stroke="#388e3c" strokeWidth="2"/>
+                <text x="450" y="315" textAnchor="middle" className="fill-green-800 font-semibold">COMPLIANCE RULE PROCESSING (1200-1299)</text>
                 
-                {/* Measurement labels */}
-                <text x="400" y="50" textAnchor="middle" className="text-lg font-bold">KEYSTROKE TIMING MEASUREMENTS</text>
+                <rect x="80" y="340" width="140" height="50" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="150" y="368" textAnchor="middle" className="fill-green-900 text-sm">Access Control Rules (1210)</text>
                 
-                {/* Legend */}
-                <rect x="50" y="80" width="200" height="120" fill="none" stroke="#666" strokeDasharray="5,5"/>
-                <text x="150" y="100" textAnchor="middle" className="font-semibold">LEGEND</text>
+                <rect x="240" y="340" width="140" height="50" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="310" y="368" textAnchor="middle" className="fill-green-900 text-sm">Data Retention Rules (1220)</text>
                 
-                <rect x="60" y="110" width="15" height="15" fill="#e91e63"/>
-                <text x="80" y="122" className="text-sm">Dwell Time (key hold duration)</text>
+                <rect x="400" y="340" width="140" height="50" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="470" y="368" textAnchor="middle" className="fill-green-900 text-sm">Audit Requirements (1230)</text>
                 
-                <rect x="60" y="130" width="15" height="15" fill="#3f51b5"/>
-                <text x="80" y="142" className="text-sm">Flight Time (inter-key interval)</text>
+                <rect x="560" y="340" width="140" height="50" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="630" y="368" textAnchor="middle" className="fill-green-900 text-sm">Privacy Controls (1240)</text>
+
+                {/* Legal Audit Layer */}
+                <rect x="50" y="440" width="800" height="100" fill="#fff3e0" stroke="#f57c00" strokeWidth="2"/>
+                <text x="450" y="465" textAnchor="middle" className="fill-orange-800 font-semibold">LEGAL-GRADE AUDIT SYSTEM (1300-1399)</text>
                 
-                <rect x="60" y="150" width="15" height="15" fill="#4caf50"/>
-                <text x="80" y="162" className="text-sm">Key Press Event</text>
+                <rect x="100" y="490" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="160" y="513" textAnchor="middle" className="fill-orange-900 text-sm">Hash Chaining (1310)</text>
                 
-                <rect x="60" y="170" width="15" height="15" fill="#ff5722"/>
-                <text x="80" y="182" className="text-sm">Key Release Event</text>
+                <rect x="240" y="490" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="300" y="513" textAnchor="middle" className="fill-orange-900 text-sm">Timestamping (1320)</text>
                 
-                {/* Formulas */}
-                <rect x="500" y="80" width="250" height="160" fill="none" stroke="#666" strokeDasharray="5,5"/>
-                <text x="625" y="100" textAnchor="middle" className="font-semibold">TIMING CALCULATIONS</text>
+                <rect x="380" y="490" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="440" y="513" textAnchor="middle" className="fill-orange-900 text-sm">Immutable Logs (1330)</text>
                 
-                <text x="510" y="120" className="text-sm">Dwell Time = t_release - t_press</text>
-                <text x="510" y="140" className="text-sm">Flight Time = t_press(n+1) - t_release(n)</text>
-                <text x="510" y="160" className="text-sm">Typing Speed = characters / time_span</text>
-                <text x="510" y="180" className="text-sm">Rhythm = Σ(inter_key_intervals)</text>
-                <text x="510" y="200" className="text-sm">Variance = σ² of timing_pattern</text>
-                <text x="510" y="220" className="text-sm">Confidence = f(consistency, stability)</text>
+                <rect x="520" y="490" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="580" y="513" textAnchor="middle" className="fill-orange-900 text-sm">Legal Reports (1340)</text>
+                
+                <rect x="660" y="490" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="720" y="513" textAnchor="middle" className="fill-orange-900 text-sm">Chain of Custody (1350)</text>
+
+                {/* Output Reports Layer */}
+                <rect x="50" y="570" width="800" height="100" fill="#ffebee" stroke="#c62828" strokeWidth="2"/>
+                <text x="450" y="595" textAnchor="middle" className="fill-red-800 font-semibold">AUTOMATED COMPLIANCE REPORTING (1400-1499)</text>
+                
+                <rect x="100" y="620" width="120" height="40" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="160" y="643" textAnchor="middle" className="fill-red-900 text-sm">Daily Reports (1410)</text>
+                
+                <rect x="240" y="620" width="120" height="40" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="300" y="643" textAnchor="middle" className="fill-red-900 text-sm">Violation Alerts (1420)</text>
+                
+                <rect x="380" y="620" width="120" height="40" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="440" y="643" textAnchor="middle" className="fill-red-900 text-sm">Audit Trails (1430)</text>
+                
+                <rect x="520" y="620" width="120" height="40" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="580" y="643" textAnchor="middle" className="fill-red-900 text-sm">Risk Assessment (1440)</text>
+                
+                <rect x="660" y="620" width="120" height="40" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="720" y="643" textAnchor="middle" className="fill-red-900 text-sm">Executive Dashboard (1450)</text>
+
+                {/* Data Flow Arrows */}
+                <line x1="450" y1="130" x2="450" y2="160" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="260" x2="450" y2="290" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="410" x2="450" y2="440" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="540" x2="450" y2="570" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
               </svg>
               <div className="mt-4 text-sm space-y-2">
-                <p><strong>Key Measurements:</strong></p>
-                <p>(200-201) Dwell Times: Individual key press durations (typically 80-200ms)</p>
-                <p>(202-203) Flight Times: Inter-key intervals (typically 100-300ms)</p>
-                <p>Statistical analysis includes mean, variance, and distribution patterns</p>
+                <p><strong>Compliance Engine Components:</strong></p>
+                <p>(1000-1050) Industry Configuration: Healthcare, Financial, Government, Education, European</p>
+                <p>(1100-1150) Regulation Engines: HIPAA, PCI-DSS, NIST, FERPA, GDPR automated processing</p>
+                <p>(1200-1240) Rule Processing: Access control, data retention, audit, privacy enforcement</p>
+                <p>(1300-1350) Legal Audit: Cryptographic hash chaining, timestamping, immutable storage</p>
+                <p>(1400-1450) Automated Reporting: Real-time compliance monitoring and executive dashboards</p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="enterprise">
+          <Card>
+            <CardHeader>
+              <CardTitle>Figure 4: Enterprise Integration Platform</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <svg viewBox="0 0 900 700" className="w-full border rounded">
+                {/* Title */}
+                <text x="450" y="25" textAnchor="middle" className="text-lg font-bold">ENTERPRISE INTEGRATION & DEPLOYMENT ARCHITECTURE</text>
+                
+                {/* API Gateway Layer */}
+                <rect x="50" y="50" width="800" height="100" fill="#e3f2fd" stroke="#1976d2" strokeWidth="2"/>
+                <text x="450" y="75" textAnchor="middle" className="fill-blue-800 font-semibold">API GATEWAY & MANAGEMENT (1500-1599)</text>
+                
+                <rect x="80" y="100" width="120" height="40" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="140" y="123" textAnchor="middle" className="fill-blue-900 text-sm">Rate Limiting (1510)</text>
+                
+                <rect x="220" y="100" width="120" height="40" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="280" y="123" textAnchor="middle" className="fill-blue-900 text-sm">Authentication (1520)</text>
+                
+                <rect x="360" y="100" width="120" height="40" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="420" y="123" textAnchor="middle" className="fill-blue-900 text-sm">Load Balancing (1530)</text>
+                
+                <rect x="500" y="100" width="120" height="40" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="560" y="123" textAnchor="middle" className="fill-blue-900 text-sm">API Versioning (1540)</text>
+                
+                <rect x="640" y="100" width="120" height="40" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="700" y="123" textAnchor="middle" className="fill-blue-900 text-sm">Documentation (1550)</text>
+
+                {/* White-Label Customization */}
+                <rect x="50" y="180" width="800" height="100" fill="#f3e5f5" stroke="#7b1fa2" strokeWidth="2"/>
+                <text x="450" y="205" textAnchor="middle" className="fill-purple-800 font-semibold">WHITE-LABEL CUSTOMIZATION ENGINE (1600-1699)</text>
+                
+                <rect x="80" y="230" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="140" y="253" textAnchor="middle" className="fill-purple-900 text-sm">Brand Manager (1610)</text>
+                
+                <rect x="220" y="230" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="280" y="253" textAnchor="middle" className="fill-purple-900 text-sm">Theme Engine (1620)</text>
+                
+                <rect x="360" y="230" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="420" y="253" textAnchor="middle" className="fill-purple-900 text-sm">Domain Config (1630)</text>
+                
+                <rect x="500" y="230" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="560" y="253" textAnchor="middle" className="fill-purple-900 text-sm">CSS Editor (1640)</text>
+                
+                <rect x="640" y="230" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="700" y="253" textAnchor="middle" className="fill-purple-900 text-sm">Live Preview (1650)</text>
+
+                {/* SDK Generation */}
+                <rect x="50" y="310" width="800" height="100" fill="#e8f5e8" stroke="#388e3c" strokeWidth="2"/>
+                <text x="450" y="335" textAnchor="middle" className="fill-green-800 font-semibold">SDK GENERATION & INTEGRATION (1700-1799)</text>
+                
+                <rect x="80" y="360" width="120" height="40" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="140" y="383" textAnchor="middle" className="fill-green-900 text-sm">JavaScript SDK (1710)</text>
+                
+                <rect x="220" y="360" width="120" height="40" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="280" y="383" textAnchor="middle" className="fill-green-900 text-sm">Python SDK (1720)</text>
+                
+                <rect x="360" y="360" width="120" height="40" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="420" y="383" textAnchor="middle" className="fill-green-900 text-sm">Java SDK (1730)</text>
+                
+                <rect x="500" y="360" width="120" height="40" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="560" y="383" textAnchor="middle" className="fill-green-900 text-sm">C# SDK (1740)</text>
+                
+                <rect x="640" y="360" width="120" height="40" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="700" y="383" textAnchor="middle" className="fill-green-900 text-sm">PHP SDK (1750)</text>
+
+                {/* Webhook Management */}
+                <rect x="50" y="440" width="800" height="100" fill="#fff3e0" stroke="#f57c00" strokeWidth="2"/>
+                <text x="450" y="465" textAnchor="middle" className="fill-orange-800 font-semibold">WEBHOOK & EVENT MANAGEMENT (1800-1899)</text>
+                
+                <rect x="100" y="490" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="160" y="513" textAnchor="middle" className="fill-orange-900 text-sm">Event Router (1810)</text>
+                
+                <rect x="240" y="490" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="300" y="513" textAnchor="middle" className="fill-orange-900 text-sm">Retry Logic (1820)</text>
+                
+                <rect x="380" y="490" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="440" y="513" textAnchor="middle" className="fill-orange-900 text-sm">Signature Verify (1830)</text>
+                
+                <rect x="520" y="490" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="580" y="513" textAnchor="middle" className="fill-orange-900 text-sm">Webhook Testing (1840)</text>
+                
+                <rect x="660" y="490" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="720" y="513" textAnchor="middle" className="fill-orange-900 text-sm">Event History (1850)</text>
+
+                {/* Deployment Options */}
+                <rect x="50" y="570" width="800" height="100" fill="#ffebee" stroke="#c62828" strokeWidth="2"/>
+                <text x="450" y="595" textAnchor="middle" className="fill-red-800 font-semibold">DEPLOYMENT & LICENSING (1900-1999)</text>
+                
+                <rect x="80" y="620" width="120" height="40" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="140" y="643" textAnchor="middle" className="fill-red-900 text-sm">Cloud Deploy (1910)</text>
+                
+                <rect x="220" y="620" width="120" height="40" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="280" y="643" textAnchor="middle" className="fill-red-900 text-sm">On-Premise (1920)</text>
+                
+                <rect x="360" y="620" width="120" height="40" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="420" y="643" textAnchor="middle" className="fill-red-900 text-sm">Air-Gapped (1930)</text>
+                
+                <rect x="500" y="620" width="120" height="40" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="560" y="643" textAnchor="middle" className="fill-red-900 text-sm">License Manager (1940)</text>
+                
+                <rect x="640" y="620" width="120" height="40" fill="#ffcdd2" stroke="#d32f2f"/>
+                <text x="700" y="643" textAnchor="middle" className="fill-red-900 text-sm">Usage Analytics (1950)</text>
+
+                {/* Data Flow Arrows */}
+                <line x1="450" y1="150" x2="450" y2="180" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="280" x2="450" y2="310" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="410" x2="450" y2="440" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="540" x2="450" y2="570" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+              </svg>
+              <div className="mt-4 text-sm space-y-2">
+                <p><strong>Enterprise Platform Components:</strong></p>
+                <p>(1500-1550) API Gateway: Rate limiting, authentication, load balancing, versioning</p>
+                <p>(1600-1650) White-Label: Brand management, theme engine, domain configuration</p>
+                <p>(1700-1750) SDK Generation: Multi-language SDK automatic generation</p>
+                <p>(1800-1850) Webhook Management: Event routing, retry logic, signature verification</p>
+                <p>(1900-1950) Deployment: Cloud, on-premise, air-gapped options with licensing</p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="audit">
+          <Card>
+            <CardHeader>
+              <CardTitle>Figure 5: Legal-Grade Audit System</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <svg viewBox="0 0 900 650" className="w-full border rounded">
+                {/* Title */}
+                <text x="450" y="25" textAnchor="middle" className="text-lg font-bold">LEGAL-GRADE AUDIT TRAIL ARCHITECTURE</text>
+                
+                {/* Event Capture Layer */}
+                <rect x="50" y="50" width="800" height="80" fill="#e3f2fd" stroke="#1976d2" strokeWidth="2"/>
+                <text x="450" y="75" textAnchor="middle" className="fill-blue-800 font-semibold">EVENT CAPTURE & CLASSIFICATION (2000-2099)</text>
+                
+                <rect x="80" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="140" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Auth Events (2010)</text>
+                
+                <rect x="220" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="280" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Access Events (2020)</text>
+                
+                <rect x="360" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="420" y="113" textAnchor="middle" className="fill-blue-900 text-sm">System Events (2030)</text>
+                
+                <rect x="500" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="560" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Security Events (2040)</text>
+                
+                <rect x="640" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                <text x="700" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Admin Events (2050)</text>
+
+                {/* Cryptographic Processing */}
+                <rect x="50" y="160" width="800" height="100" fill="#f3e5f5" stroke="#7b1fa2" strokeWidth="2"/>
+                <text x="450" y="185" textAnchor="middle" className="fill-purple-800 font-semibold">CRYPTOGRAPHIC INTEGRITY LAYER (2100-2199)</text>
+                
+                <rect x="80" y="210" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="140" y="233" textAnchor="middle" className="fill-purple-900 text-sm">SHA-256 Hashing (2110)</text>
+                
+                <rect x="220" y="210" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="280" y="233" textAnchor="middle" className="fill-purple-900 text-sm">Chain Validation (2120)</text>
+                
+                <rect x="360" y="210" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="420" y="233" textAnchor="middle" className="fill-purple-900 text-sm">Timestamp Authority (2130)</text>
+                
+                <rect x="500" y="210" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="560" y="233" textAnchor="middle" className="fill-purple-900 text-sm">Digital Signatures (2140)</text>
+                
+                <rect x="640" y="210" width="120" height="40" fill="#e1bee7" stroke="#6a1b9a"/>
+                <text x="700" y="233" textAnchor="middle" className="fill-purple-900 text-sm">Tamper Detection (2150)</text>
+
+                {/* Immutable Storage */}
+                <rect x="50" y="290" width="800" height="100" fill="#e8f5e8" stroke="#388e3c" strokeWidth="2"/>
+                <text x="450" y="315" textAnchor="middle" className="fill-green-800 font-semibold">IMMUTABLE STORAGE SYSTEM (2200-2299)</text>
+                
+                <rect x="80" y="340" width="120" height="40" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="140" y="363" textAnchor="middle" className="fill-green-900 text-sm">Write-Once DB (2210)</text>
+                
+                <rect x="220" y="340" width="120" height="40" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="280" y="363" textAnchor="middle" className="fill-green-900 text-sm">Merkle Tree (2220)</text>
+                
+                <rect x="360" y="340" width="120" height="40" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="420" y="363" textAnchor="middle" className="fill-green-900 text-sm">Log Replication (2230)</text>
+                
+                <rect x="500" y="340" width="120" height="40" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="560" y="363" textAnchor="middle" className="fill-green-900 text-sm">Backup Sync (2240)</text>
+                
+                <rect x="640" y="340" width="120" height="40" fill="#c8e6c9" stroke="#2e7d32"/>
+                <text x="700" y="363" textAnchor="middle" className="fill-green-900 text-sm">Archive Storage (2250)</text>
+
+                {/* Legal Evidence Preparation */}
+                <rect x="50" y="420" width="800" height="100" fill="#fff3e0" stroke="#f57c00" strokeWidth="2"/>
+                <text x="450" y="445" textAnchor="middle" className="fill-orange-800 font-semibold">LEGAL EVIDENCE PREPARATION (2300-2399)</text>
+                
+                <rect x="80" y="470" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="140" y="493" textAnchor="middle" className="fill-orange-900 text-sm">Chain of Custody (2310)</text>
+                
+                <rect x="220" y="470" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="280" y="493" textAnchor="middle" className="fill-orange-900 text-sm">Evidence Exports (2320)</text>
+                
+                <rect x="360" y="470" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="420" y="493" textAnchor="middle" className="fill-orange-900 text-sm">Integrity Proofs (2330)</text>
+                
+                <rect x="500" y="470" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="560" y="493" textAnchor="middle" className="fill-orange-900 text-sm">Court Reports (2340)</text>
+                
+                <rect x="640" y="470" width="120" height="40" fill="#ffcc02" stroke="#e65100"/>
+                <text x="700" y="493" textAnchor="middle" className="fill-orange-900 text-sm">Expert Testimony (2350)</text>
+
+                {/* Hash Chain Visualization */}
+                <rect x="50" y="550" width="800" height="80" fill="#f5f5f5" stroke="#757575"/>
+                <text x="450" y="570" textAnchor="middle" className="font-semibold">CRYPTOGRAPHIC HASH CHAIN STRUCTURE</text>
+                
+                {/* Hash blocks */}
+                <rect x="80" y="580" width="60" height="30" fill="#e91e63" stroke="#ad1457"/>
+                <text x="110" y="598" textAnchor="middle" className="text-xs text-white">Block₀</text>
+                
+                <line x1="140" y1="595" x2="160" y2="595" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
+                
+                <rect x="160" y="580" width="60" height="30" fill="#e91e63" stroke="#ad1457"/>
+                <text x="190" y="598" textAnchor="middle" className="text-xs text-white">Block₁</text>
+                
+                <line x1="220" y1="595" x2="240" y2="595" stroke="#333" strokeWidth="2" markerEnd="url(#arrowhead)"/>
+                
+                <rect x="240" y="580" width="60" height="30" fill="#e91e63" stroke="#ad1457"/>
+                <text x="270" y="598" textAnchor="middle" className="text-xs text-white">Block₂</text>
+                
+                <text x="320" y="598" className="text-sm">Hash(Blockₙ) = SHA256(Blockₙ₋₁ + Event + Timestamp)</text>
+
+                {/* Data Flow Arrows */}
+                <line x1="450" y1="130" x2="450" y2="160" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="260" x2="450" y2="290" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                <line x1="450" y1="390" x2="450" y2="420" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+              </svg>
+              <div className="mt-4 text-sm space-y-2">
+                <p><strong>Legal Audit Components:</strong></p>
+                <p>(2000-2050) Event Capture: Comprehensive logging of all system activities</p>
+                <p>(2100-2150) Cryptographic Integrity: SHA-256 hashing, chain validation, tamper detection</p>
+                <p>(2200-2250) Immutable Storage: Write-once database, Merkle trees, replicated logs</p>
+                <p>(2300-2350) Legal Evidence: Chain of custody, court-ready reports, expert testimony support</p>
               </div>
             </CardContent>
           </Card>
