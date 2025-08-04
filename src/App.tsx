@@ -17,6 +17,7 @@ import Settings from '@/pages/Settings';
 import Support from '@/pages/Support';
 import EnterprisePortal from '@/pages/EnterprisePortal';
 import PatentDrawingsPage from '@/pages/PatentDrawingsPage';
+import PatentApplicationPage from '@/pages/PatentApplicationPage';
 import FeatureShowcase from '@/pages/FeatureShowcase';
 import NotFound from '@/pages/NotFound';
 import Admin from '@/pages/Admin';
@@ -72,6 +73,7 @@ function App() {
                       <Route path="/auth" element={<Auth />} />
                       <Route path="/reset-password" element={<ResetPassword />} />
                       <Route path="/patent-drawings" element={<PatentDrawingsPage />} />
+                      <Route path="/patent-application" element={<PatentApplicationPage />} />
                       
                       {/* Legacy redirects */}
                       <Route path="/login" element={<Navigate to="/auth" replace />} />

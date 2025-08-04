@@ -95,6 +95,14 @@ const Header = () => {
               >
                 Patent Drawings
               </Link>
+              <Link 
+                to="/patent-application" 
+                className={`text-sm font-medium transition-colors hover:text-[#9b87f5] ${
+                  isActive('/patent-application') ? 'text-[#9b87f5]' : 'text-foreground/60'
+                }`}
+              >
+                Patent Application
+              </Link>
             </>
           )}
         </nav>
