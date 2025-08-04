@@ -1795,41 +1795,287 @@ const PatentDrawings: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-                  <div className="p-4 border rounded-lg bg-muted/50">
-                    <h4 className="font-semibold mb-2">Figure 14: Advanced Threat Detection</h4>
-                    <p className="text-xs space-y-1">
-                      • AI-powered threat identification (5200-5299)<br/>
-                      • Behavioral anomaly detection algorithms<br/>
-                      • Real-time attack pattern recognition<br/>
-                      • Automated incident response workflows<br/>
-                      • Threat intelligence integration<br/>
-                      • Advanced persistent threat (APT) detection
-                    </p>
-                  </div>
+            {/* Figure 14: Advanced Threat Detection */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Figure 14: Advanced Threat Detection System</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <svg viewBox="0 0 900 500" className="w-full border rounded">
+                  <text x="450" y="25" textAnchor="middle" className="text-lg font-bold">AI-POWERED THREAT DETECTION ARCHITECTURE</text>
                   
-                  <div className="p-4 border rounded-lg bg-muted/50">
-                    <h4 className="font-semibold mb-2">Figure 15: Performance Optimization</h4>
-                    <p className="text-xs space-y-1">
-                      • Latency optimization techniques (5300-5399)<br/>
-                      • Distributed processing architecture<br/>
-                      • Edge computing implementation<br/>
-                      • Memory management strategies<br/>
-                      • Network optimization protocols<br/>
-                      • Resource allocation algorithms
-                    </p>
-                  </div>
+                  <rect x="50" y="50" width="800" height="80" fill="#ffebee" stroke="#c62828" strokeWidth="2"/>
+                  <text x="450" y="75" textAnchor="middle" className="fill-red-800 font-semibold">THREAT INTELLIGENCE LAYER (5200-5299)</text>
                   
-                  <div className="p-4 border rounded-lg bg-muted/50">
-                    <h4 className="font-semibold mb-2">Figure 16: Integration Test Framework</h4>
-                    <p className="text-xs space-y-1">
-                      • Automated testing pipelines (5400-5499)<br/>
-                      • Biometric simulation environments<br/>
-                      • Load testing and stress analysis<br/>
-                      • Security penetration testing<br/>
-                      • Compliance validation suites<br/>
-                      • Continuous integration workflows
-                    </p>
-                  </div>
+                  <rect x="80" y="100" width="120" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                  <text x="140" y="113" textAnchor="middle" className="fill-red-900 text-sm">ML Threat Models (5210)</text>
+                  
+                  <rect x="220" y="100" width="120" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                  <text x="280" y="113" textAnchor="middle" className="fill-red-900 text-sm">Pattern Recognition (5220)</text>
+                  
+                  <rect x="360" y="100" width="120" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                  <text x="420" y="113" textAnchor="middle" className="fill-red-900 text-sm">Anomaly Scoring (5230)</text>
+                  
+                  <rect x="500" y="100" width="120" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                  <text x="560" y="113" textAnchor="middle" className="fill-red-900 text-sm">Attack Vectors (5240)</text>
+                  
+                  <rect x="640" y="100" width="120" height="20" fill="#ffcdd2" stroke="#d32f2f"/>
+                  <text x="700" y="113" textAnchor="middle" className="fill-red-900 text-sm">Threat Feed (5250)</text>
+
+                  <rect x="50" y="160" width="800" height="80" fill="#fff3e0" stroke="#f57c00" strokeWidth="2"/>
+                  <text x="450" y="185" textAnchor="middle" className="fill-orange-800 font-semibold">BEHAVIORAL ANALYSIS ENGINE (5260-5279)</text>
+                  
+                  <rect x="100" y="210" width="120" height="20" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="160" y="223" textAnchor="middle" className="fill-orange-900 text-sm">User Profiling (5260)</text>
+                  
+                  <rect x="240" y="210" width="120" height="20" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="300" y="223" textAnchor="middle" className="fill-orange-900 text-sm">Deviation Detection (5265)</text>
+                  
+                  <rect x="380" y="210" width="120" height="20" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="440" y="223" textAnchor="middle" className="fill-orange-900 text-sm">Risk Modeling (5270)</text>
+                  
+                  <rect x="520" y="210" width="120" height="20" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="580" y="223" textAnchor="middle" className="fill-orange-900 text-sm">Session Analysis (5275)</text>
+                  
+                  <rect x="660" y="210" width="120" height="20" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="720" y="223" textAnchor="middle" className="fill-orange-900 text-sm">APT Detection (5279)</text>
+
+                  <rect x="50" y="270" width="800" height="80" fill="#e3f2fd" stroke="#1976d2" strokeWidth="2"/>
+                  <text x="450" y="295" textAnchor="middle" className="fill-blue-800 font-semibold">INCIDENT RESPONSE AUTOMATION (5280-5299)</text>
+                  
+                  <rect x="80" y="320" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="140" y="333" textAnchor="middle" className="fill-blue-900 text-sm">Alert Prioritization (5280)</text>
+                  
+                  <rect x="220" y="320" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="280" y="333" textAnchor="middle" className="fill-blue-900 text-sm">Auto Containment (5285)</text>
+                  
+                  <rect x="360" y="320" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="420" y="333" textAnchor="middle" className="fill-blue-900 text-sm">Response Workflows (5290)</text>
+                  
+                  <rect x="500" y="320" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="560" y="333" textAnchor="middle" className="fill-blue-900 text-sm">Forensic Collection (5295)</text>
+                  
+                  <rect x="640" y="320" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="700" y="333" textAnchor="middle" className="fill-blue-900 text-sm">Recovery Plans (5299)</text>
+
+                  <rect x="50" y="380" width="800" height="80" fill="#e8f5e8" stroke="#388e3c" strokeWidth="2"/>
+                  <text x="450" y="405" textAnchor="middle" className="fill-green-800 font-semibold">CONTINUOUS LEARNING & ADAPTATION</text>
+                  
+                  <rect x="150" y="430" width="120" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="210" y="443" textAnchor="middle" className="fill-green-900 text-sm">Model Updates</text>
+                  
+                  <rect x="290" y="430" width="120" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="350" y="443" textAnchor="middle" className="fill-green-900 text-sm">Feedback Loops</text>
+                  
+                  <rect x="430" y="430" width="120" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="490" y="443" textAnchor="middle" className="fill-green-900 text-sm">Pattern Evolution</text>
+                  
+                  <rect x="570" y="430" width="120" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="630" y="443" textAnchor="middle" className="fill-green-900 text-sm">Intelligence Sharing</text>
+
+                  <line x1="450" y1="130" x2="450" y2="160" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                  <line x1="450" y1="240" x2="450" y2="270" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                  <line x1="450" y1="350" x2="450" y2="380" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                </svg>
+                <div className="mt-4 text-sm space-y-2">
+                  <p><strong>Threat Detection Components:</strong></p>
+                  <p>(5200-5250) Intelligence Layer: ML threat models, pattern recognition, anomaly scoring</p>
+                  <p>(5260-5279) Behavioral Analysis: User profiling, deviation detection, APT identification</p>
+                  <p>(5280-5299) Incident Response: Alert prioritization, auto containment, forensic collection</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Figure 15: Performance Optimization */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Figure 15: Performance Optimization System</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <svg viewBox="0 0 900 450" className="w-full border rounded">
+                  <text x="450" y="25" textAnchor="middle" className="text-lg font-bold">PERFORMANCE OPTIMIZATION ARCHITECTURE</text>
+                  
+                  <rect x="50" y="50" width="800" height="70" fill="#e3f2fd" stroke="#1976d2" strokeWidth="2"/>
+                  <text x="450" y="70" textAnchor="middle" className="fill-blue-800 font-semibold">LATENCY OPTIMIZATION (5300-5349)</text>
+                  
+                  <rect x="80" y="90" width="100" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="130" y="103" textAnchor="middle" className="fill-blue-900 text-sm">Edge Caching (5300)</text>
+                  
+                  <rect x="200" y="90" width="100" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="250" y="103" textAnchor="middle" className="fill-blue-900 text-sm">Precompute (5310)</text>
+                  
+                  <rect x="320" y="90" width="100" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="370" y="103" textAnchor="middle" className="fill-blue-900 text-sm">Data Locality (5320)</text>
+                  
+                  <rect x="440" y="90" width="100" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="490" y="103" textAnchor="middle" className="fill-blue-900 text-sm">Compression (5330)</text>
+                  
+                  <rect x="560" y="90" width="100" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="610" y="103" textAnchor="middle" className="fill-blue-900 text-sm">CDN Deploy (5340)</text>
+                  
+                  <rect x="680" y="90" width="100" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="730" y="103" textAnchor="middle" className="fill-blue-900 text-sm">HTTP/3 (5349)</text>
+
+                  <rect x="50" y="150" width="800" height="70" fill="#f3e5f5" stroke="#7b1fa2" strokeWidth="2"/>
+                  <text x="450" y="170" textAnchor="middle" className="fill-purple-800 font-semibold">DISTRIBUTED PROCESSING (5350-5374)</text>
+                  
+                  <rect x="100" y="190" width="120" height="20" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="160" y="203" textAnchor="middle" className="fill-purple-900 text-sm">Load Balancing (5350)</text>
+                  
+                  <rect x="240" y="190" width="120" height="20" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="300" y="203" textAnchor="middle" className="fill-purple-900 text-sm">Sharding Logic (5360)</text>
+                  
+                  <rect x="380" y="190" width="120" height="20" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="440" y="203" textAnchor="middle" className="fill-purple-900 text-sm">Task Queues (5365)</text>
+                  
+                  <rect x="520" y="190" width="120" height="20" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="580" y="203" textAnchor="middle" className="fill-purple-900 text-sm">Worker Pools (5370)</text>
+                  
+                  <rect x="660" y="190" width="120" height="20" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="720" y="203" textAnchor="middle" className="fill-purple-900 text-sm">Auto Scaling (5374)</text>
+
+                  <rect x="50" y="250" width="800" height="70" fill="#e8f5e8" stroke="#388e3c" strokeWidth="2"/>
+                  <text x="450" y="270" textAnchor="middle" className="fill-green-800 font-semibold">MEMORY & RESOURCE MANAGEMENT (5375-5399)</text>
+                  
+                  <rect x="80" y="290" width="110" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="135" y="303" textAnchor="middle" className="fill-green-900 text-sm">Memory Pools (5375)</text>
+                  
+                  <rect x="210" y="290" width="110" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="265" y="303" textAnchor="middle" className="fill-green-900 text-sm">Garbage Collection (5380)</text>
+                  
+                  <rect x="340" y="290" width="110" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="395" y="303" textAnchor="middle" className="fill-green-900 text-sm">Buffer Management (5385)</text>
+                  
+                  <rect x="470" y="290" width="110" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="525" y="303" textAnchor="middle" className="fill-green-900 text-sm">Resource Pooling (5390)</text>
+                  
+                  <rect x="600" y="290" width="110" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="655" y="303" textAnchor="middle" className="fill-green-900 text-sm">Leak Detection (5395)</text>
+                  
+                  <rect x="730" y="290" width="110" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="785" y="303" textAnchor="middle" className="fill-green-900 text-sm">CPU Affinity (5399)</text>
+
+                  <rect x="50" y="350" width="800" height="70" fill="#fff3e0" stroke="#f57c00" strokeWidth="2"/>
+                  <text x="450" y="370" textAnchor="middle" className="fill-orange-800 font-semibold">REAL-TIME MONITORING & ADAPTIVE OPTIMIZATION</text>
+                  
+                  <rect x="120" y="390" width="120" height="20" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="180" y="403" textAnchor="middle" className="fill-orange-900 text-sm">Performance Metrics</text>
+                  
+                  <rect x="260" y="390" width="120" height="20" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="320" y="403" textAnchor="middle" className="fill-orange-900 text-sm">Bottleneck Detection</text>
+                  
+                  <rect x="400" y="390" width="120" height="20" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="460" y="403" textAnchor="middle" className="fill-orange-900 text-sm">Auto Tuning</text>
+                  
+                  <rect x="540" y="390" width="120" height="20" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="600" y="403" textAnchor="middle" className="fill-orange-900 text-sm">SLA Compliance</text>
+
+                  <line x1="450" y1="120" x2="450" y2="150" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                  <line x1="450" y1="220" x2="450" y2="250" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                  <line x1="450" y1="320" x2="450" y2="350" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                </svg>
+                <div className="mt-4 text-sm space-y-2">
+                  <p><strong>Performance Optimization Components:</strong></p>
+                  <p>(5300-5349) Latency Optimization: Edge caching, precomputation, data locality, compression</p>
+                  <p>(5350-5374) Distributed Processing: Load balancing, sharding, auto-scaling, worker pools</p>
+                  <p>(5375-5399) Resource Management: Memory pools, garbage collection, buffer management</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Figure 16: Integration Test Framework */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Figure 16: Integration Test Framework</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <svg viewBox="0 0 900 500" className="w-full border rounded">
+                  <text x="450" y="25" textAnchor="middle" className="text-lg font-bold">COMPREHENSIVE TESTING & VALIDATION FRAMEWORK</text>
+                  
+                  <rect x="50" y="50" width="800" height="80" fill="#e3f2fd" stroke="#1976d2" strokeWidth="2"/>
+                  <text x="450" y="75" textAnchor="middle" className="fill-blue-800 font-semibold">AUTOMATED TESTING PIPELINES (5400-5449)</text>
+                  
+                  <rect x="80" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="140" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Unit Tests (5400)</text>
+                  
+                  <rect x="220" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="280" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Integration Tests (5410)</text>
+                  
+                  <rect x="360" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="420" y="113" textAnchor="middle" className="fill-blue-900 text-sm">E2E Tests (5420)</text>
+                  
+                  <rect x="500" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="560" y="113" textAnchor="middle" className="fill-blue-900 text-sm">API Tests (5430)</text>
+                  
+                  <rect x="640" y="100" width="120" height="20" fill="#bbdefb" stroke="#1565c0"/>
+                  <text x="700" y="113" textAnchor="middle" className="fill-blue-900 text-sm">Regression (5440)</text>
+
+                  <rect x="50" y="160" width="800" height="80" fill="#f3e5f5" stroke="#7b1fa2" strokeWidth="2"/>
+                  <text x="450" y="185" textAnchor="middle" className="fill-purple-800 font-semibold">BIOMETRIC SIMULATION ENVIRONMENT (5450-5474)</text>
+                  
+                  <rect x="100" y="210" width="120" height="20" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="160" y="223" textAnchor="middle" className="fill-purple-900 text-sm">Synthetic Data (5450)</text>
+                  
+                  <rect x="240" y="210" width="120" height="20" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="300" y="223" textAnchor="middle" className="fill-purple-900 text-sm">Pattern Generator (5460)</text>
+                  
+                  <rect x="380" y="210" width="120" height="20" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="440" y="223" textAnchor="middle" className="fill-purple-900 text-sm">User Emulation (5465)</text>
+                  
+                  <rect x="520" y="210" width="120" height="20" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="580" y="223" textAnchor="middle" className="fill-purple-900 text-sm">Attack Simulation (5470)</text>
+                  
+                  <rect x="660" y="210" width="120" height="20" fill="#e1bee7" stroke="#6a1b9a"/>
+                  <text x="720" y="223" textAnchor="middle" className="fill-purple-900 text-sm">Scenario Testing (5474)</text>
+
+                  <rect x="50" y="270" width="800" height="80" fill="#e8f5e8" stroke="#388e3c" strokeWidth="2"/>
+                  <text x="450" y="295" textAnchor="middle" className="fill-green-800 font-semibold">PERFORMANCE & SECURITY VALIDATION (5475-5499)</text>
+                  
+                  <rect x="80" y="320" width="110" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="135" y="333" textAnchor="middle" className="fill-green-900 text-sm">Load Testing (5475)</text>
+                  
+                  <rect x="210" y="320" width="110" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="265" y="333" textAnchor="middle" className="fill-green-900 text-sm">Stress Analysis (5480)</text>
+                  
+                  <rect x="340" y="320" width="110" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="395" y="333" textAnchor="middle" className="fill-green-900 text-sm">Pen Testing (5485)</text>
+                  
+                  <rect x="470" y="320" width="110" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="525" y="333" textAnchor="middle" className="fill-green-900 text-sm">Compliance Check (5490)</text>
+                  
+                  <rect x="600" y="320" width="110" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="655" y="333" textAnchor="middle" className="fill-green-900 text-sm">Audit Validation (5495)</text>
+                  
+                  <rect x="730" y="320" width="110" height="20" fill="#c8e6c9" stroke="#2e7d32"/>
+                  <text x="785" y="333" textAnchor="middle" className="fill-green-900 text-sm">Quality Gates (5499)</text>
+
+                  <rect x="50" y="380" width="800" height="80" fill="#fff3e0" stroke="#f57c00" strokeWidth="2"/>
+                  <text x="450" y="405" textAnchor="middle" className="fill-orange-800 font-semibold">CONTINUOUS INTEGRATION & DEPLOYMENT</text>
+                  
+                  <rect x="120" y="430" width="120" height="20" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="180" y="443" textAnchor="middle" className="fill-orange-900 text-sm">CI/CD Pipeline</text>
+                  
+                  <rect x="260" y="430" width="120" height="20" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="320" y="443" textAnchor="middle" className="fill-orange-900 text-sm">Test Orchestration</text>
+                  
+                  <rect x="400" y="430" width="120" height="20" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="460" y="443" textAnchor="middle" className="fill-orange-900 text-sm">Coverage Reports</text>
+                  
+                  <rect x="540" y="430" width="120" height="20" fill="#ffcc02" stroke="#e65100"/>
+                  <text x="600" y="443" textAnchor="middle" className="fill-orange-900 text-sm">Quality Metrics</text>
+
+                  <line x1="450" y1="130" x2="450" y2="160" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                  <line x1="450" y1="240" x2="450" y2="270" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                  <line x1="450" y1="350" x2="450" y2="380" stroke="#333" strokeWidth="3" markerEnd="url(#arrowhead)"/>
+                </svg>
+                <div className="mt-4 text-sm space-y-2">
+                  <p><strong>Testing Framework Components:</strong></p>
+                  <p>(5400-5440) Automated Pipelines: Unit, integration, E2E, API, and regression testing</p>
+                  <p>(5450-5474) Biometric Simulation: Synthetic data, pattern generation, attack simulation</p>
+                  <p>(5475-5499) Validation: Load testing, security analysis, compliance checking</p>
+                </div>
+              </CardContent>
+            </Card>
                 </div>
                 
                 <div className="mt-6 p-4 bg-primary/10 rounded-lg">
