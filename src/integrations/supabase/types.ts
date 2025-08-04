@@ -173,6 +173,48 @@ export type Database = {
           },
         ]
       }
+      behavioral_analysis_sessions: {
+        Row: {
+          analysis_confidence: number | null
+          anomaly_score: number | null
+          baseline_patterns: Json
+          created_at: string
+          deviation_metrics: Json
+          id: string
+          ml_model_version: string | null
+          risk_factors: Json | null
+          session_end: string | null
+          session_start: string
+          user_id: string
+        }
+        Insert: {
+          analysis_confidence?: number | null
+          anomaly_score?: number | null
+          baseline_patterns?: Json
+          created_at?: string
+          deviation_metrics?: Json
+          id?: string
+          ml_model_version?: string | null
+          risk_factors?: Json | null
+          session_end?: string | null
+          session_start?: string
+          user_id: string
+        }
+        Update: {
+          analysis_confidence?: number | null
+          anomaly_score?: number | null
+          baseline_patterns?: Json
+          created_at?: string
+          deviation_metrics?: Json
+          id?: string
+          ml_model_version?: string | null
+          risk_factors?: Json | null
+          session_end?: string | null
+          session_start?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       behavioral_patterns: {
         Row: {
           biometric_profile_id: string
@@ -363,6 +405,87 @@ export type Database = {
           },
         ]
       }
+      fraud_prediction_models: {
+        Row: {
+          accuracy_metrics: Json | null
+          created_at: string
+          id: string
+          industry: string
+          is_active: boolean | null
+          last_trained: string | null
+          model_name: string
+          model_parameters: Json
+          model_version: string
+          training_data_hash: string | null
+        }
+        Insert: {
+          accuracy_metrics?: Json | null
+          created_at?: string
+          id?: string
+          industry: string
+          is_active?: boolean | null
+          last_trained?: string | null
+          model_name: string
+          model_parameters: Json
+          model_version: string
+          training_data_hash?: string | null
+        }
+        Update: {
+          accuracy_metrics?: Json | null
+          created_at?: string
+          id?: string
+          industry?: string
+          is_active?: boolean | null
+          last_trained?: string | null
+          model_name?: string
+          model_parameters?: Json
+          model_version?: string
+          training_data_hash?: string | null
+        }
+        Relationships: []
+      }
+      industry_compliance_records: {
+        Row: {
+          assessor_id: string | null
+          compliance_data: Json
+          compliance_standard: string
+          created_at: string
+          id: string
+          industry: string
+          last_assessment_date: string | null
+          next_assessment_due: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assessor_id?: string | null
+          compliance_data?: Json
+          compliance_standard: string
+          created_at?: string
+          id?: string
+          industry: string
+          last_assessment_date?: string | null
+          next_assessment_due?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assessor_id?: string | null
+          compliance_data?: Json
+          compliance_standard?: string
+          created_at?: string
+          id?: string
+          industry?: string
+          last_assessment_date?: string | null
+          next_assessment_due?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       keystroke_patterns: {
         Row: {
           biometric_profile_id: string
@@ -488,57 +611,75 @@ export type Database = {
       legal_audit_logs: {
         Row: {
           action: string
+          chain_of_custody: Json | null
           compliance_standards: string[]
           created_at: string
           cryptographic_signature: string | null
+          data_classification: string | null
           details: Json | null
+          evidence_integrity_hash: string | null
           hash_chain_previous: string | null
           id: string
           ip_address: unknown | null
+          jurisdiction: string | null
           legal_hold: boolean | null
           legal_significance: string
+          regulatory_framework: string | null
           resource_id: string | null
           resource_type: string
           retention_required_until: string | null
           tamper_evidence: Json | null
           user_agent: string | null
           user_id: string | null
+          witness_accounts: Json | null
         }
         Insert: {
           action: string
+          chain_of_custody?: Json | null
           compliance_standards?: string[]
           created_at?: string
           cryptographic_signature?: string | null
+          data_classification?: string | null
           details?: Json | null
+          evidence_integrity_hash?: string | null
           hash_chain_previous?: string | null
           id?: string
           ip_address?: unknown | null
+          jurisdiction?: string | null
           legal_hold?: boolean | null
           legal_significance: string
+          regulatory_framework?: string | null
           resource_id?: string | null
           resource_type: string
           retention_required_until?: string | null
           tamper_evidence?: Json | null
           user_agent?: string | null
           user_id?: string | null
+          witness_accounts?: Json | null
         }
         Update: {
           action?: string
+          chain_of_custody?: Json | null
           compliance_standards?: string[]
           created_at?: string
           cryptographic_signature?: string | null
+          data_classification?: string | null
           details?: Json | null
+          evidence_integrity_hash?: string | null
           hash_chain_previous?: string | null
           id?: string
           ip_address?: unknown | null
+          jurisdiction?: string | null
           legal_hold?: boolean | null
           legal_significance?: string
+          regulatory_framework?: string | null
           resource_id?: string | null
           resource_type?: string
           retention_required_until?: string | null
           tamper_evidence?: Json | null
           user_agent?: string | null
           user_id?: string | null
+          witness_accounts?: Json | null
         }
         Relationships: []
       }
@@ -756,6 +897,48 @@ export type Database = {
           subscription_tier?: string | null
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"]
+        }
+        Relationships: []
+      }
+      risk_assessments: {
+        Row: {
+          assessment_context: Json | null
+          assessment_type: string
+          assessor_type: string
+          created_at: string
+          id: string
+          mitigation_recommendations: Json | null
+          risk_factors: Json
+          risk_score: number
+          updated_at: string
+          user_id: string
+          valid_until: string | null
+        }
+        Insert: {
+          assessment_context?: Json | null
+          assessment_type: string
+          assessor_type?: string
+          created_at?: string
+          id?: string
+          mitigation_recommendations?: Json | null
+          risk_factors?: Json
+          risk_score: number
+          updated_at?: string
+          user_id: string
+          valid_until?: string | null
+        }
+        Update: {
+          assessment_context?: Json | null
+          assessment_type?: string
+          assessor_type?: string
+          created_at?: string
+          id?: string
+          mitigation_recommendations?: Json | null
+          risk_factors?: Json
+          risk_score?: number
+          updated_at?: string
+          user_id?: string
+          valid_until?: string | null
         }
         Relationships: []
       }
