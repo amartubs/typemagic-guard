@@ -5,9 +5,12 @@ import AuthenticationTrendsChart from './AuthenticationTrendsChart';
 import UserBehaviorAnalysis from './UserBehaviorAnalysis';
 import SecurityInsights from './SecurityInsights';
 import CustomReports from './CustomReports';
+import IndustryDashboards from './IndustryDashboards';
+import PredictiveAnalytics from './PredictiveAnalytics';
 
 interface AnalyticsTabsProps {
   timeRange: string;
+  industry?: 'financial' | 'healthcare' | 'legal' | 'government';
   analyticsData: {
     authTrends: Array<{
       date: string;
@@ -65,6 +68,7 @@ interface AnalyticsTabsProps {
 
 const AnalyticsTabs: React.FC<AnalyticsTabsProps> = ({
   timeRange,
+  industry,
   analyticsData,
   onGenerateReport,
   onCreateTemplate
@@ -75,6 +79,8 @@ const AnalyticsTabs: React.FC<AnalyticsTabsProps> = ({
         <TabsTrigger value="trends">Authentication Trends</TabsTrigger>
         <TabsTrigger value="behavior">User Behavior</TabsTrigger>
         <TabsTrigger value="security">Security Insights</TabsTrigger>
+        {industry && <TabsTrigger value="industry">Industry Dashboard</TabsTrigger>}
+        <TabsTrigger value="predictive">Predictive Analytics</TabsTrigger>
         <TabsTrigger value="reports">Custom Reports</TabsTrigger>
       </TabsList>
 
@@ -95,6 +101,16 @@ const AnalyticsTabs: React.FC<AnalyticsTabsProps> = ({
           threatTrends={analyticsData.securityInsights.threatTrends}
           anomalyDetection={analyticsData.securityInsights.anomalyDetection}
         />
+      </TabsContent>
+
+      {industry && (
+        <TabsContent value="industry" className="space-y-4">
+          <IndustryDashboards industry={industry} timeRange={timeRange} />
+        </TabsContent>
+      )}
+
+      <TabsContent value="predictive" className="space-y-4">
+        <PredictiveAnalytics timeRange={timeRange} />
       </TabsContent>
 
       <TabsContent value="reports" className="space-y-4">

@@ -141,6 +141,7 @@ const AdvancedAnalytics: React.FC = () => {
 
       <AnalyticsTabs
         timeRange={timeRange}
+        industry={'financial'}
         analyticsData={analyticsData}
         onGenerateReport={handleGenerateReport}
         onCreateTemplate={handleCreateTemplate}
