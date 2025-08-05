@@ -18,6 +18,7 @@ import Support from '@/pages/Support';
 import EnterprisePortal from '@/pages/EnterprisePortal';
 import PatentDrawingsPage from '@/pages/PatentDrawingsPage';
 import PatentApplicationPage from '@/pages/PatentApplicationPage';
+import PitchDeck from '@/pages/PitchDeck';
 import FeatureShowcase from '@/pages/FeatureShowcase';
 import NotFound from '@/pages/NotFound';
 import Admin from '@/pages/Admin';
@@ -74,6 +75,7 @@ function App() {
                       <Route path="/reset-password" element={<ResetPassword />} />
                       <Route path="/patent-drawings" element={<PatentDrawingsPage />} />
                       <Route path="/patent-application" element={<PatentApplicationPage />} />
+                      <Route path="/pitch-deck" element={<PitchDeck />} />
                       
                       {/* Legacy redirects */}
                       <Route path="/login" element={<Navigate to="/auth" replace />} />
