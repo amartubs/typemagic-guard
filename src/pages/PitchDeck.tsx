@@ -43,7 +43,7 @@ const PitchDeck = () => {
               Behavioral Biometrics for Zero-Friction Security
             </p>
             <p className="text-lg text-muted-foreground">
-              Series A Funding • $5M Round
+              Pre-Seed Funding • $500K Round
             </p>
           </div>
         </div>
@@ -341,12 +341,46 @@ const PitchDeck = () => {
       )
     },
 
-    // Slide 6: Business Model
+    // Slide 6: Business Model & MVP Validation
     {
-      title: "Business Model",
-      subtitle: "Scalable SaaS with Enterprise Focus",
+      title: "Business Model & MVP Validation",
+      subtitle: "Proven Concept Ready for Scale",
       content: (
         <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  MVP Completed
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>✓ Core keystroke analysis engine</div>
+                <div>✓ Real-time authentication API</div>
+                <div>✓ JavaScript SDK for web integration</div>
+                <div>✓ Admin dashboard and analytics</div>
+                <div>✓ 99.7% accuracy achieved in testing</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="w-5 h-5 text-primary" />
+                  Patent Pending
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>📋 Patent application filed</div>
+                <div>🔬 Novel keystroke analysis method</div>
+                <div>🛡️ Continuous authentication system</div>
+                <div>⚡ Real-time behavioral profiling</div>
+                <div>🔒 Privacy-preserving biometrics</div>
+              </CardContent>
+            </Card>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>
               <CardHeader>
@@ -356,10 +390,10 @@ const PitchDeck = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-center space-y-2">
-                <div className="text-2xl font-bold">$0.10</div>
+                <div className="text-2xl font-bold">$0.05</div>
                 <div className="text-sm text-muted-foreground">per authentication</div>
                 <div className="text-xs">Pay-as-you-scale</div>
-                <Badge variant="outline">Free tier: 1,000 auths/month</Badge>
+                <Badge variant="outline">Free tier: 5,000 auths/month</Badge>
               </CardContent>
             </Card>
 
@@ -371,10 +405,10 @@ const PitchDeck = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-center space-y-2">
-                <div className="text-2xl font-bold">$5-50</div>
+                <div className="text-2xl font-bold">$25-100</div>
                 <div className="text-sm text-muted-foreground">per user/month</div>
                 <div className="text-xs">Advanced features</div>
-                <Badge variant="outline">Analytics, SSO, Support</Badge>
+                <Badge variant="outline">Analytics, Support, SLA</Badge>
               </CardContent>
             </Card>
 
@@ -386,7 +420,7 @@ const PitchDeck = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-center space-y-2">
-                <div className="text-2xl font-bold">$100K+</div>
+                <div className="text-2xl font-bold">$50K+</div>
                 <div className="text-sm text-muted-foreground">annual contracts</div>
                 <div className="text-xs">Custom deployment</div>
                 <Badge variant="outline">On-premise, White-label</Badge>
@@ -397,50 +431,48 @@ const PitchDeck = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Revenue Streams</CardTitle>
+                <CardTitle>Early Validation Metrics</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex justify-between">
-                  <span>API Usage (40%)</span>
-                  <span>$2.8M ARR</span>
+                  <span>Beta Users</span>
+                  <span>47 companies</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>SaaS Subscriptions (45%)</span>
-                  <span>$3.2M ARR</span>
+                  <span>Developer Signups</span>
+                  <span>312 accounts</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Enterprise Licenses (15%)</span>
-                  <span>$1.1M ARR</span>
+                  <span>API Calls (monthly)</span>
+                  <span>1.2M requests</span>
                 </div>
-                <div className="pt-2 border-t font-semibold">
-                  <div className="flex justify-between">
-                    <span>Total ARR</span>
-                    <span>$7.1M</span>
-                  </div>
+                <div className="flex justify-between">
+                  <span>Pilot Program Interest</span>
+                  <span>23 enterprises</span>
                 </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>Unit Economics</CardTitle>
+                <CardTitle>Go-to-Market Readiness</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex justify-between">
-                  <span>Average Contract Value</span>
-                  <span>$24,000</span>
+                  <span>Technical Documentation</span>
+                  <span className="text-green-600">✓ Complete</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Customer Acquisition Cost</span>
-                  <span>$3,200</span>
+                  <span>Sales Materials</span>
+                  <span className="text-green-600">✓ Ready</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Gross Margin</span>
-                  <span>87%</span>
+                  <span>Pricing Strategy</span>
+                  <span className="text-green-600">✓ Validated</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>LTV/CAC Ratio</span>
-                  <span>8.2x</span>
+                  <span>First Customers</span>
+                  <span className="text-yellow-600">⏳ In pipeline</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Payback Period</span>
@@ -475,35 +507,35 @@ const PitchDeck = () => {
       )
     },
 
-    // Slide 7: Traction
+    // Slide 7: Early Traction & Validation
     {
-      title: "Traction & Growth",
-      subtitle: "Proven Product-Market Fit",
+      title: "Early Traction & Validation",
+      subtitle: "Strong MVP Performance & Market Response",
       content: (
         <div className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card className="text-center">
               <CardContent className="pt-6">
-                <div className="text-3xl font-bold text-primary">147</div>
-                <div className="text-sm text-muted-foreground">Paying Customers</div>
+                <div className="text-3xl font-bold text-primary">47</div>
+                <div className="text-sm text-muted-foreground">Beta Companies</div>
               </CardContent>
             </Card>
             <Card className="text-center">
               <CardContent className="pt-6">
-                <div className="text-3xl font-bold text-primary">$7.1M</div>
-                <div className="text-sm text-muted-foreground">Annual Recurring Revenue</div>
+                <div className="text-3xl font-bold text-primary">312</div>
+                <div className="text-sm text-muted-foreground">Developer Signups</div>
               </CardContent>
             </Card>
             <Card className="text-center">
               <CardContent className="pt-6">
-                <div className="text-3xl font-bold text-primary">312%</div>
-                <div className="text-sm text-muted-foreground">Net Revenue Retention</div>
+                <div className="text-3xl font-bold text-primary">1.2M</div>
+                <div className="text-sm text-muted-foreground">Monthly API Calls</div>
               </CardContent>
             </Card>
             <Card className="text-center">
               <CardContent className="pt-6">
-                <div className="text-3xl font-bold text-primary">2.1M</div>
-                <div className="text-sm text-muted-foreground">Monthly Authentications</div>
+                <div className="text-3xl font-bold text-primary">23</div>
+                <div className="text-sm text-muted-foreground">Pilot Programs</div>
               </CardContent>
             </Card>
           </div>
@@ -511,47 +543,61 @@ const PitchDeck = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Customer Logos</CardTitle>
+                <CardTitle>Early Adopters & Interest</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                  <Badge variant="outline" className="justify-center">TechBank</Badge>
-                  <Badge variant="outline" className="justify-center">HealthCorp</Badge>
-                  <Badge variant="outline" className="justify-center">EduSoft</Badge>
-                  <Badge variant="outline" className="justify-center">RetailPlus</Badge>
-                  <Badge variant="outline" className="justify-center">GovTech</Badge>
-                  <Badge variant="outline" className="justify-center">InsureCo</Badge>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>Regional Bank</span>
+                    <Badge variant="secondary">Pilot Active</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>FinTech Startup</span>
+                    <Badge variant="secondary">Pilot Active</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Healthcare SaaS</span>
+                    <Badge variant="outline">Contract Pending</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>EdTech Platform</span>
+                    <Badge variant="outline">LOI Signed</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>E-commerce</span>
+                    <Badge variant="outline">Evaluation</Badge>
+                  </div>
                 </div>
                 <p className="text-sm text-muted-foreground mt-4">
-                  Including Fortune 500 financial services, healthcare, and government agencies
+                  Strong inbound interest from mid-market companies in regulated industries
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>Key Metrics</CardTitle>
+                <CardTitle>MVP Performance Metrics</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex justify-between">
-                  <span>Monthly Growth Rate</span>
-                  <span className="text-green-600 font-semibold">23%</span>
+                  <span>Authentication Accuracy</span>
+                  <span className="text-green-600 font-semibold">99.7%</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Customer Churn (Monthly)</span>
-                  <span className="text-green-600 font-semibold">0.8%</span>
+                  <span>False Positive Rate</span>
+                  <span className="text-green-600 font-semibold">0.3%</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Time to Value</span>
-                  <span className="text-green-600 font-semibold">5 minutes</span>
+                  <span>Integration Time</span>
+                  <span className="text-green-600 font-semibold">&lt; 5 minutes</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>API Uptime</span>
-                  <span className="text-green-600 font-semibold">99.97%</span>
+                  <span>API Response Time</span>
+                  <span className="text-green-600 font-semibold">&lt; 50ms</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Customer Satisfaction</span>
-                  <span className="text-green-600 font-semibold">4.8/5</span>
+                  <span>Developer NPS</span>
+                  <span className="text-green-600 font-semibold">73</span>
                 </div>
               </CardContent>
             </Card>
@@ -559,17 +605,17 @@ const PitchDeck = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Customer Testimonials</CardTitle>
+              <CardTitle>Early Feedback & Validation</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <blockquote className="border-l-4 border-primary pl-4 italic">
-                  "Reduced fraud by 94% while eliminating password resets. ROI in 3 months."
-                  <footer className="text-sm text-muted-foreground mt-2">- CISO, Fortune 100 Bank</footer>
+                  "This could replace our entire 2FA system. The user experience is incredible."
+                  <footer className="text-sm text-muted-foreground mt-2">- CTO, Regional Bank (Pilot)</footer>
                 </blockquote>
                 <blockquote className="border-l-4 border-primary pl-4 italic">
-                  "Seamless integration, zero user complaints. Best security investment we've made."
-                  <footer className="text-sm text-muted-foreground mt-2">- CTO, Healthcare Platform</footer>
+                  "Integration took 3 minutes. Our security team is already seeing suspicious activity alerts."
+                  <footer className="text-sm text-muted-foreground mt-2">- Lead Developer, FinTech</footer>
                 </blockquote>
               </div>
             </CardContent>
@@ -633,7 +679,7 @@ const PitchDeck = () => {
                 </tr>
                 <tr>
                   <td className="border border-border p-3">Cost per Auth</td>
-                  <td className="border border-border p-3 text-center">$0.10</td>
+                  <td className="border border-border p-3 text-center">$0.05</td>
                   <td className="border border-border p-3 text-center">$0.50</td>
                   <td className="border border-border p-3 text-center">$2.00</td>
                   <td className="border border-border p-3 text-center">$1.50</td>
@@ -775,39 +821,39 @@ const PitchDeck = () => {
             </Card>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Team Stats</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <div>
-                  <div className="text-2xl font-bold text-primary">47</div>
-                  <div className="text-sm text-muted-foreground">Total Employees</div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Team Stats</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                  <div>
+                    <div className="text-2xl font-bold text-primary">8</div>
+                    <div className="text-sm text-muted-foreground">Total Employees</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-primary">5</div>
+                    <div className="text-sm text-muted-foreground">Engineers</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-primary">100%</div>
+                    <div className="text-sm text-muted-foreground">Retention Rate</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-primary">1</div>
+                    <div className="text-sm text-muted-foreground">Patent Pending</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-primary">28</div>
-                  <div className="text-sm text-muted-foreground">Engineers</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-primary">89%</div>
-                  <div className="text-sm text-muted-foreground">Retention Rate</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-primary">15</div>
-                  <div className="text-sm text-muted-foreground">Patents Filed</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
         </div>
       )
     },
 
-    // Slide 10: Financials
+    // Slide 10: Financial Projections
     {
       title: "Financial Projections",
-      subtitle: "Path to Profitability",
+      subtitle: "Path to First Revenue & Scale",
       content: (
         <div className="space-y-6">
           <div className="overflow-x-auto">
@@ -815,53 +861,53 @@ const PitchDeck = () => {
               <thead>
                 <tr className="bg-muted">
                   <th className="border border-border p-3 text-left">Metric</th>
-                  <th className="border border-border p-3 text-center">2024</th>
                   <th className="border border-border p-3 text-center">2025</th>
                   <th className="border border-border p-3 text-center">2026</th>
                   <th className="border border-border p-3 text-center">2027</th>
                   <th className="border border-border p-3 text-center">2028</th>
+                  <th className="border border-border p-3 text-center">2029</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td className="border border-border p-3 font-semibold">Revenue ($M)</td>
-                  <td className="border border-border p-3 text-center">7.1</td>
-                  <td className="border border-border p-3 text-center">15.2</td>
-                  <td className="border border-border p-3 text-center">35.8</td>
-                  <td className="border border-border p-3 text-center">68.5</td>
-                  <td className="border border-border p-3 text-center">105.3</td>
+                  <td className="border border-border p-3 font-semibold">Revenue ($K)</td>
+                  <td className="border border-border p-3 text-center">150</td>
+                  <td className="border border-border p-3 text-center">850</td>
+                  <td className="border border-border p-3 text-center">3,200</td>
+                  <td className="border border-border p-3 text-center">8,500</td>
+                  <td className="border border-border p-3 text-center">18,000</td>
                 </tr>
                 <tr>
-                  <td className="border border-border p-3">Gross Margin %</td>
-                  <td className="border border-border p-3 text-center">87%</td>
-                  <td className="border border-border p-3 text-center">89%</td>
-                  <td className="border border-border p-3 text-center">91%</td>
-                  <td className="border border-border p-3 text-center">92%</td>
-                  <td className="border border-border p-3 text-center">93%</td>
+                  <td className="border border-border p-3">Paying Customers</td>
+                  <td className="border border-border p-3 text-center">5</td>
+                  <td className="border border-border p-3 text-center">25</td>
+                  <td className="border border-border p-3 text-center">85</td>
+                  <td className="border border-border p-3 text-center">200</td>
+                  <td className="border border-border p-3 text-center">350</td>
                 </tr>
                 <tr>
-                  <td className="border border-border p-3">Operating Margin %</td>
-                  <td className="border border-border p-3 text-center">-15%</td>
-                  <td className="border border-border p-3 text-center">-8%</td>
-                  <td className="border border-border p-3 text-center">12%</td>
-                  <td className="border border-border p-3 text-center">23%</td>
-                  <td className="border border-border p-3 text-center">28%</td>
+                  <td className="border border-border p-3">Monthly API Calls (M)</td>
+                  <td className="border border-border p-3 text-center">2.5</td>
+                  <td className="border border-border p-3 text-center">12</td>
+                  <td className="border border-border p-3 text-center">45</td>
+                  <td className="border border-border p-3 text-center">120</td>
+                  <td className="border border-border p-3 text-center">250</td>
                 </tr>
                 <tr>
-                  <td className="border border-border p-3">Customers</td>
-                  <td className="border border-border p-3 text-center">147</td>
-                  <td className="border border-border p-3 text-center">285</td>
-                  <td className="border border-border p-3 text-center">520</td>
-                  <td className="border border-border p-3 text-center">890</td>
-                  <td className="border border-border p-3 text-center">1,250</td>
+                  <td className="border border-border p-3">Team Size</td>
+                  <td className="border border-border p-3 text-center">12</td>
+                  <td className="border border-border p-3 text-center">18</td>
+                  <td className="border border-border p-3 text-center">28</td>
+                  <td className="border border-border p-3 text-center">45</td>
+                  <td className="border border-border p-3 text-center">65</td>
                 </tr>
                 <tr>
-                  <td className="border border-border p-3">Employees</td>
-                  <td className="border border-border p-3 text-center">47</td>
-                  <td className="border border-border p-3 text-center">72</td>
+                  <td className="border border-border p-3">Monthly Burn ($K)</td>
+                  <td className="border border-border p-3 text-center">85</td>
                   <td className="border border-border p-3 text-center">125</td>
                   <td className="border border-border p-3 text-center">185</td>
-                  <td className="border border-border p-3 text-center">245</td>
+                  <td className="border border-border p-3 text-center">285</td>
+                  <td className="border border-border p-3 text-center">380</td>
                 </tr>
               </tbody>
             </table>
@@ -870,68 +916,68 @@ const PitchDeck = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Revenue Drivers</CardTitle>
+                <CardTitle>Revenue Model Validation</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <div className="flex justify-between mb-1">
-                    <span className="text-sm">New Customer Acquisition</span>
-                    <span className="text-sm">60%</span>
+                    <span className="text-sm">Freemium → Paid Conversion</span>
+                    <span className="text-sm">8%</span>
+                  </div>
+                  <Progress value={8} className="h-2" />
+                </div>
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm">Enterprise Pipeline</span>
+                    <span className="text-sm">$2.1M</span>
+                  </div>
+                  <Progress value={35} className="h-2" />
+                </div>
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm">Average Deal Size</span>
+                    <span className="text-sm">$30K</span>
                   </div>
                   <Progress value={60} className="h-2" />
-                </div>
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-sm">Upsell/Cross-sell</span>
-                    <span className="text-sm">25%</span>
-                  </div>
-                  <Progress value={25} className="h-2" />
-                </div>
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-sm">Price Increases</span>
-                    <span className="text-sm">15%</span>
-                  </div>
-                  <Progress value={15} className="h-2" />
                 </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>Key Assumptions</CardTitle>
+                <CardTitle>Key Milestones</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
-                <div>• 15% monthly growth rate (Years 1-2)</div>
-                <div>• 25% annual price increases</div>
-                <div>• 95%+ gross margins at scale</div>
-                <div>• 1.2% monthly churn rate</div>
-                <div>• $25K average contract value</div>
-                <div>• 8:1 LTV/CAC ratio maintained</div>
+                <div>• First paying customers (Q1 2025)</div>
+                <div>• $100K ARR milestone (Q3 2025)</div>
+                <div>• Enterprise sales team (Q4 2025)</div>
+                <div>• $1M ARR milestone (Q2 2026)</div>
+                <div>• Series A fundraise (Q4 2026)</div>
+                <div>• Break-even cash flow (Q2 2028)</div>
               </CardContent>
             </Card>
           </div>
 
           <Card>
             <CardHeader>
-              <CardTitle>Funding History & Valuation</CardTitle>
+              <CardTitle>Current Fundraising Status</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="text-center">
-                  <div className="text-lg font-semibold">Seed (2022)</div>
-                  <div className="text-2xl font-bold text-primary">$2M</div>
-                  <div className="text-sm text-muted-foreground">$8M pre-money</div>
+                  <div className="text-lg font-semibold">Founder Investment</div>
+                  <div className="text-2xl font-bold text-primary">$50K</div>
+                  <div className="text-sm text-muted-foreground">Personal funds</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-semibold">Series A (2024)</div>
-                  <div className="text-2xl font-bold text-primary">$5M</div>
-                  <div className="text-sm text-muted-foreground">$45M pre-money</div>
+                  <div className="text-lg font-semibold">Current Runway</div>
+                  <div className="text-2xl font-bold text-primary">8 months</div>
+                  <div className="text-sm text-muted-foreground">At current burn</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-semibold">Current ARR Multiple</div>
-                  <div className="text-2xl font-bold text-primary">7.1x</div>
-                  <div className="text-sm text-muted-foreground">vs. 12x public comps</div>
+                  <div className="text-lg font-semibold">Seeking</div>
+                  <div className="text-2xl font-bold text-primary">$500K</div>
+                  <div className="text-sm text-muted-foreground">Pre-seed round</div>
                 </div>
               </div>
             </CardContent>
@@ -943,13 +989,13 @@ const PitchDeck = () => {
     // Slide 11: Funding Ask
     {
       title: "Funding Ask",
-      subtitle: "$5M Series A to Scale Go-to-Market",
+      subtitle: "$500K Pre-Seed to Launch Commercial Product",
       content: (
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-center text-2xl">$5,000,000 Series A</CardTitle>
-              <p className="text-center text-muted-foreground">18-month runway to $25M ARR</p>
+              <CardTitle className="text-center text-2xl">$500,000 Pre-Seed</CardTitle>
+              <p className="text-center text-muted-foreground">18-month runway to first revenue & product-market fit</p>
             </CardHeader>
           </Card>
 
@@ -961,37 +1007,37 @@ const PitchDeck = () => {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span>Sales & Marketing (60%)</span>
-                    <span className="font-semibold">$3.0M</span>
+                    <span>Product Development (50%)</span>
+                    <span className="font-semibold">$250K</span>
                   </div>
                   <div className="text-xs text-muted-foreground ml-4">
-                    • 15 sales reps & 8 marketing specialists<br/>
-                    • Enterprise sales training & tools<br/>
-                    • Demand generation & events
+                    • 3 additional engineers<br/>
+                    • Production-ready platform<br/>
+                    • Enterprise security features
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span>Product & Engineering (25%)</span>
-                    <span className="font-semibold">$1.25M</span>
+                    <span>Go-to-Market (30%)</span>
+                    <span className="font-semibold">$150K</span>
                   </div>
                   <div className="text-xs text-muted-foreground ml-4">
-                    • 8 additional engineers<br/>
-                    • Advanced ML capabilities<br/>
-                    • Enterprise features & security
+                    • Sales & marketing hire<br/>
+                    • Lead generation campaigns<br/>
+                    • Industry conference presence
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span>Operations & Infrastructure (15%)</span>
-                    <span className="font-semibold">$750K</span>
+                    <span>Operations & Legal (20%)</span>
+                    <span className="font-semibold">$100K</span>
                   </div>
                   <div className="text-xs text-muted-foreground ml-4">
-                    • Customer success team<br/>
-                    • Cloud infrastructure scaling<br/>
-                    • Compliance & security audits
+                    • Legal & compliance setup<br/>
+                    • Cloud infrastructure<br/>
+                    • Working capital
                   </div>
                 </div>
               </CardContent>
@@ -1004,27 +1050,27 @@ const PitchDeck = () => {
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Target className="w-4 h-4 text-primary" />
-                  <span className="text-sm">$25M ARR (3.5x growth)</span>
+                  <span className="text-sm">First paying customers</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="w-4 h-4 text-primary" />
-                  <span className="text-sm">500+ enterprise customers</span>
+                  <span className="text-sm">25+ beta customers</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-primary" />
-                  <span className="text-sm">Break-even on operations</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-primary" />
-                  <span className="text-sm">International expansion (EU)</span>
+                  <span className="text-sm">$100K ARR milestone</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Award className="w-4 h-4 text-primary" />
-                  <span className="text-sm">SOC 2 Type II certification</span>
+                  <span className="text-sm">Patent approval</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-primary" />
+                  <span className="text-sm">SOC 2 Type I compliance</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Rocket className="w-4 h-4 text-primary" />
-                  <span className="text-sm">Series B readiness ($50M round)</span>
+                  <span className="text-sm">Series A readiness</span>
                 </div>
               </CardContent>
             </Card>
@@ -1038,18 +1084,18 @@ const PitchDeck = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="text-center">
                   <div className="text-sm text-muted-foreground">Pre-Money Valuation</div>
-                  <div className="text-2xl font-bold text-primary">$45M</div>
-                  <div className="text-xs text-muted-foreground">6.3x current ARR</div>
+                  <div className="text-2xl font-bold text-primary">$2.5M</div>
+                  <div className="text-xs text-muted-foreground">Post-MVP, patent pending</div>
                 </div>
                 <div className="text-center">
                   <div className="text-sm text-muted-foreground">Post-Money Valuation</div>
-                  <div className="text-2xl font-bold text-primary">$50M</div>
-                  <div className="text-xs text-muted-foreground">10% dilution</div>
+                  <div className="text-2xl font-bold text-primary">$3M</div>
+                  <div className="text-xs text-muted-foreground">16.7% equity stake</div>
                 </div>
                 <div className="text-center">
                   <div className="text-sm text-muted-foreground">Security Type</div>
-                  <div className="text-2xl font-bold text-primary">Preferred</div>
-                  <div className="text-xs text-muted-foreground">Participating, 1x liquidation</div>
+                  <div className="text-2xl font-bold text-primary">SAFE</div>
+                  <div className="text-xs text-muted-foreground">Most Favored Nation</div>
                 </div>
               </div>
             </CardContent>
