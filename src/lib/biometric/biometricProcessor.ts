@@ -2,16 +2,41 @@
 import { supabase } from '@/integrations/supabase/client';
 import { KeyTiming, KeystrokePattern, AuthenticationResult } from '@/lib/types';
 import { BiometricEncryption } from '@/lib/security/encryption';
+import { KeystrokeNeuralNetwork } from '@/lib/ml/KeystrokeNeuralNetwork';
+import { BiometricCache } from '@/lib/caching/BiometricCache';
+import { performanceMonitor } from '@/lib/monitoring/performanceMonitor';
 
 export class BiometricProcessor {
   private static readonly CONFIDENCE_THRESHOLD = 70;
   private static readonly LEARNING_PATTERN_COUNT = 10;
+  private static neuralNetwork: KeystrokeNeuralNetwork;
+  private static cache: BiometricCache;
+
+  static {
+    // Initialize neural network for ML-powered authentication
+    this.neuralNetwork = new KeystrokeNeuralNetwork({
+      inputSize: 15, // Number of features extracted from keystroke patterns
+      hiddenLayers: [32, 16, 8],
+      outputSize: 1,
+      learningRate: 0.001,
+      epochs: 100,
+      batchSize: 32,
+      momentum: 0.9,
+      optimizer: 'adam',
+      regularization: 0.01
+    });
+    
+    // Initialize Redis caching
+    this.cache = BiometricCache.getInstance();
+  }
 
   static async processKeystrokeData(
     timings: KeyTiming[],
     userId: string,
     context: string = 'authentication'
   ): Promise<AuthenticationResult> {
+    const startTime = performance.now();
+    
     try {
       // Create pattern from timings
       const pattern: KeystrokePattern = {
@@ -22,8 +47,18 @@ export class BiometricProcessor {
         context
       };
 
-      // Get user's biometric profile
-      const profile = await this.getBiometricProfile(userId);
+      // Try to get cached profile first
+      let profile = await this.cache.getBiometricProfile(userId);
+      
+      if (!profile) {
+        // Get user's biometric profile from database
+        profile = await this.getBiometricProfile(userId);
+        
+        if (profile) {
+          // Cache the profile for future requests
+          await this.cache.setBiometricProfile(userId, profile);
+        }
+      }
       
       if (!profile) {
         // Create new profile for first-time user
@@ -37,8 +72,8 @@ export class BiometricProcessor {
         };
       }
 
-      // Calculate confidence score
-      const confidenceScore = await this.calculateConfidence(pattern, profile);
+      // Calculate confidence score using ML neural network
+      const confidenceScore = await this.calculateMLConfidence(pattern, profile);
       
       // Store the pattern
       await this.storeKeystrokePattern(pattern, profile.id, confidenceScore);
@@ -51,7 +86,7 @@ export class BiometricProcessor {
         await this.updateProfileLearning(profile.id, profile.pattern_count + 1);
       }
 
-      return {
+      const result: AuthenticationResult = {
         success: confidenceScore >= this.CONFIDENCE_THRESHOLD,
         confidenceScore,
         timestamp: Date.now(),
@@ -63,7 +98,21 @@ export class BiometricProcessor {
           description: `Keystroke pattern anomaly detected. Confidence: ${confidenceScore}%`
         } : undefined
       };
+
+      // Record performance metrics
+      const processingTime = performance.now() - startTime;
+      performanceMonitor.recordBiometricProcessingTime(processingTime);
+      
+      // Log if processing time exceeds 50ms target
+      if (processingTime > 50) {
+        console.warn(`⚠️ Biometric processing exceeded 50ms target: ${processingTime.toFixed(2)}ms`);
+      }
+
+      return result;
     } catch (error) {
+      const processingTime = performance.now() - startTime;
+      performanceMonitor.recordBiometricProcessingTime(processingTime);
+      
       console.error('Error processing keystroke data:', error);
       return {
         success: false,
@@ -110,8 +159,56 @@ export class BiometricProcessor {
     }
   }
 
-  private static async calculateConfidence(pattern: KeystrokePattern, profile: any): Promise<number> {
-    // Simplified confidence calculation - in production this would use ML models
+  /**
+   * ML-powered confidence calculation using neural network
+   */
+  private static async calculateMLConfidence(pattern: KeystrokePattern, profile: any): Promise<number> {
+    try {
+      // Try to get cached training data first
+      let trainingData = await this.cache.getTrainingData(pattern.userId);
+      
+      if (!trainingData) {
+        // Get training data from database
+        const { data: existingPatterns } = await supabase
+          .from('keystroke_patterns')
+          .select('pattern_data, confidence_score')
+          .eq('biometric_profile_id', profile.id)
+          .limit(100);
+
+        if (!existingPatterns || existingPatterns.length === 0) {
+          return 85; // New user gets high initial confidence
+        }
+
+        // Prepare training data for neural network
+        trainingData = existingPatterns.map(p => ({
+          pattern: p.pattern_data,
+          confidence: p.confidence_score
+        }));
+
+        // Cache training data
+        await this.cache.setTrainingData(pattern.userId, trainingData);
+      }
+
+      // Use neural network for prediction
+      const mlResult = await this.neuralNetwork.predict(pattern);
+      
+      // Combine ML confidence with rule-based confidence for robustness
+      const traditionalConfidence = await this.calculateTraditionalConfidence(pattern, profile);
+      
+      // Weighted combination: 70% ML, 30% traditional
+      const combinedConfidence = (mlResult.confidence * 0.7) + (traditionalConfidence * 0.3);
+      
+      return Math.max(0, Math.min(100, combinedConfidence));
+    } catch (error) {
+      console.error('ML confidence calculation failed, falling back to traditional method:', error);
+      return await this.calculateTraditionalConfidence(pattern, profile);
+    }
+  }
+
+  /**
+   * Traditional confidence calculation as fallback
+   */
+  private static async calculateTraditionalConfidence(pattern: KeystrokePattern, profile: any): Promise<number> {
     const { data: existingPatterns } = await supabase
       .from('keystroke_patterns')
       .select('pattern_data')

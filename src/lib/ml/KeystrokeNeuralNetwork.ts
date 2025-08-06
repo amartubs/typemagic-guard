@@ -10,9 +10,11 @@ export interface NeuralNetworkConfig {
   hiddenLayers: number[];
   outputSize: number;
   learningRate: number;
-  momentum: number;
   epochs: number;
   batchSize: number;
+  momentum?: number;
+  optimizer?: 'sgd' | 'adam';
+  regularization?: number;
 }
 
 export interface TrainingData {
@@ -37,7 +39,12 @@ export class KeystrokeNeuralNetwork {
   private errors: number[][];
 
   constructor(config: NeuralNetworkConfig) {
-    this.config = config;
+    this.config = {
+      momentum: 0.9,
+      optimizer: 'sgd',
+      regularization: 0.01,
+      ...config
+    };
     this.initializeNetwork();
   }
 
@@ -262,7 +269,7 @@ export class KeystrokeNeuralNetwork {
         // Update weights
         for (let input = 0; input < this.weights[layer][neuron].length; input++) {
           const weightDelta = this.config.learningRate * this.errors[layer + 1][neuron] * this.activations[layer][input];
-          const momentumTerm = this.config.momentum * this.previousWeightDeltas[layer][neuron][input];
+          const momentumTerm = (this.config.momentum || 0.9) * this.previousWeightDeltas[layer][neuron][input];
           
           this.weights[layer][neuron][input] += weightDelta + momentumTerm;
           this.previousWeightDeltas[layer][neuron][input] = weightDelta;
@@ -270,7 +277,7 @@ export class KeystrokeNeuralNetwork {
         
         // Update biases
         const biasDelta = this.config.learningRate * this.errors[layer + 1][neuron];
-        const biasMomentum = this.config.momentum * this.previousBiasDeltas[layer][neuron];
+        const biasMomentum = (this.config.momentum || 0.9) * this.previousBiasDeltas[layer][neuron];
         
         this.biases[layer][neuron] += biasDelta + biasMomentum;
         this.previousBiasDeltas[layer][neuron] = biasDelta;
