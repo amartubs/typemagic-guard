@@ -51,6 +51,17 @@ export interface ScalabilityMetrics {
   };
 }
 
+interface TestPhaseResult {
+  maxUsers: number;
+  throughput: number;
+  avgResponseTime: number;
+  p95ResponseTime: number;
+  p99ResponseTime: number;
+  errorRate: number;
+  throughputData: Array<{ timestamp: number; throughput: number }>;
+  responseTimeData: Array<{ timestamp: number; responseTime: number }>;
+}
+
 export class LoadTester {
   private static activeTests: Map<string, {
     config: LoadTestConfig;
@@ -131,9 +142,13 @@ export class LoadTester {
         throughputOverTime: [...rampUpResults.throughputData, ...sustainedResults.throughputData, ...spikeResults.throughputData],
         responseTimeOverTime: [...rampUpResults.responseTimeData, ...sustainedResults.responseTimeData, ...spikeResults.responseTimeData],
         resourceUtilization: resourceMetrics,
-        bottlenecks: this.identifyBottlenecks(resourceMetrics, combinedResults),
-        recommendations: this.generateRecommendations(resourceMetrics, combinedResults)
+        bottlenecks: [],
+        recommendations: []
       };
+
+      // Calculate bottlenecks and recommendations after the object is created
+      combinedResults.bottlenecks = this.identifyBottlenecks(resourceMetrics, combinedResults);
+      combinedResults.recommendations = this.generateRecommendations(resourceMetrics, combinedResults);
 
       this.activeTests.delete(testId);
       
@@ -306,15 +321,7 @@ export class LoadTester {
   }
 
   // Private helper methods
-  private static async runRampUpTest(config: LoadTestConfig): Promise<{
-    maxUsers: number;
-    throughput: number;
-    avgResponseTime: number;
-    p95ResponseTime: number;
-    errorRate: number;
-    throughputData: Array<{ timestamp: number; throughput: number }>;
-    responseTimeData: Array<{ timestamp: number; responseTime: number }>;
-  }> {
+  private static async runRampUpTest(config: LoadTestConfig): Promise<TestPhaseResult> {
     const duration = config.rampUpTime * 1000;
     const interval = 1000; // 1 second intervals
     const steps = duration / interval;
@@ -380,15 +387,7 @@ export class LoadTester {
     };
   }
 
-  private static async runSustainedLoadTest(config: LoadTestConfig): Promise<{
-    maxUsers: number;
-    throughput: number;
-    avgResponseTime: number;
-    p95ResponseTime: number;
-    errorRate: number;
-    throughputData: Array<{ timestamp: number; throughput: number }>;
-    responseTimeData: Array<{ timestamp: number; responseTime: number }>;
-  }> {
+  private static async runSustainedLoadTest(config: LoadTestConfig): Promise<TestPhaseResult> {
     const duration = config.testDuration * 1000;
     const interval = 10000; // 10 second intervals
     const steps = duration / interval;
@@ -433,6 +432,7 @@ export class LoadTester {
     const avgResponseTime = responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length;
     const sortedTimes = responseTimes.sort((a, b) => a - b);
     const p95ResponseTime = sortedTimes[Math.floor(sortedTimes.length * 0.95)];
+    const p99ResponseTime = sortedTimes[Math.floor(sortedTimes.length * 0.99)];
     const errorRate = failedRequests / totalRequests;
 
     return {
@@ -440,21 +440,14 @@ export class LoadTester {
       throughput: totalRequests / (duration / 1000),
       avgResponseTime,
       p95ResponseTime,
+      p99ResponseTime,
       errorRate,
       throughputData,
       responseTimeData
     };
   }
 
-  private static async runSpikeTest(config: LoadTestConfig): Promise<{
-    maxUsers: number;
-    throughput: number;
-    avgResponseTime: number;
-    p95ResponseTime: number;
-    errorRate: number;
-    throughputData: Array<{ timestamp: number; throughput: number }>;
-    responseTimeData: Array<{ timestamp: number; responseTime: number }>;
-  }> {
+  private static async runSpikeTest(config: LoadTestConfig): Promise<TestPhaseResult> {
     // Spike to 10x normal load for 1 minute
     const spikeMultiplier = 10;
     const spikeDuration = 60000; // 1 minute
@@ -493,6 +486,7 @@ export class LoadTester {
     const avgResponseTime = responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length;
     const sortedTimes = responseTimes.sort((a, b) => a - b);
     const p95ResponseTime = sortedTimes[Math.floor(sortedTimes.length * 0.95)];
+    const p99ResponseTime = sortedTimes[Math.floor(sortedTimes.length * 0.99)];
     const errorRate = failedRequests / requests.length;
     const actualDuration = Date.now() - startTime;
 
@@ -501,6 +495,7 @@ export class LoadTester {
       throughput: requests.length / (actualDuration / 1000),
       avgResponseTime,
       p95ResponseTime,
+      p99ResponseTime,
       errorRate,
       throughputData: [{ timestamp: Date.now(), throughput: requests.length / (actualDuration / 1000) }],
       responseTimeData: [{ timestamp: Date.now(), responseTime: avgResponseTime }]
@@ -597,7 +592,7 @@ export class LoadTester {
 
   private static identifyBottlenecks(
     resourceMetrics: { cpu: number[]; memory: number[]; network: number[] },
-    results: Partial<LoadTestResults>
+    results: LoadTestResults
   ): string[] {
     const bottlenecks: string[] = [];
     
@@ -608,15 +603,15 @@ export class LoadTester {
     if (avgCpu > 80) bottlenecks.push('High CPU utilization');
     if (avgMemory > 7) bottlenecks.push('High memory usage');
     if (avgNetwork > 400) bottlenecks.push('Network bandwidth saturation');
-    if ((results.p95ResponseTime || 0) > 50) bottlenecks.push('Response time exceeds target');
-    if ((results.errorRate || 0) > 0.01) bottlenecks.push('High error rate');
+    if (results.p95ResponseTime > 50) bottlenecks.push('Response time exceeds target');
+    if (results.errorRate > 0.01) bottlenecks.push('High error rate');
 
     return bottlenecks;
   }
 
   private static generateRecommendations(
     resourceMetrics: { cpu: number[]; memory: number[]; network: number[] },
-    results: Partial<LoadTestResults>
+    results: LoadTestResults
   ): string[] {
     const recommendations: string[] = [];
     
@@ -626,10 +621,10 @@ export class LoadTester {
     if (resourceMetrics.memory.some(val => val > 7)) {
       recommendations.push('Implement memory caching and optimization');
     }
-    if ((results.errorRate || 0) > 0.01) {
+    if (results.errorRate > 0.01) {
       recommendations.push('Improve error handling and retry mechanisms');
     }
-    if ((results.p95ResponseTime || 0) > 50) {
+    if (results.p95ResponseTime > 50) {
       recommendations.push('Optimize critical path performance');
     }
 
