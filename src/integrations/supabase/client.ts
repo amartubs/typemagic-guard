@@ -12,6 +12,16 @@ console.log('Supabase configuration:', {
   timestamp: new Date().toISOString()
 });
 
+// Clear any potential Firebase conflicts from browser storage
+if (typeof window !== 'undefined') {
+  Object.keys(localStorage).forEach(key => {
+    if (key.includes('firebase') || key.includes('Firebase')) {
+      console.log('Removing Firebase storage item:', key);
+      localStorage.removeItem(key);
+    }
+  });
+}
+
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     storage: localStorage,
