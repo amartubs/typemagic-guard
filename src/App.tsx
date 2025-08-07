@@ -3,7 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/auth';
-import ReactReadyWrapper from '@/components/ReactReadyWrapper';
+
 import Index from '@/pages/Index';
 import Demo from '@/pages/Demo';
 import DemoEnvironment from '@/pages/DemoEnvironment';
@@ -46,8 +46,7 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <ErrorBoundary>
-      <ReactReadyWrapper>
-        <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
           <Router>
             <AuthProvider>
               <AccessibleWrapper
@@ -192,7 +191,6 @@ function App() {
             </AuthProvider>
           </Router>
         </QueryClientProvider>
-      </ReactReadyWrapper>
     </ErrorBoundary>
   );
 }
