@@ -4,6 +4,8 @@ import { CDNIntegration } from '@/components/infrastructure/CDNIntegration';
 import { AutoScalingDashboard } from '@/components/infrastructure/AutoScalingDashboard';
 import { PerformanceMonitoringDashboard } from '@/components/performance/PerformanceMonitoringDashboard';
 import { IntegrationStatus } from '@/components/integration/IntegrationStatus';
+import { ProductionScalingDashboard } from '@/components/infrastructure/ProductionScalingDashboard';
+import { EnhancedBiometricMonitor } from '@/components/monitoring/EnhancedBiometricMonitor';
 import SEOHead from '@/components/seo/SEOHead';
 
 const Infrastructure: React.FC = () => {
@@ -23,15 +25,25 @@ const Infrastructure: React.FC = () => {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="cdn">CDN Management</TabsTrigger>
+            <TabsTrigger value="production">Production</TabsTrigger>
+            <TabsTrigger value="biometric">Biometric ML</TabsTrigger>
+            <TabsTrigger value="cdn">CDN</TabsTrigger>
             <TabsTrigger value="scaling">Auto-Scaling</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
             <IntegrationStatus />
+          </TabsContent>
+
+          <TabsContent value="production" className="space-y-6">
+            <ProductionScalingDashboard />
+          </TabsContent>
+
+          <TabsContent value="biometric" className="space-y-6">
+            <EnhancedBiometricMonitor />
           </TabsContent>
 
           <TabsContent value="cdn" className="space-y-6">
