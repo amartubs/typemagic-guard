@@ -15,10 +15,10 @@ const VALUE_PROPOSITION_TEST = {
 };
 
 const ValuePropositionTest = () => {
-  const variant = useABTest(VALUE_PROPOSITION_TEST);
+  const { selectedVariant } = useABTest(VALUE_PROPOSITION_TEST);
 
   const getValueProposition = () => {
-    switch (variant) {
+    switch (selectedVariant) {
       case 'security_focused':
         return {
           headline: 'Unbreakable Security Through Keystroke DNA',

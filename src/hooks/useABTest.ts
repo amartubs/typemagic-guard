@@ -47,7 +47,27 @@ export const useABTest = (test: ABTest) => {
     }
   }, [test]);
 
-  return selectedVariant;
+  const trackTestResult = (metric: string, value: number, context?: Record<string, any>) => {
+    trackEvent('ab_test_result', {
+      test_id: test.testId,
+      variant_id: selectedVariant,
+      metric,
+      value,
+      context,
+      timestamp: new Date().toISOString()
+    });
+  };
+
+  const getTestResults = () => {
+    const results = JSON.parse(localStorage.getItem('ab_test_results') || '[]');
+    return results.filter((result: any) => result.test_id === test.testId);
+  };
+
+  return {
+    selectedVariant,
+    trackTestResult,
+    getTestResults
+  };
 };
 
 const trackEvent = (eventName: string, properties: Record<string, any>) => {
