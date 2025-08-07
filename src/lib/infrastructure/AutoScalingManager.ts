@@ -468,7 +468,7 @@ export class AutoScalingManager {
   /**
    * Collect current system metrics
    */
-  private async collectMetrics(): Promise<ScalingMetrics> {
+  async collectMetrics(): Promise<ScalingMetrics> {
     // Simulate metric collection
     // In production, this would integrate with monitoring systems
     
