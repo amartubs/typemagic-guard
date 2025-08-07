@@ -1487,7 +1487,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_performance_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          table_name: string
+          total_size: string
+          index_size: string
+        }[]
+      }
     }
     Enums: {
       biometric_status: "learning" | "active" | "locked"
