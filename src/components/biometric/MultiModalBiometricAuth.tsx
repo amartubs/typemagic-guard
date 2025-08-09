@@ -19,6 +19,7 @@ import {
 import { multiModalProcessor } from '@/lib/biometric/multiModalProcessor';
 import { deviceFingerprinting } from '@/lib/biometric/deviceFingerprinting';
 import KeystrokeCapture from '@/components/ui-custom/KeystrokeCapture';
+import { useAuth } from '@/contexts/auth';
 
 interface MultiModalBiometricAuthProps {
   mode: 'training' | 'verification';
@@ -44,6 +45,7 @@ const MultiModalBiometricAuth: React.FC<MultiModalBiometricAuthProps> = ({
   userEmail = 'demo@example.com'
 }) => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isCapturing, setIsCapturing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<any>(null);
@@ -127,7 +129,8 @@ const MultiModalBiometricAuth: React.FC<MultiModalBiometricAuthProps> = ({
 
     try {
       // Start multi-modal capture
-      await multiModalProcessor.startCapture(userEmail);
+      const resolvedUserId = user?.id || userEmail;
+      await multiModalProcessor.startCapture(resolvedUserId);
       
       // Simulate progress
       const progressInterval = setInterval(() => {
@@ -165,7 +168,8 @@ const MultiModalBiometricAuth: React.FC<MultiModalBiometricAuthProps> = ({
       setModalities(prev => prev.map(m => ({ ...m, status: 'analyzing' as const })));
 
       // Stop capture and analyze
-      const authResult = await multiModalProcessor.stopCaptureAndAnalyze(userEmail);
+      const resolvedUserId = user?.id || userEmail;
+      const authResult = await multiModalProcessor.stopCaptureAndAnalyze(resolvedUserId);
       
       // Update modality status with results
       setModalities(prev => prev.map(modality => {

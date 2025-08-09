@@ -115,58 +115,121 @@ export class MultiModalBiometricProcessor {
   }
 
   private async analyzeTouchPatterns(userId: string, patterns: TouchPattern[], deviceFingerprint: string): Promise<number> {
-    // Store patterns and calculate confidence
     const biometricProfileId = await this.getBiometricProfileId(userId);
-    
+
+    // Compute simple stability-based score
+    const speeds: number[] = patterns.map(p => {
+      if (p.type === 'swipe' && typeof p.velocity === 'number') return Math.max(0, p.velocity);
+      const dur = Math.max(1, p.duration);
+      return 1 / dur; // taps -> inverse of duration
+    });
+    const avg = speeds.length ? speeds.reduce((a, b) => a + b, 0) / speeds.length : 0;
+    const variance = speeds.length ? speeds.reduce((s, v) => s + Math.pow(v - avg, 2), 0) / speeds.length : 0;
+    const std = Math.sqrt(variance);
+    const stability = avg > 0 ? Math.max(0, 1 - std / avg) : 0;
+    const sessionScore = Math.round(Math.min(95, Math.max(40, 50 + stability * 40 + Math.min(patterns.length, 10))));
+
     for (const pattern of patterns) {
-      await supabase.from('touch_patterns').insert({
+      const { error } = await supabase.from('touch_patterns').insert({
         user_id: userId,
         biometric_profile_id: biometricProfileId,
         pattern_type: pattern.type,
-        pattern_data: pattern as any, // Cast to Json type
+        pattern_data: pattern as any,
         device_fingerprint: deviceFingerprint,
-        context: pattern.context
+        context: pattern.context,
+        confidence_score: sessionScore
       });
+      if (error) console.warn('Failed to insert touch pattern', error.message);
     }
 
-    // Simplified confidence calculation - would use ML in production
-    return Math.random() * 40 + 50; // 50-90% confidence
+    return sessionScore;
   }
 
   private async analyzeMousePatterns(userId: string, patterns: MousePattern[], deviceFingerprint: string): Promise<number> {
-    // Store patterns and calculate confidence
     const biometricProfileId = await this.getBiometricProfileId(userId);
-    
+
+    // Compute per-pattern scores and store
+    const perScores: number[] = [];
     for (const pattern of patterns) {
-      await supabase.from('mouse_patterns').insert({
+      let score = 65; // baseline
+      if ((pattern as any).straightness !== undefined) {
+        const m = pattern as any;
+        const straightness = Math.max(0, Math.min(1, m.straightness));
+        const jerk = Math.abs(m.jerk || 0);
+        const smoothness = Math.max(0, 1 - Math.min(jerk / 0.02, 1));
+        score = Math.round(40 + straightness * 40 + smoothness * 20);
+      }
+      perScores.push(score);
+      const { error } = await supabase.from('mouse_patterns').insert({
         user_id: userId,
         biometric_profile_id: biometricProfileId,
         pattern_type: pattern.type,
-        pattern_data: pattern as any, // Cast to Json type
+        pattern_data: pattern as any,
         device_fingerprint: deviceFingerprint,
-        context: pattern.context
+        context: pattern.context,
+        confidence_score: score
       });
+      if (error) console.warn('Failed to insert mouse pattern', error.message);
     }
 
-    return Math.random() * 40 + 50;
+    const avgScore = perScores.length ? Math.round(perScores.reduce((a, b) => a + b, 0) / perScores.length) : 60;
+    return Math.min(95, Math.max(40, avgScore));
   }
 
   private async analyzeBehavioralPatterns(userId: string, patterns: BehavioralPattern[], deviceFingerprint: string): Promise<number> {
-    // Store patterns and calculate confidence
     const biometricProfileId = await this.getBiometricProfileId(userId);
-    
+
+    // Compute session score from observed behavioral patterns
+    const scores: number[] = [];
     for (const pattern of patterns) {
-      await supabase.from('behavioral_patterns').insert({
+      try {
+        if (pattern.type === 'timing') {
+          const data = (pattern as any).data || {};
+          const rhythm: number[] = Array.isArray(data.typingRhythm) ? data.typingRhythm : [];
+          const mean = rhythm.length ? rhythm.reduce((a, b) => a + b, 0) / rhythm.length : 0;
+          const variance = rhythm.length ? rhythm.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / rhythm.length : 0;
+          const std = Math.sqrt(variance);
+          const cv = mean > 0 ? Math.min(1, std / mean) : 0.5;
+          const activityLevel = (data.activityLevel || 'medium') as 'low' | 'medium' | 'high';
+          const activityMap: Record<string, number> = { low: 0.5, medium: 0.7, high: 0.9 };
+          const freqPerMin = (data.typingRhythm?.length || 0) / Math.max(1, (data.sessionDuration || 60000) / 60000);
+          const score = 45 + (activityMap[activityLevel] || 0.7) * 30 + (1 - cv) * 20 + Math.min(5, freqPerMin);
+          scores.push(score);
+        } else if (pattern.type === 'network') {
+          const ns = Math.max(0, Math.min(1, (pattern as any).data?.networkStability ?? 0.5));
+          scores.push(50 + ns * 40);
+        } else if (pattern.type === 'location') {
+          const lc = Math.max(0, Math.min(1, (pattern as any).data?.locationConsistency ?? 0.5));
+          scores.push(50 + lc * 35);
+        } else if (pattern.type === 'app_usage') {
+          const freq = Math.max(0, (pattern as any).data?.interactionFrequency ?? 0);
+          const norm = Math.min(1, freq / 20);
+          scores.push(45 + norm * 45);
+        }
+      } catch (e) {
+        console.warn('Behavioral scoring fallback', e);
+      }
+    }
+
+    const sessionScore = scores.length
+      ? Math.round(Math.min(95, Math.max(40, scores.reduce((a, b) => a + b, 0) / scores.length)))
+      : 60;
+
+    // Store patterns with computed confidence
+    for (const pattern of patterns) {
+      const { error } = await supabase.from('behavioral_patterns').insert({
         user_id: userId,
         biometric_profile_id: biometricProfileId,
         pattern_type: pattern.type,
-        pattern_data: pattern.data as any, // Cast to Json type
+        pattern_data: (pattern as any).data as any,
         device_fingerprint: deviceFingerprint,
-        context: pattern.context
+        context: pattern.context,
+        confidence_score: sessionScore
       });
+      if (error) console.warn('Failed to insert behavioral pattern', error.message);
     }
 
-    return Math.random() * 30 + 60; // Behavioral is typically more reliable
+    return sessionScore;
   }
 
   private calculateCombinedScore(scores: any, modalities: string[]) {
