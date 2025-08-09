@@ -296,12 +296,12 @@ const getAlertClassName = (severity: string): string => {
 
 async function fetchSystemMetrics(): Promise<SystemMetrics> {
   try {
-    // Fetch total users
+    // Profiles visible to current user (RLS enforced)
     const { count: totalUsers } = await supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true });
 
-    // Fetch profile statistics
+    // Biometric profile for current user (RLS enforced)
     const { data: profiles } = await supabase
       .from('biometric_profiles')
       .select('status, confidence_score');
@@ -310,19 +310,40 @@ async function fetchSystemMetrics(): Promise<SystemMetrics> {
     const learningProfiles = profiles?.filter(p => p.status === 'learning').length || 0;
     const lockedProfiles = profiles?.filter(p => p.status === 'locked').length || 0;
 
-    const avgConfidenceScore = profiles?.length ? 
-      profiles.reduce((sum, p) => sum + (p.confidence_score || 0), 0) / profiles.length : 0;
+    const avgConfidenceScore = profiles?.length
+      ? profiles.reduce((sum, p) => sum + (p.confidence_score || 0), 0) / profiles.length
+      : 0;
 
-    // Mock data for other metrics (would be replaced with real queries)
+    // Attempts in the last 24h (RLS ensures only current user's data)
+    const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: attempts } = await supabase
+      .from('multimodal_auth_attempts')
+      .select('success')
+      .gte('created_at', since24h)
+      .order('created_at', { ascending: false });
+
+    const totalAttempts = attempts?.length || 0;
+    const successAttempts = attempts?.filter(a => a.success).length || 0;
+    const failAttempts = totalAttempts - successAttempts;
+    const systemUptime = totalAttempts > 0 ? Math.round((successAttempts / totalAttempts) * 100) : 100;
+
+    // Patterns processed today (simple volume proxy)
+    const sinceToday = new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
+    const [{ count: keyCount }, { count: mouseCount }, { count: behCount }] = await Promise.all([
+      supabase.from('keystroke_patterns').select('*', { count: 'exact', head: true }).gte('created_at', sinceToday),
+      supabase.from('mouse_patterns').select('*', { count: 'exact', head: true }).gte('created_at', sinceToday),
+      supabase.from('behavioral_patterns').select('*', { count: 'exact', head: true }).gte('created_at', sinceToday)
+    ]);
+
     return {
       totalUsers: totalUsers || 0,
       activeProfiles,
       learningProfiles,
       lockedProfiles,
       avgConfidenceScore: Math.round(avgConfidenceScore),
-      fraudDetections: 3, // Mock data
-      systemUptime: 99.9, // Mock data
-      dataProcessed: 1247 // Mock data
+      fraudDetections: failAttempts,
+      systemUptime,
+      dataProcessed: (keyCount || 0) + (mouseCount || 0) + (behCount || 0)
     };
   } catch (error) {
     console.error('Error fetching system metrics:', error);
@@ -340,23 +361,41 @@ async function fetchSystemMetrics(): Promise<SystemMetrics> {
 }
 
 async function fetchSecurityAlerts(): Promise<SecurityAlert[]> {
-  // Mock data - in a real app, this would fetch from a security_alerts table
-  return [
-    {
-      id: '1',
-      severity: 'medium',
-      description: 'Unusual login pattern detected from IP 192.168.1.100',
-      timestamp: new Date().toISOString(),
-      status: 'active'
-    },
-    {
-      id: '2',
-      severity: 'low',
-      description: 'Failed biometric verification attempt',
-      timestamp: new Date(Date.now() - 3600000).toISOString(),
-      status: 'resolved'
-    }
-  ];
+  try {
+    const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data, error } = await supabase
+      .from('multimodal_auth_attempts')
+      .select('id, risk_score, anomaly_details, created_at, success')
+      .gte('created_at', since24h)
+      .eq('success', false)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    const alerts: SecurityAlert[] = (data || []).map((row: any) => {
+      const risk = Number(row.risk_score) || 0;
+      let severity: SecurityAlert['severity'] = 'low';
+      if (risk >= 80) severity = 'critical';
+      else if (risk >= 60) severity = 'high';
+      else if (risk >= 40) severity = 'medium';
+
+      const isRecent = Date.now() - new Date(row.created_at).getTime() < 60 * 60 * 1000;
+      const description = row.anomaly_details?.reason || `Authentication failed with risk score ${risk}`;
+
+      return {
+        id: row.id,
+        severity,
+        description,
+        timestamp: row.created_at,
+        status: isRecent ? 'active' : 'resolved'
+      };
+    });
+
+    return alerts;
+  } catch (e) {
+    console.error('Error fetching security alerts', e);
+    return [];
+  }
 }
 
 export default AdminDashboard;

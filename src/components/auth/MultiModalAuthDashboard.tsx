@@ -43,11 +43,11 @@ const MODALITY_ICONS = {
 };
 
 const MODALITY_COLORS = {
-  keystroke: '#9b87f5',
-  mouse: '#7E69AB',
-  touch: '#6E59A5',
-  behavioral: '#D6BCFA',
-  device: '#E879F9'
+  keystroke: 'hsl(var(--primary))',
+  mouse: 'hsl(var(--secondary))',
+  touch: 'hsl(var(--accent))',
+  behavioral: 'hsl(var(--muted-foreground))',
+  device: 'hsl(var(--ring))'
 };
 
 export const MultiModalAuthDashboard = () => {
@@ -96,11 +96,44 @@ export const MultiModalAuthDashboard = () => {
   const recentAttempts = analytics?.recent_attempts || [];
   const recommendations = analytics?.learning_recommendations || [];
 
-  const modalityData = profile?.modalities.map((modality: BiometricModality) => ({
-    modality,
-    weight: Math.round((profile.confidence_weights[modality] || 0) * 100),
-    performance: Math.round(Math.random() * 30 + 70) // Simulated performance
-  })) || [];
+const modalityData = (() => {
+  const modalities: BiometricModality[] = profile?.modalities || [];
+  const attempts = recentAttempts as any[];
+  const totalAttempts = attempts.length || 0;
+
+  return modalities.map((modality) => {
+    const weight = Math.round((profile?.confidence_weights?.[modality] || 0) * 100);
+
+    const scores: number[] = attempts
+      .map((a: any) => {
+        const raw = a.individual_scores?.[modality];
+        if (typeof raw !== 'number') return null;
+        const pct = raw <= 1 ? raw * 100 : raw;
+        return Math.max(0, Math.min(100, pct));
+      })
+      .filter((v: number | null): v is number => v !== null);
+
+    const performance = scores.length
+      ? Math.round(scores.reduce((s, v) => s + v, 0) / scores.length)
+      : 0;
+
+    let consistency = 0;
+    if (scores.length >= 2) {
+      const mean = scores.reduce((s, v) => s + v, 0) / scores.length;
+      const variance = scores.reduce((acc, v) => acc + Math.pow(v - mean, 2), 0) / scores.length;
+      const std = Math.sqrt(variance);
+      const cv = mean > 0 ? Math.min(1, std / mean) : 1;
+      consistency = Math.round((1 - cv) * 100);
+    } else {
+      consistency = scores.length === 1 ? 80 : 0;
+    }
+
+    const presentCount = scores.length;
+    const reliability = totalAttempts > 0 ? Math.round((presentCount / totalAttempts) * 100) : 0;
+
+    return { modality, weight, performance, consistency, reliability };
+  });
+})();
 
   const confidenceTrendData = recentAttempts.slice(0, 20).reverse().map((attempt, index) => ({
     attempt: index + 1,
@@ -202,7 +235,7 @@ export const MultiModalAuthDashboard = () => {
                     <XAxis dataKey="modality" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="weight" fill="#9b87f5" />
+                    <Bar dataKey="weight" fill="hsl(var(--primary))" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -292,14 +325,14 @@ export const MultiModalAuthDashboard = () => {
                   <Line 
                     type="monotone" 
                     dataKey="confidence" 
-                    stroke="#9b87f5" 
+                    stroke="hsl(var(--primary))" 
                     strokeWidth={2}
                     name="Confidence"
                   />
                   <Line 
                     type="monotone" 
                     dataKey="risk" 
-                    stroke="#ef4444" 
+                    stroke="hsl(var(--destructive))" 
                     strokeWidth={2}
                     name="Risk Score"
                   />
@@ -340,16 +373,16 @@ export const MultiModalAuthDashboard = () => {
                         <div>
                           <p className="text-sm text-muted-foreground">Consistency</p>
                           <div className="flex items-center gap-2">
-                            <Progress value={Math.round(Math.random() * 20 + 75)} className="flex-1" />
-                            <span className="text-sm font-medium">{Math.round(Math.random() * 20 + 75)}%</span>
+                            <Progress value={item.consistency} className="flex-1" />
+                            <span className="text-sm font-medium">{item.consistency}%</span>
                           </div>
                         </div>
                         
                         <div>
                           <p className="text-sm text-muted-foreground">Reliability</p>
                           <div className="flex items-center gap-2">
-                            <Progress value={Math.round(Math.random() * 15 + 80)} className="flex-1" />
-                            <span className="text-sm font-medium">{Math.round(Math.random() * 15 + 80)}%</span>
+                            <Progress value={item.reliability} className="flex-1" />
+                            <span className="text-sm font-medium">{item.reliability}%</span>
                           </div>
                         </div>
                       </div>
