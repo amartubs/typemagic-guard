@@ -7,12 +7,13 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Shield, Activity, CheckCircle, AlertTriangle } from 'lucide-react';
-import { KeyTiming } from '@/lib/types';
+import { BiometricProfile, KeystrokePattern, KeyTiming } from '@/lib/types';
 import { BiometricAnalyzer, KeystrokeCapture } from '@/lib/biometricAuth';
 import { useAuth } from '@/contexts/auth';
 import KeystrokeVisualizer from '@/components/demo/KeystrokeVisualizer';
 import ConfidenceScoreAnimation from '@/components/demo/ConfidenceScoreAnimation';
-
+import { supabase } from '@/integrations/supabase/client';
+import { ContinuousLearningEngine } from '@/lib/biometric/continuousLearning';
 interface EnhancedBiometricAuthProps {
   mode: 'registration' | 'verification';
   onAuthentication: (success: boolean, confidence: number) => void;
@@ -84,27 +85,62 @@ const EnhancedBiometricAuth: React.FC<EnhancedBiometricAuthProps> = ({
   };
 
   const analyzePattern = async () => {
-    if (!user || keystrokes.length < 5) return;
+    if (!user) return;
 
     try {
       const capturedKeystrokes = stopCapture();
-      
-      if (mode === 'registration') {
-        // For registration, we accept the pattern and build confidence
-        const confidence = Math.min(85 + Math.random() * 10, 95);
-        setConfidenceScore(confidence);
-        setAnalysisComplete(true);
-        onAuthentication(true, confidence);
-      } else {
-        // For verification, we simulate checking against stored patterns
-        // In a real implementation, this would use BiometricProcessor
-        const confidence = 70 + Math.random() * 25; // Simulate varying confidence
-        const success = confidence >= 70;
-        
-        setConfidenceScore(confidence);
-        setAnalysisComplete(true);
-        onAuthentication(success, confidence);
+      if (capturedKeystrokes.length < 5) return;
+
+      // Build new pattern from captured keystrokes
+      const newPattern: KeystrokePattern = keystrokeCapture.createPattern(user.id);
+
+      // Fetch existing biometric profile and related patterns
+      const { data: dbProfile, error } = await supabase
+        .from('biometric_profiles')
+        .select(`*, keystroke_patterns(*)`)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Failed to load biometric profile:', error);
       }
+
+      // Reconstruct profile from DB (patterns may be encrypted; if so, they will be learned over time)
+      const existingPatterns: KeystrokePattern[] = (dbProfile?.keystroke_patterns || []).map((kp: any) => ({
+        userId: user.id,
+        patternId: kp.id,
+        timings: kp.pattern_data?.timings || [],
+        timestamp: new Date(kp.created_at).getTime(),
+        context: kp.context || 'unknown'
+      }));
+
+      const profile: BiometricProfile = {
+        userId: user.id,
+        keystrokePatterns: existingPatterns,
+        confidenceScore: dbProfile?.confidence_score || 0,
+        lastUpdated: new Date(dbProfile?.last_updated || Date.now()).getTime(),
+        status: dbProfile?.status || 'learning'
+      };
+
+      // Compute authentication result against existing profile
+      const result = BiometricAnalyzer.authenticate(profile, newPattern);
+
+      // Continuous learning will persist successful/high-confidence attempts and update the profile
+      await ContinuousLearningEngine.updateProfileWithLearning(profile, newPattern, result);
+
+      // Persist authentication attempt for monitoring
+      await supabase.from('authentication_attempts').insert({
+        user_id: user.id,
+        success: result.success,
+        confidence_score: Math.round(result.confidenceScore),
+        pattern_id: null,
+        anomaly_details: result.anomalyDetails || null,
+        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null
+      });
+
+      setConfidenceScore(result.confidenceScore);
+      setAnalysisComplete(true);
+      onAuthentication(result.success, result.confidenceScore);
     } catch (error) {
       console.error('Error analyzing biometric pattern:', error);
       onAuthentication(false, 0);

@@ -4,6 +4,7 @@ import { AdvancedBiometricAnalyzer } from '@/lib/biometric/advancedAnalyzer';
 import { ContinuousLearningEngine } from '@/lib/biometric/continuousLearning';
 import { BiometricProfile, KeystrokePattern, KeyTiming } from '@/lib/types';
 import { supabase } from '@/integrations/supabase/client';
+import { BiometricEncryption } from '@/lib/security/encryption';
 
 export interface UserProfileAnalysis {
   userId: string;
@@ -78,15 +79,36 @@ export const useBiometricMonitorData = () => {
           continue;
         }
         
+        const patterns: KeystrokePattern[] = [];
+        if (dbProfile.keystroke_patterns?.length) {
+          const decryptedPatterns = await Promise.all(
+            dbProfile.keystroke_patterns.map(async (kp: any) => {
+              let timings: KeyTiming[] = [];
+              try {
+                if (kp.pattern_data?.encrypted) {
+                  const decrypted = await BiometricEncryption.decryptBiometricData(kp.pattern_data.encrypted);
+                  timings = decrypted as KeyTiming[];
+                } else if (kp.pattern_data?.timings) {
+                  timings = kp.pattern_data.timings as KeyTiming[];
+                }
+              } catch (e) {
+                console.warn('Failed to decrypt keystroke pattern', kp.id, e);
+              }
+              return {
+                userId: dbProfile.user_id,
+                patternId: kp.id,
+                timings,
+                timestamp: new Date(kp.created_at).getTime(),
+                context: kp.context || 'unknown'
+              } as KeystrokePattern;
+            })
+          );
+          patterns.push(...decryptedPatterns);
+        }
+
         const profile: BiometricProfile = {
           userId: dbProfile.user_id,
-          keystrokePatterns: dbProfile.keystroke_patterns?.map((kp: any) => ({
-            userId: dbProfile.user_id,
-            patternId: kp.id,
-            timings: kp.pattern_data?.timings || [],
-            timestamp: new Date(kp.created_at).getTime(),
-            context: kp.context || 'unknown'
-          })) || [],
+          keystrokePatterns: patterns,
           confidenceScore: dbProfile.confidence_score || 0,
           lastUpdated: new Date(dbProfile.last_updated).getTime(),
           status: dbProfile.status || 'learning'
@@ -94,26 +116,20 @@ export const useBiometricMonitorData = () => {
 
         console.log('Reconstructed profile for user:', profile.userId, 'patterns:', profile.keystrokePatterns.length);
 
-        // Create mock pattern for analysis if no patterns exist
-        const mockTimings: KeyTiming[] = [
-          { key: 'a', pressTime: 0, releaseTime: 100, duration: 100 },
-          { key: 'b', pressTime: 150, releaseTime: 270, duration: 120 },
-          { key: 'c', pressTime: 300, releaseTime: 380, duration: 80 },
-          { key: 'd', pressTime: 420, releaseTime: 620, duration: 200 },
-          { key: 'e', pressTime: 650, releaseTime: 750, duration: 100 }
-        ];
-
-        const mockPattern: KeystrokePattern = {
-          userId: profile.userId,
-          patternId: 'analysis-mock',
-          timings: mockTimings,
-          timestamp: Date.now(),
-          context: 'analysis'
-        };
+        // Use the most recent real pattern for analysis when available
+        const latestPattern: KeystrokePattern = profile.keystrokePatterns.length > 0 ?
+          profile.keystrokePatterns[profile.keystrokePatterns.length - 1] :
+          {
+            userId: profile.userId,
+            patternId: 'no-pattern',
+            timings: [],
+            timestamp: Date.now(),
+            context: 'analysis'
+          };
 
         const analysisResult = AdvancedBiometricAnalyzer.analyzePatternWithFraudDetection(
-          profile, 
-          mockPattern
+          profile,
+          latestPattern
         );
 
         const learningMetrics = ContinuousLearningEngine.calculateLearningMetrics(profile);
